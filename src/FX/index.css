@@ -1,0 +1,77 @@
+#fx {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#fx-app {
+  background: #fff;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+#fx-menu {
+  --menu-size: 44px;
+
+  background: #f0f1f2;
+  color: #32416e;
+  display: flex;
+  height: var(--menu-size);
+  min-height: var(--menu-size);
+  line-height: var(--menu-size);
+  box-shadow: 0 0 0 1px #ddd, 0 0 1em 0 rgba(0, 0, 0, 0.1);
+}
+
+#fx-menu-button {
+  color: #32416e;
+  transition: all 0.25s ease-in;
+}
+#fx-logo {
+  fill: currentColor;
+  width: var(--menu-size);
+  height: var(--menu-size);
+}
+#fx-title {
+  flex: 1 1 auto;
+  padding: 0 1em;
+  font-size: 18px;
+  line-height: var(--menu-size);
+  border: 1px solid #ddd;
+  border-width: 0 1px;
+}
+#fx-version {
+  float: right;
+  margin-bottom: -10px;
+  margin-right: -8px;
+  opacity: 0.3;
+  font-size: 11px;
+}
+#fx-user-button {
+  width: var(--menu-size);
+  height: var(--menu-size);
+  text-align: center;
+  transition: all 0.25s ease-in-out;
+}
+#fx-user-options {
+  margin-right: 2px;
+}
+
+#fx-menu-button.active,
+#fx-user-button.active,
+#fx-menu-button:hover,
+#fx-user-button:hover {
+  background: #32416e;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 400px) {
+  #fx-title {
+    font-size: 14px;
+  }
+  #fx-version,
+  #fx-user-button .name {
+    display: none;
+  }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React Rental</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsforce/1.9.1/jsforce.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/salesforce-lightning-design-system.min.css"
+    />
+  </head>
+  <body style="background: #f0f1f2;padding:0;margin:0">
+    <div
+      id="fx-spinner"
+      style="z-index: 100; background: #ffffff; height: 100vh; display: flex; justify-content: center; align-items: center"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="100"
+        height="100"
+        viewBox="0 0 512 512"
+      >
+        <mask id="icon-fx-ring-mask">
+          <rect x="0" y="0" width="256" height="256" fill="#32416e" />
+        </mask>
+        <path
+          fill="#32416e"
+          d="M164 201h91l43.2 55.3L178 422h45.6L322 286.7l46.4 59.4h47l-70.8-90.3L435 131h-45.7L321 225l-48-61H127v183h37v-73h72.8l14.4-18.5-14.4-18.5H164v-36z"
+        />
+        <path
+          fill="#32416e"
+          d="M256 36C134.5 36 36 134.5 36 256s98.5 220 220 220 220-98.5 220-220S377.5 36 256 36zm0 403c-101 0-183-82-183-183S155 73 256 73s183 82 183 183-82 183-183 183z"
+          mask="url(#icon-fx-ring-mask)"
+          opacity=".5"
+        >
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="rotate"
+            from="0 256 256"
+            to="360 256 256"
+            dur="1s"
+            repeatCount="indefinite"
+          />
+        </path>
+      </svg>
+    </div>
+    <div id="root"></div>
+  </body>
+</html>
