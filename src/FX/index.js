@@ -1,78 +1,43 @@
-import React, { Component } from 'react';
-import { Modal, Header, Button } from 'semantic-ui-react';
-import Connect from './Connect';
-import FxMenu from './FxMenu';
+import React, { useState, useEffect } from 'react';
+import Connect, { useConnection } from './Connect';
 import './index.css';
 
 export * from './Connect';
 
-/** FX container component that provides authentication,
- * standard header navigation, and salesforce connection context
- * @property title - application name displayed in the menu bar
- * @property version - a build number to display in the user menu
- * @property permissions - default permissions required to use the app */
-export default class FxApp extends Component {
-  state = { sessionExpired: false, hasError: false };
+const ConnectionProvider = props => {
+  const [sessionExpired, setSessionExpired] = useState(false);
 
-  componentDidCatch(error, info) {
-    console.error(error, info);
-    this.setState({ hasError: true });
-  }
+  useEffect(() => {
+    if (!sessionExpired) return;
+    window.alert('Session Expired');
+    window.location.reload();
+  }, [sessionExpired]);
 
-  onSessionExpired = () => {
-    this.setState({ sessionExpired: true });
-  };
+  return (
+    <React.StrictMode>
+      <Connect onSessionExpired={() => setSessionExpired(true)}>
+        <FxMenu />
+        <div id="dev-main">{props.children}</div>
+      </Connect>
+    </React.StrictMode>
+  );
+};
 
-  render() {
-    const { title, version, children } = this.props;
-    const { sessionExpired, hasError } = this.state;
+const FxMenu = props => {
+  const connection = useConnection();
+  const { display_name, organization_name } = connection.identity;
 
-    return (
-      <React.StrictMode>
-        <Connect onSessionExpired={this.onSessionExpired}>
-          <div id="fx">
-            <FxMenu title={title} version={version} />
-            <div id="fx-app">{hasError === false && children}</div>
-          </div>
-        </Connect>
+  return (
+    <div id="dev-menu">
+      <svg id="fx-logo" viewBox="-4.5 -5 42 42">
+        <path d="M9.625 17.125v4.75h-2.375v-11.813h0.003v-0.003l9.442-0.002 3.079 3.941 4.357-5.997 2.941-0.008-5.777 7.952 4.535 5.804-3.020-0.008-2.967-3.797-5.988 8.242-2.934-0.003 7.401-10.186-2.784-3.563h-5.913v2.316h4.697l0.928 1.188-0.928 1.187h-4.697z" />
+      </svg>
+      {display_name} - {organization_name}
+      <a href="#logout" onClick={connection.logout}>
+        Logout
+      </a>
+    </div>
+  );
+};
 
-        {hasError && (
-          <Modal open={true} size="tiny" centered={false}>
-            <Header
-              icon="warning sign"
-              content="An Unexpected Error Occurred"
-            />
-            <Modal.Content>
-              Please try again or contact LiquidFrameworks Support for
-              assistance
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                color="green"
-                content="Reload"
-                onClick={() => window.location.reload()}
-              />
-            </Modal.Actions>
-          </Modal>
-        )}
-
-        {sessionExpired && (
-          <Modal open={true} size="tiny" centered={false}>
-            <Header icon="hourglass half" content="Are you still there?" />
-            <Modal.Content>
-              This page has been inactive for a while. Please log in again
-              before continuing so we can verify your identity.
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                color="green"
-                content="Log In"
-                onClick={() => window.location.reload()}
-              />
-            </Modal.Actions>
-          </Modal>
-        )}
-      </React.StrictMode>
-    );
-  }
-}
+export default ConnectionProvider;

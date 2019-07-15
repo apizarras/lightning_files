@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useApi } from '../api';
+import { useLightningContext } from '../contexts/LightningContext';
 
 export default function EquipmentPlanning(props) {
-  const api = useApi();
+  const { api } = useLightningContext();
   const [rows, setRows] = useState(null);
 
   useEffect(() => {
     async function fetchRows() {
-      const soql = await api
+      const result = await api
         .describeFields('FX5__Equipment_Planning__c')
         .then(fieldDescriptions => {
           const fieldList = Object.keys(fieldDescriptions).join(',');
           return `SELECT ${fieldList} FROM FX5__Equipment_Planning__c`;
-        });
-      const result = await api.query(soql);
+        })
+        .then(soql => api.query(soql));
 
       setRows(result);
     }
 
     fetchRows();
-  }, []);
+  }, [api]);
 
   if (!rows) return 'no rows found';
 

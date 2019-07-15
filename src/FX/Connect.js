@@ -19,13 +19,6 @@ const ConnectionContext = createContext();
 /** React hook to access jsforce connection in function components */
 export const useConnection = () => useContext(ConnectionContext);
 
-/** Higher order component to access jsforce connection in class components */
-export const withConnection = Component => props => (
-  <ConnectionContext.Consumer>
-    {connection => <Component {...props} connection={connection} />}
-  </ConnectionContext.Consumer>
-);
-
 /** Component that provides context access to jsforce connection */
 export default function Connect({ onSessionExpired, children }) {
   const [connection, setConnection] = useState();

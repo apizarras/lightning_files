@@ -1,8 +1,4 @@
-import { useLightningContext } from '../contexts/LightningContext';
-
-export const useApi = () => {
-  const { dataService /*, settings, events */ } = useLightningContext();
-
+export default dataService => {
   return {
     describeFields: sobject => dataService.describeFields(sobject),
     query: soql => dataService.query(soql)

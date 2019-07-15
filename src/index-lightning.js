@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { LightningContextProvider } from './api/LightningContext';
+import LightningContextProvider from './contexts/LightningContext';
 
 const init = (containerElement, dataService, settings, events) => {
   ReactDOM.render(

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useApi } from '../api';
+import { useLightningContext } from '../contexts/LightningContext';
 
 export default function FieldList(props) {
-  const api = useApi();
+  const { api } = useLightningContext();
   const [fieldList, setFieldList] = useState(null);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function FieldList(props) {
     }
 
     fetchFields();
-  }, []);
+  }, [api]);
 
   if (!fieldList) return 'no fields found';
 

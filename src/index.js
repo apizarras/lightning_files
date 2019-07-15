@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import FxApp, { useConnection } from './FX';
-import { LightningContextProvider } from './contexts/LightningContext';
+import ConnectionContextProvider, { useConnection } from './FX';
+import LightningContextProvider from './contexts/LightningContext';
 import { dataService, settings, events } from './api/dev';
 
 // stubs out LightningContext params for local dev
@@ -21,10 +21,10 @@ const DevLightningContextProvider = ({ children }) => {
 };
 
 ReactDOM.render(
-  <FxApp>
+  <ConnectionContextProvider>
     <DevLightningContextProvider>
       <App />
     </DevLightningContextProvider>
-  </FxApp>,
+  </ConnectionContextProvider>,
   document.getElementById('root')
 );
