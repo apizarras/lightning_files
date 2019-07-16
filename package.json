@@ -16,7 +16,7 @@
     "react-start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build": "node ./build-config.js",
+    "build": "node ./build-config.js && rm -rf build/assets",
     "deploy": "node ./deploy.js"
   },
   "eslintConfig": {
