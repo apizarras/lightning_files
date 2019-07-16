@@ -16,8 +16,10 @@ export const ConnectionProvider = props => {
   return (
     <React.StrictMode>
       <Connect onSessionExpired={() => setSessionExpired(true)}>
-        <Menu />
-        {props.children}
+        <div style={{ marginTop: 50 }}>
+          <Menu />
+          <div className="slds-is-relative">{props.children}</div>
+        </div>
       </Connect>
     </React.StrictMode>
   );

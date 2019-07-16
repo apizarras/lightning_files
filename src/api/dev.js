@@ -1,5 +1,9 @@
 // dev-only stubs for LightningContext params
 
+export const settings = () => {
+  return {};
+};
+
 export const dataService = connection => {
   return {
     describeFields: sobject =>
@@ -13,10 +17,6 @@ export const dataService = connection => {
   };
 };
 
-export const settings = () => {
-  return {};
-};
-
-export const events = () => {
+export const eventService = () => {
   return {};
 };

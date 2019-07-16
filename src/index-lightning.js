@@ -1,17 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContextProvider } from './contexts/AppContext';
+import { IconSettings } from '@salesforce/design-system-react';
 import App from './App';
 
-export function createComponent(dataService, settings, events) {
+export function createComponent(settings, dataService, eventService) {
   return (
-    <AppContextProvider
-      dataService={dataService}
-      settings={settings}
-      events={events}
-    >
-      <App />
-    </AppContextProvider>
+    <IconSettings iconPath="/assets/icons">
+      <AppContextProvider
+        settings={settings}
+        dataService={dataService}
+        eventService={eventService}
+      >
+        <App />
+      </AppContextProvider>
+    </IconSettings>
   );
 }
 

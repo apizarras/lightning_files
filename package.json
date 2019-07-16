@@ -5,18 +5,19 @@
   "private": true,
   "deploy-path": "../lightning/FX_React_Wrapper/force-app/main/default/staticresources/",
   "dependencies": {
+    "@salesforce-ux/design-system": "^2.9.4",
+    "@salesforce/design-system-react": "^0.10.8",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },
   "scripts": {
-    "start": "npm run react-start",
+    "start": "react-scripts start",
+    "build": "react-app-rewired build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
     "precommit": "pretty-quick --staged",
     "format": "pretty-quick",
-    "react-start": "react-scripts start",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build": "node ./build-config.js && rm -rf build/assets",
     "deploy": "node ./deploy.js"
   },
   "eslintConfig": {
@@ -26,15 +27,12 @@
     "singleQuote": true
   },
   "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
+    "last 2 Chrome versions"
   ],
   "devDependencies": {
     "husky": "3.0.0",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.1",
-    "rewire": "4.0.1"
+    "react-app-rewired": "^2.1.3"
   }
 }
