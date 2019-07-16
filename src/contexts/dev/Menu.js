@@ -11,9 +11,9 @@ const Menu = props => {
         <div className="slds-page-header__col-title">
           <div className="slds-media">
             <div className="slds-media__figure">
-              <span class="slds-icon_container slds-icon-standard-lightning-component">
+              <span className="slds-icon_container slds-icon-standard-lightning-component">
                 <svg
-                  class="slds-icon slds-page-header__icon"
+                  className="slds-icon slds-page-header__icon"
                   aria-hidden="true"
                 >
                   <use xlinkHref="/assets/icons/standard-sprite/svg/symbols.svg#lightning_component"></use>
@@ -34,11 +34,11 @@ const Menu = props => {
             </div>
           </div>
         </div>
-        <div class="slds-page-header__col-actions">
-          <div class="slds-page-header__controls">
-            <div class="slds-page-header__control">
+        <div className="slds-page-header__col-actions">
+          <div className="slds-page-header__controls">
+            <div className="slds-page-header__control">
               <button
-                class="slds-button slds-button_neutral"
+                className="slds-button slds-button_neutral"
                 onClick={() => connection.logout()}
               >
                 Logout
