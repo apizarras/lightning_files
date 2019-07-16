@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Connect from './Connect';
 import Menu from './Menu';
+import { SettingsProvider } from './Settings';
 
 export * from './Connect';
 
@@ -14,13 +15,13 @@ export const ConnectionProvider = props => {
   }, [sessionExpired]);
 
   return (
-    <React.StrictMode>
-      <Connect onSessionExpired={() => setSessionExpired(true)}>
+    <Connect onSessionExpired={() => setSessionExpired(true)}>
+      <SettingsProvider>
         <div style={{ marginTop: 50 }}>
           <Menu />
           <div className="slds-is-relative">{props.children}</div>
         </div>
-      </Connect>
-    </React.StrictMode>
+      </SettingsProvider>
+    </Connect>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useConnection } from './Connect';
+import { DesignAttributesEditor } from './Settings';
 import {
   GlobalHeader,
   GlobalHeaderProfile,
@@ -18,12 +19,18 @@ const Menu = props => {
           <Popover
             body={
               <>
-                <p className="slds-text-heading_small">{organization_name}</p>
-                <Button
-                  variant="base"
-                  label="Log Out"
-                  onClick={() => connection.logout()}
-                />
+                <div className="slds-clearfix">
+                  <p className="slds-text-title slds-p-bottom_medium">
+                    {organization_name}
+                  </p>
+                  <Button
+                    className="slds-float_right"
+                    variant="destructive"
+                    label="Log Out"
+                    onClick={() => connection.logout()}
+                  />
+                </div>
+                <DesignAttributesEditor />
               </>
             }
             id="header-profile-popover-id"
