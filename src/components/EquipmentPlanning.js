@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLightningContext } from '../contexts/LightningContext';
+import { useAppContext } from '../contexts/AppContext';
 
 export default function EquipmentPlanning(props) {
-  const { api } = useLightningContext();
+  const { api } = useAppContext();
   const [rows, setRows] = useState(null);
 
   useEffect(() => {

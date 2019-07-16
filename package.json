@@ -1,4 +1,5 @@
 {
+  "homepage": ".",
   "name": "react_rental",
   "version": "0.1.0",
   "private": true,
@@ -6,8 +7,7 @@
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
-    "rewire": "4.0.1"
+    "react-scripts": "3.0.1"
   },
   "scripts": {
     "start": "npm run react-start",
@@ -32,9 +32,9 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "husky": "3.0.0",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.1",
-    "husky": "3.0.0",
-    "semantic-ui-react": "^0.87.3"
+    "rewire": "4.0.1"
   }
 }

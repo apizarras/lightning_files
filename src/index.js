@@ -1,30 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import ConnectionContextProvider, { useConnection } from './FX';
-import LightningContextProvider from './contexts/LightningContext';
+import { ConnectionProvider, useConnection } from './contexts/dev';
 import { dataService, settings, events } from './api/dev';
+import { createComponent } from './index-lightning';
 
-// stubs out LightningContext params for local dev
-const DevLightningContextProvider = ({ children }) => {
+// stubs out AppContext params for local dev
+const Component = props => {
   const connection = useConnection();
-
-  return (
-    <LightningContextProvider
-      dataService={dataService(connection)}
-      settings={settings()}
-      events={events()}
-    >
-      {children}
-    </LightningContextProvider>
-  );
+  return createComponent(dataService(connection), settings(), events());
 };
 
 ReactDOM.render(
-  <ConnectionContextProvider>
-    <DevLightningContextProvider>
-      <App />
-    </DevLightningContextProvider>
-  </ConnectionContextProvider>,
+  <ConnectionProvider>
+    <Component />
+  </ConnectionProvider>,
   document.getElementById('root')
 );

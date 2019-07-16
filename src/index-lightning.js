@@ -1,19 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { AppContextProvider } from './contexts/AppContext';
 import App from './App';
-import LightningContextProvider from './contexts/LightningContext';
 
-const init = (containerElement, dataService, settings, events) => {
-  ReactDOM.render(
-    <LightningContextProvider
+export function createComponent(dataService, settings, events) {
+  return (
+    <AppContextProvider
       dataService={dataService}
       settings={settings}
       events={events}
     >
       <App />
-    </LightningContextProvider>,
+    </AppContextProvider>
+  );
+}
+
+export function initialize(containerElement, dataService, settings, events) {
+  ReactDOM.render(
+    createComponent(dataService, settings, events),
     containerElement
   );
-};
-
-export { init };
+}
