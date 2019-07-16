@@ -18,9 +18,14 @@ export function createComponent(settings, dataService, eventService) {
   );
 }
 
-export function initialize(containerElement, dataService, settings, events) {
+export function initialize(
+  containerElement,
+  settings,
+  dataService,
+  eventService
+) {
   ReactDOM.render(
-    createComponent(dataService, settings, events),
+    createComponent(settings, dataService, eventService),
     containerElement
   );
 }
