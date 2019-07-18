@@ -4,6 +4,7 @@ import Menu from './Menu';
 import { SettingsProvider } from './Settings';
 
 export * from './Connect';
+export * from './Settings';
 
 export const ConnectionProvider = props => {
   const [sessionExpired, setSessionExpired] = useState(false);

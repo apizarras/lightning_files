@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback
 } from 'react';
-import useEventListener from './useEventListener';
+import useDOMEventListener from './useDOMEventListener';
 
 const SESSION_URL = 'https://login.fieldfx.com/session';
 const LOGIN_URL = 'https://login.fieldfx.com/login';
@@ -27,7 +27,7 @@ export default function Connect({ onSessionExpired, children }) {
     [connection, onSessionExpired]
   );
 
-  useEventListener('visibilitychange', checkSession);
+  useDOMEventListener('visibilitychange', checkSession);
 
   useEffect(() => {
     async function connect() {

@@ -2,17 +2,16 @@
 
 export const dataService = connection => {
   return {
-    describeFields: sobject =>
-      connection.describe(sobject).then(description =>
-        description.fields.reduce((collection, field) => {
-          collection[field.name] = field;
-          return collection;
-        }, {})
-      ),
+    describe: sobject => connection.describe(sobject),
     query: soql => connection.query(soql).then(r => r.records)
   };
 };
 
 export const eventService = () => {
-  return {};
+  return {
+    triggerLightningEvent: action => {
+      // no other lightning components here...just log to console
+      console.info('EVENT TRIGGERED', action);
+    }
+  };
 };

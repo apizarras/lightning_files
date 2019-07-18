@@ -1,6 +1,6 @@
 export function createApi(dataService) {
   return {
-    describeFields: sobject => dataService.describeFields(sobject),
+    describe: sobject => dataService.describe(sobject),
     query: soql => dataService.query(soql)
   };
 }

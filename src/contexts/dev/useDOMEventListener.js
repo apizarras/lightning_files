@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function useEventListener(
+export default function useDOMEventListener(
   eventName,
   handler,
   target = document

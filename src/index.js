@@ -1,16 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ConnectionProvider, useConnection } from './contexts/dev';
-import { useSettings } from './contexts/dev/Settings';
+import { ConnectionProvider, useConnection, useSettings } from './contexts/dev';
 import { dataService, eventService } from './api/dev';
-import { createComponent } from './index-lightning';
+import LightningComponent from './index-lightning';
 
 // stubs out AppContext params for local dev
 const Component = props => {
   const connection = useConnection();
   const settings = useSettings();
 
-  return createComponent(settings, dataService(connection), eventService());
+  return (
+    <LightningComponent
+      settings={settings}
+      dataService={dataService(connection)}
+      eventService={eventService()}
+    />
+  );
 };
 
 ReactDOM.render(

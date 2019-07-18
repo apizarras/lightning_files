@@ -1,6 +1,7 @@
 import React from 'react';
 import { useConnection } from './Connect';
-import { DesignAttributesEditor } from './Settings';
+import DesignAttributesEditor from './DesignAttributesEditor';
+import EventDebugger from './EventDebugger';
 import {
   GlobalHeader,
   GlobalHeaderProfile,
@@ -31,6 +32,7 @@ const Menu = props => {
                   />
                 </div>
                 <DesignAttributesEditor />
+                <EventDebugger />
               </>
             }
             id="header-profile-popover-id"

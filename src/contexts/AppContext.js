@@ -7,14 +7,14 @@ export const useAppContext = () => useContext(AppContext);
 
 export const AppContextProvider = ({
   children,
-  dataService,
   settings,
-  events
+  dataService,
+  eventService
 }) => {
   const api = createApi(dataService);
 
   return (
-    <AppContext.Provider value={{ api, settings, events }}>
+    <AppContext.Provider value={{ api, settings, eventService }}>
       {children}
     </AppContext.Provider>
   );

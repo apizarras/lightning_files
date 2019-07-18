@@ -1,0 +1,16 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="fxl_controller_generic" access="global">
+  <aura:attribute name="TicketRecordTypes" type="String" />
+  <aura:attribute name="ValidPriceBookItemTypes" type="String" />
+  <aura:attribute name="AllowBulkEditHistory" type="Boolean" default="{!true}" />
+  <aura:attribute name="AllowTicketCreate" type="Boolean" default="{!true}" />
+  <aura:attribute name="AllowAddEquipment" type="Boolean" default="{!true}" />
+  <aura:attribute name="AllowAddNonEquipment" type="Boolean" default="{!false}" />
+
+  <aura:registerEvent name="ACTION" type="FX5:ACTION" />
+  <aura:handler event="FX5:ACTION" action="{!c.handleEvent}" />
+  <aura:handler event="force:refreshView" action="{!c.handleEvent}" />
+
+  <ltng:require scripts="{!$Resource.react_rental}" afterScriptsLoaded="{!c.initialize}" />
+
+  <div aura:id="root"></div>
+</aura:component>

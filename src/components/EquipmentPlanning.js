@@ -9,14 +9,12 @@ export default function EquipmentPlanning(props) {
 
   useEffect(() => {
     async function fetchRows() {
-      const fieldsByName = await api.describeFields(
-        'FX5__Equipment_Planning__c'
-      );
-      const fieldNames = Object.keys(fieldsByName).join(',');
+      const description = await api.describe('FX5__Equipment_Planning__c');
+      const fieldNames = description.fields.map(({ name }) => name).join(',');
       const soql = `SELECT ${fieldNames} FROM FX5__Equipment_Planning__c`;
       const rows = await api.query(soql);
 
-      setFields(fieldsByName);
+      setFields(description.fields);
       setRows(rows);
     }
 
@@ -26,10 +24,12 @@ export default function EquipmentPlanning(props) {
   if (!fields || !rows) return null;
 
   return (
-    <DataTable items={rows} striped>
-      {Object.values(fields).map(({ name, label }) => (
-        <DataTableColumn key={name} label={label} property={name} />
-      ))}
-    </DataTable>
+    <div className="slds-scrollable">
+      <DataTable items={rows} striped>
+        {fields.map(({ name, label }) => (
+          <DataTableColumn key={name} label={label} property={name} />
+        ))}
+      </DataTable>
+    </div>
   );
 }
