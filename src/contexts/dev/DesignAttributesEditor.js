@@ -2,6 +2,7 @@ import React, { useReducer } from 'react';
 import { useSettings, getDefaultSettings } from './Settings';
 import { DESIGN_ATTRIBUTES } from '../../constants';
 import {
+  Card,
   Input,
   Checkbox,
   RadioGroup,
@@ -28,21 +29,20 @@ const DesignAttributesEditor = props => {
   }
 
   return (
-    <div className="slds-form slds-form_stacked slds-m-top_medium slds-border_top slds-clearfix">
-      <h1 className="slds-text-heading_small slds-p-vertical_medium">
-        Design Attributes
-      </h1>
-      {DESIGN_ATTRIBUTES.map(config => getEditor(config, changes, onChange))}
-      <div className="slds-m-top_medium">
-        <Button variant="base" label="Reset to defaults" onClick={reset} />
-        <Button
-          className="slds-float_right"
-          variant="brand"
-          label="Update Settings"
-          onClick={save}
-        />
+    <Card heading="Design Attributes">
+      <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked">
+        {DESIGN_ATTRIBUTES.map(config => getEditor(config, changes, onChange))}
+        <div className="slds-m-top_medium">
+          <Button variant="base" label="Reset to defaults" onClick={reset} />
+          <Button
+            className="slds-float_right"
+            variant="brand"
+            label="Update Settings"
+            onClick={save}
+          />
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

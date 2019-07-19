@@ -25,7 +25,7 @@ export default function EquipmentPlanning(props) {
 
   return (
     <div className="slds-scrollable">
-      <DataTable items={rows} striped>
+      <DataTable items={rows} striped fixedHeader>
         {fields.map(({ name, label }) => (
           <DataTableColumn key={name} label={label} property={name} />
         ))}

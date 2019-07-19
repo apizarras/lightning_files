@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react';
 import {
+  Card,
   RadioGroup,
   Radio,
   Textarea,
@@ -29,39 +30,38 @@ const EventDebugger = props => {
   }
 
   return (
-    <div className="slds-form slds-form_stacked slds-m-top_medium slds-border_top slds-clearfix">
-      <h1 className="slds-text-heading_small slds-p-vertical_medium">
-        Event Debugger
-      </h1>
-      <RadioGroup
-        labels={{ label: 'Type' }}
-        onChange={e => dispatch({ type: e.target.value })}
-      >
-        {ACTION_TYPES.map(option => (
-          <Radio
-            key={option}
-            value={option}
-            labels={{ label: option }}
-            checked={params.type === option}
-            variant="base"
-          />
-        ))}
-      </RadioGroup>
-      <Textarea
-        label="Payload"
-        value={params.payload}
-        onChange={e => dispatch({ payload: e.target.value })}
-      />
-
-      <div className="slds-m-top_medium">
-        <Button
-          className="slds-float_right"
-          variant="brand"
-          label="Simulate Incoming Event"
-          onClick={triggerEvent}
+    <Card heading="Application Events">
+      <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked slds-clearfix">
+        <RadioGroup
+          labels={{ label: 'Type' }}
+          onChange={e => dispatch({ type: e.target.value })}
+        >
+          {ACTION_TYPES.map(option => (
+            <Radio
+              key={option}
+              value={option}
+              labels={{ label: option }}
+              checked={params.type === option}
+              variant="base"
+            />
+          ))}
+        </RadioGroup>
+        <Textarea
+          label="Payload"
+          value={params.payload}
+          onChange={e => dispatch({ payload: e.target.value })}
         />
+
+        <div className="slds-m-top_medium">
+          <Button
+            className="slds-float_right"
+            variant="brand"
+            label="Simulate Incoming Event"
+            onClick={triggerEvent}
+          />
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

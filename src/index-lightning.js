@@ -10,7 +10,7 @@ export default function LightningComponent(props) {
   const { settings, dataService, eventService } = props;
 
   return (
-    <IconSettings iconPath="/assets/icons">
+    <IconSettings iconPath="/_slds/icons">
       <AppContextProvider
         settings={settings}
         dataService={dataService}
@@ -22,7 +22,7 @@ export default function LightningComponent(props) {
   );
 }
 
-export function initialize(component) {
+export function initializeAura(component) {
   const aura = window.$A;
 
   function wrap(method, params, needsParse) {
@@ -83,3 +83,5 @@ export function initialize(component) {
     component.find('root')
   );
 }
+
+export function initializeLWC(webComponent) {}

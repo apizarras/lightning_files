@@ -1,7 +1,5 @@
 import React from 'react';
 import { useConnection } from './Connect';
-import DesignAttributesEditor from './DesignAttributesEditor';
-import EventDebugger from './EventDebugger';
 import {
   GlobalHeader,
   GlobalHeaderProfile,
@@ -14,7 +12,7 @@ const Menu = props => {
   const { display_name, organization_name } = connection.identity;
 
   return (
-    <GlobalHeader logoSrc="/assets/images/logo.svg">
+    <GlobalHeader logoSrc="/_slds/images/logo.svg">
       <GlobalHeaderProfile
         popover={
           <Popover
@@ -31,8 +29,6 @@ const Menu = props => {
                     onClick={() => connection.logout()}
                   />
                 </div>
-                <DesignAttributesEditor />
-                <EventDebugger />
               </>
             }
             id="header-profile-popover-id"
