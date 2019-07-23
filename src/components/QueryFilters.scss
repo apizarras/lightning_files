@@ -1,4 +1,15 @@
+.query-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.query-filters-label {
+  margin-right: 0.5em;
+  font-weight: bold;
+}
 .query-filter {
+  margin: 0.2rem;
+
   svg {
     width: 0.8rem !important;
     height: 0.8rem !important;

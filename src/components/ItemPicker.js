@@ -26,13 +26,15 @@ const ItemPicker = () => {
 
       setTitle(description.label + ' Picker');
       setColumns(
-        fields.filter(
-          field =>
-            settings.hideSystemFields &&
-            !~SYSTEM_FIELDS.indexOf(field.name) &&
-            !~(settings.hiddenColumns || []).indexOf(field.name) &&
-            !/^(FX5__)?Locked_/.test(field.name)
-        )
+        fields
+          .filter(
+            field =>
+              settings.hideSystemFields &&
+              !~SYSTEM_FIELDS.indexOf(field.name) &&
+              !~(settings.hiddenColumns || []).indexOf(field.name) &&
+              !/^(FX5__)?Locked_/.test(field.name)
+          )
+          .slice(0, 20) // max 20 columns
       );
     }
 

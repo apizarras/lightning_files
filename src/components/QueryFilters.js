@@ -9,17 +9,20 @@ const QueryFilters = props => {
   if (!filters || !filters.length)
     return (
       <div className="slds-card__body slds-card__body--inner">
-        <p>
-          Results can be filtered by selecting cells that match desired values
+        <p style={{ margin: '1.2rem 0' }}>
+          Quickly filter matches by selecting cells with desired values
         </p>
       </div>
     );
 
   return (
     <div className="slds-card__body slds-card__body--inner">
-      {filters.map((filter, i) => (
-        <FilterPill key={i} filter={filter} onRemove={onRemoveFilter} />
-      ))}
+      <div className="query-filters">
+        <div className="query-filters-label">Filters:</div>
+        {filters.map((filter, i) => (
+          <FilterPill key={i} filter={filter} onRemove={onRemoveFilter} />
+        ))}
+      </div>
     </div>
   );
 };

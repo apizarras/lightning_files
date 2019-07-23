@@ -4,6 +4,7 @@ import { StickyTable, Row, Cell } from 'react-sticky-table';
 import { Checkbox, Spinner } from '@salesforce/design-system-react';
 import FormattedValue from './FormattedValue';
 import { getFieldNames, getWhereClause, getOrderBy } from '../api/soql';
+import { useDebounce } from '../api/hooks';
 import 'react-sticky-table/dist/react-sticky-table.css';
 import './FilterTable.scss';
 
@@ -20,6 +21,11 @@ const FilterTable = props => {
   const [loading, setLoading] = useState(false);
   const [orderBy, setOrderBy] = useState();
   const [items, setItems] = useState(null);
+  const debouncedTextSearch = useDebounce(textSearch, 1000);
+
+  useEffect(() => {
+    console.log('query server for search matches now');
+  }, [debouncedTextSearch]);
 
   useEffect(() => {
     if (!columns || !columns.length) {
@@ -37,7 +43,7 @@ const FilterTable = props => {
       const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
       soql.push(getWhereClause(filters, staticFilters));
       soql.push(getOrderBy(orderBy));
-      soql.push('LIMIT 50');
+      soql.push('LIMIT 100');
 
       setLoading(true);
       const items = await api.query(soql.join(' '));
@@ -47,6 +53,8 @@ const FilterTable = props => {
 
     fetchRows();
   }, [api, sobject, columns, filters, orderBy, staticFilters]);
+
+  if (!columns || !items) return null;
 
   function updateSort(field) {
     if (orderBy && orderBy.field === field) {
@@ -86,15 +94,15 @@ const FilterTable = props => {
 
   const filteredItems =
     textSearch && textSearch.length > 2
-      ? items.filter(item =>
-          keywords.reduce(
-            (result, search) => search.test(item._keywords) && result,
-            true
+      ? items
+          .filter(item =>
+            keywords.reduce(
+              (result, search) => search.test(item._keywords) && result,
+              true
+            )
           )
-        )
-      : items;
-
-  if (!columns || !items) return null;
+          .slice(0, 50)
+      : items.slice(0, 50);
 
   return (
     <div className="filter-table">
