@@ -31,7 +31,14 @@ const DesignAttributesEditor = props => {
   return (
     <Card heading="Design Attributes">
       <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked">
-        {DESIGN_ATTRIBUTES.map(config => getEditor(config, changes, onChange))}
+        {DESIGN_ATTRIBUTES.map(config => (
+          <Editor
+            key={config.name}
+            config={config}
+            settings={changes}
+            onChange={onChange}
+          />
+        ))}
         <div className="slds-m-top_medium">
           <Button variant="base" label="Reset to defaults" onClick={reset} />
           <Button
@@ -47,14 +54,14 @@ const DesignAttributesEditor = props => {
 };
 
 // https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_attribute.htm
-function getEditor(config, settings, onChange) {
+const Editor = ({ config, settings, onChange }) => {
   const { name, label, type, options } = config;
 
   switch (type) {
     case 'boolean':
       return (
         <Checkbox
-          label={label}
+          labels={{ label }}
           checked={settings[name]}
           onChange={checked => onChange(name, checked)}
         />
@@ -85,7 +92,7 @@ function getEditor(config, settings, onChange) {
         />
       );
   }
-}
+};
 
 function applyChanges(state, action) {
   return { ...state, ...action };

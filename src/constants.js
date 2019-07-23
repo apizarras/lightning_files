@@ -2,24 +2,67 @@
 
 export const DESIGN_ATTRIBUTES = [
   {
-    name: 'setting1',
-    label: 'Setting 1',
-    type: 'boolean',
-    defaultValue: false
+    name: 'sobject',
+    label: 'Object API Name',
+    type: 'string',
+    defaultValue: 'FX5__Price_Book_Item__c'
   },
   {
-    name: 'setting2',
-    label: 'Setting 2',
+    name: 'defaultColumns',
+    label: 'Default Columns',
+    description:
+      'Specify a default set of columns to display to the user. Defined as a set of comma separated field API names',
     type: 'string',
     defaultValue: ''
   },
   {
-    name: 'setting3',
-    label: 'Setting 3',
-    type: 'picklist',
-    options: ['option1', 'option2', 'option3'],
+    name: 'hiddenFields',
+    label: 'Hidden Fields',
+    description:
+      'Hide a set of fields from the user. Defined as a set of comma separated field API names',
+    type: 'string',
     defaultValue: ''
+  },
+  {
+    name: 'hideSystemFields',
+    label: 'Hide System Fields',
+    description:
+      'Prevent system fields like IsDeleted and CreatedBy from appearing to the user',
+    type: 'boolean',
+    defaultValue: true
   }
+  // {
+  //   name: 'defaultColumns',
+  //   label: 'Default Columns',
+  //   description: 'Comma separated field API names',
+  //   type: 'picklist',
+  //   options: ['option1', 'option2', 'option3'],
+  //   defaultValue: ''
+  // }
 ];
 
 export const ACTION_TYPES = ['I did something good', 'I did something bad'];
+
+export const SYSTEM_FIELDS = [
+  'Id',
+  'IsDeleted',
+  'CreatedBy',
+  'CreatedById',
+  'CreatedDate',
+  'CurrencyIsoCode',
+  'LastModifiedBy',
+  'LastModifiedById',
+  'LastModifiedDate',
+  'LastReferencedDate',
+  'LastViewedDate',
+  'SystemModstamp',
+  'FX5__Breadcrumb__c',
+  'FX5__Catalog_Classification__c',
+  'FX5__CatalogItemPriceBook__c',
+  'FX5__Catalog_Price_Book_Index__c',
+  'FX5__Enable_Dynamic_Parenting__c',
+  'FX5__Catalog_Allow_Dynamic_Parenting__c',
+  'FX5__Ticket_Item_Record_Type__c',
+  'FX5__Sequence_Number__c',
+  'FX5__Requires_Parent_Item__c'
+];

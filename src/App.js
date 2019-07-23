@@ -1,14 +1,8 @@
 import React from 'react';
-import SearchCriteria from './components/SearchCriteria';
-import EquipmentPlanning from './components/EquipmentPlanning';
+import ItemPicker from './components/ItemPicker';
 
 const App = () => {
-  return (
-    <div>
-      <SearchCriteria />
-      <EquipmentPlanning />
-    </div>
-  );
+  return <ItemPicker />;
 };
 
 export default App;

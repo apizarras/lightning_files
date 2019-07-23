@@ -7,7 +7,7 @@ import LightningComponent from './index-lightning';
 // stubs out AppContext params for local dev
 const Component = props => {
   const connection = useConnection();
-  const settings = useSettings();
+  const [settings] = useSettings();
 
   return (
     <LightningComponent
