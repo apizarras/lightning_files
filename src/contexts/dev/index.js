@@ -4,7 +4,6 @@ import Menu from './Menu';
 import { SettingsProvider } from './Settings';
 import DesignAttributesEditor from './DesignAttributesEditor';
 import EventDebugger from './EventDebugger';
-import { Card } from '@salesforce/design-system-react';
 
 export * from './Connect';
 export * from './Settings';
@@ -49,9 +48,7 @@ export const ConnectionProvider = props => {
                     marginBottom: '3rem'
                   }}
                 >
-                  <div style={{ width: '66.66%' }}>
-                    <Card heading="Component Preview">{props.children}</Card>
-                  </div>
+                  <div style={{ width: '66.66%' }}>{props.children}</div>
                   <div style={{ width: '33.33%', paddingLeft: '.75rem' }}>
                     <DesignAttributesEditor />
                     <EventDebugger />

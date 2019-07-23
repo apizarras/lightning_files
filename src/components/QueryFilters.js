@@ -1,29 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/AppContext';
+import React from 'react';
 import FormattedValue from './FormattedValue';
 import { Pill, Icon } from '@salesforce/design-system-react';
 import './QueryFilters.scss';
 
 const QueryFilters = props => {
-  const { sobject, filters, onRemoveFilter } = props;
-  const { api } = useAppContext();
-  const [fields, setFields] = useState();
-
-  useEffect(() => {
-    if (!sobject) return;
-
-    async function fetchData() {
-      const description = await api.describe(sobject);
-      setFields(description.fields);
-    }
-
-    fetchData();
-  }, [api, sobject]);
+  const { filters, onRemoveFilter } = props;
 
   if (!filters || !filters.length)
     return (
       <div className="slds-card__body slds-card__body--inner">
-        <p>Select cells to match similar items</p>
+        <p>
+          Results can be filtered by selecting cells that match desired values
+        </p>
       </div>
     );
 

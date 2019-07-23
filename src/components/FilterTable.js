@@ -8,8 +8,15 @@ import 'react-sticky-table/dist/react-sticky-table.css';
 import './FilterTable.scss';
 
 const FilterTable = props => {
-  const { sobject, columns, filters, staticFilters, onAddFilter } = props;
-  const { api } = useAppContext();
+  const {
+    sobject,
+    columns,
+    filters,
+    staticFilters,
+    textSearch,
+    onAddFilter
+  } = props;
+  const { api, settings } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [orderBy, setOrderBy] = useState();
   const [items, setItems] = useState(null);
@@ -26,7 +33,7 @@ const FilterTable = props => {
     async function fetchRows() {
       if (!sobject || !columns || !orderBy) return;
 
-      const fieldNames = getFieldNames(columns);
+      const fieldNames = getFieldNames(columns, staticFilters);
       const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
       soql.push(getWhereClause(filters, staticFilters));
       soql.push(getOrderBy(orderBy));
@@ -39,7 +46,7 @@ const FilterTable = props => {
     }
 
     fetchRows();
-  }, [api, sobject, columns, filters, orderBy]);
+  }, [api, sobject, columns, filters, orderBy, staticFilters]);
 
   function updateSort(field) {
     if (orderBy && orderBy.field === field) {
@@ -52,6 +59,41 @@ const FilterTable = props => {
     setOrderBy({ field, direction: 'ASC' });
   }
 
+  const searchFields = settings.textSearchColumns.split(',').map(x => x.trim());
+  const keywords = textSearch
+    ? textSearch
+        .trim()
+        .split(' ')
+        .map(x => new RegExp(x.trim(), 'i'))
+    : [];
+
+  if (keywords.length > 0) {
+    items.forEach(item => {
+      if (item._keywords) return;
+      item._keywords = columns
+        .map(field => {
+          switch (field.type) {
+            case 'reference':
+              return item[field.name] && item[field.relationshipName].Name;
+            default:
+              return item[field.name];
+          }
+        })
+        .filter(value => value)
+        .join(' ');
+    });
+  }
+
+  const filteredItems =
+    textSearch && textSearch.length > 2
+      ? items.filter(item =>
+          keywords.reduce(
+            (result, search) => search.test(item._keywords) && result,
+            true
+          )
+        )
+      : items;
+
   if (!columns || !items) return null;
 
   return (
@@ -59,9 +101,7 @@ const FilterTable = props => {
       {loading && <Spinner size="small" variant="base" />}
       <StickyTable stickyColumnCount={1}>
         <Row>
-          <Cell>
-            <Checkbox />
-          </Cell>
+          <Cell></Cell>
           {columns.map(field => (
             <Cell
               key={field.name}
@@ -77,7 +117,7 @@ const FilterTable = props => {
             </Cell>
           ))}
         </Row>
-        {items.map(item => (
+        {filteredItems.map(item => (
           <Row key={item.Id}>
             <Cell>
               <Checkbox />

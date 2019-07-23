@@ -3,13 +3,15 @@ import { useAppContext } from '../contexts/AppContext';
 import { SYSTEM_FIELDS } from '../constants';
 import QueryFilters from './QueryFilters';
 import FilterTable from './FilterTable';
-import { Card } from '@salesforce/design-system-react';
+import { Icon, Card, CardFilter } from '@salesforce/design-system-react';
+import './ItemPicker.scss';
 
 const ItemPicker = () => {
   const { api, settings } = useAppContext();
   const [title, setTitle] = useState();
   const [columns, setColumns] = useState();
   const [filters, dispatch] = useReducer(reducer, []);
+  const [textSearch, setTextSearch] = useState();
 
   useEffect(() => {
     async function fetchColumns() {
@@ -22,7 +24,7 @@ const ItemPicker = () => {
 
       if (fields.length === 0) fields.push(...description.fields);
 
-      setTitle(description.labelPlural);
+      setTitle(description.label + ' Picker');
       setColumns(
         fields.filter(
           field =>
@@ -52,8 +54,17 @@ const ItemPicker = () => {
     dispatch({ type: 'REMOVE_FILTER', payload: filter });
   }
 
+  function onSearch(e, { value }) {
+    setTextSearch(value);
+  }
+
   return (
-    <Card heading={title}>
+    <Card
+      className="item-picker"
+      heading={title}
+      icon={<Icon category="standard" name="multi_select_checkbox" />}
+      filter={<CardFilter onChange={onSearch} />}
+    >
       <QueryFilters
         sobject={settings.sobject}
         filters={filters}
@@ -65,6 +76,7 @@ const ItemPicker = () => {
         columns={columns}
         staticFilters={settings.staticFilters}
         filters={filters}
+        textSearch={textSearch}
         onAddFilter={onAddFilter}
       />
     </Card>

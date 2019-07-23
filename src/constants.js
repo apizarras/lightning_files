@@ -8,12 +8,20 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'FX5__Price_Book_Item__c'
   },
   {
-    name: 'defaultColumns',
-    label: 'Default Columns',
+    name: 'displayedColumns',
+    label: 'Displayed Columns',
     description:
-      'Specify a default set of columns to display to the user. Defined as a set of comma separated field API names',
+      'Columns initially displayed in results table. Defined as a set of comma separated field API names',
     type: 'string',
     defaultValue: ''
+  },
+  {
+    name: 'textSearchColumns',
+    label: 'Search Columns',
+    description:
+      'Restrict columns used for type-ahead search. Defaults to all displayed columns of type string. Defined as a set of comma separated field API names',
+    type: 'string',
+    defaultValue: 'FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c'
   },
   {
     name: 'hiddenFields',
