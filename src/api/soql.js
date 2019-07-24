@@ -42,16 +42,18 @@ function getOrderBy(orderBy) {
   return ` ORDER BY ${field.name} ${direction}`;
 }
 
-function getSearchConditions(fields, searchText) {
-  const keywords = searchText
+function getKeywords(searchText) {
+  return searchText
     ? searchText
-        .trim()
         .split(' ')
-        .filter(x => x)
+        .map(x => x.trim())
+        .filter(x => x && x.length > 1)
     : [];
+}
 
+function getSearchConditions(fields, searchText) {
+  const keywords = getKeywords(searchText);
   if (!keywords.length) return;
-
   return keywords.map(keyword => searchClause(fields, keyword)).join(' AND ');
 }
 
@@ -93,41 +95,30 @@ export async function executeQuery(api, query) {
 }
 
 export function executeLocalSearch(query, items, textSearch) {
-  const keywords = textSearch
-    ? textSearch
-        .trim()
-        .split(' ')
-        .map(x => new RegExp(x.trim(), 'i'))
-    : [];
+  const keywords = getKeywords(textSearch).map(x => new RegExp(x.trim(), 'i'));
+  if (keywords.length === 0) return items;
 
-  if (keywords.length > 0) {
-    items.forEach(item => {
-      if (item._keywords) return;
+  items.forEach(item => {
+    if (item._keywords) return;
 
-      item._keywords = query.columns
-        .filter(({ type }) => type === 'string' || type === 'reference')
-        .map(({ type, name, relationshipName }) =>
-          type === 'reference'
-            ? item[name] && item[relationshipName].Name
-            : item[name]
-        )
-        .join(' ');
-    });
-  }
+    item._keywords = query.columns
+      .filter(({ type }) => type === 'string' || type === 'reference')
+      .map(({ type, name, relationshipName }) =>
+        type === 'reference'
+          ? item[name] && item[relationshipName].Name
+          : item[name]
+      )
+      .join(' ');
+  });
 
-  const filteredItems =
-    textSearch && textSearch.length > 2
-      ? items
-          .filter(item =>
-            keywords.reduce(
-              (result, search) => search.test(item._keywords) && result,
-              true
-            )
-          )
-          .slice(0, 50)
-      : items.slice(0, 50);
-
-  return filteredItems;
+  return items
+    .filter(item =>
+      keywords.reduce(
+        (result, search) => search.test(item._keywords) && result,
+        true
+      )
+    )
+    .slice(0, 100);
 }
 
 export function queryReducer(state, action) {
@@ -156,7 +147,7 @@ export function queryReducer(state, action) {
     case 'REMOVE_FILTER':
       return { ...state, filters: state.filters.filter(x => x !== payload) };
     case 'UPDATE_SEARCH_TEXT':
-      if (state.searchText === payload) return state;
+      if (state.searchText === payload || payload.length === 1) return state;
       return { ...state, searchText: payload };
     default:
       return state;

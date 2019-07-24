@@ -58,20 +58,22 @@ const ItemPicker = () => {
 };
 
 function getColumns(description, settings) {
-  const fields = (settings.displayedColumns || [])
+  const defaultColumns = settings.displayedColumns
+    .trim()
+    .split(',')
+    .map(x => x.trim())
+    .filter(x => x);
+
+  const fields = defaultColumns
     .map(name => description.fields.find(field => field.name === name))
     .filter(field => field);
 
-  if (fields.length === 0) fields.push(...description.fields);
-
   return fields
     .filter(
-      field =>
-        settings.hideSystemFields &&
-        !~SYSTEM_FIELDS.indexOf(field.name) &&
-        !~(settings.hiddenColumns || []).indexOf(field.name) &&
-        !/^(FX5__)?Locked_/.test(field.name)
+      field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
     )
+    .filter(field => !~(settings.hiddenColumns || []).indexOf(field.name))
+    .filter(field => !/^(FX5__)?Locked_/.test(field.name))
     .slice(0, 20); // max 20 columns
 }
 

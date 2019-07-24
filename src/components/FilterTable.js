@@ -28,8 +28,10 @@ const FilterTable = props => {
 
   useEffect(() => {
     if (query.searchText === textSearch) return;
+    const filteredItems = executeLocalSearch(query, items, textSearch);
+    if (filteredItems === items) return;
+    setItems(filteredItems);
     setLoading(true);
-    setItems(executeLocalSearch(query, items, textSearch));
   }, [query, items, textSearch]);
 
   if (!query.columns) return null;
