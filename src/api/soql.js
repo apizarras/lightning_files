@@ -129,9 +129,7 @@ export function queryReducer(state, action) {
       return {
         ...state,
         columns: payload,
-        orderBy: !state.columns
-          ? { field: payload[0], direction: 'ASC' }
-          : state.orderBy
+        orderBy: { field: payload[0], direction: 'ASC' }
       };
     case 'UPDATE_SORT':
       const direction =
