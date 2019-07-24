@@ -3,7 +3,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { StickyTable, Row, Cell } from 'react-sticky-table';
 import { Checkbox, Spinner } from '@salesforce/design-system-react';
 import FormattedValue from './FormattedValue';
-import { getFieldNames, getWhereClause, getOrderBy } from '../api/soql';
+import { query } from '../api/soql';
 import { useDebounce } from '../api/hooks';
 import 'react-sticky-table/dist/react-sticky-table.css';
 import './FilterTable.scss';
@@ -12,49 +12,52 @@ const FilterTable = props => {
   const {
     sobject,
     columns,
-    filters,
     staticFilters,
+    filters,
     textSearch,
     onAddFilter
   } = props;
-  const { api, settings } = useAppContext();
-  const [loading, setLoading] = useState(false);
+  const { api } = useAppContext();
+  const [fetching, setFetching] = useState(false);
   const [orderBy, setOrderBy] = useState();
-  const [items, setItems] = useState(null);
-  const debouncedTextSearch = useDebounce(textSearch, 1000);
+  const [items, setItems] = useState([]);
+  const [debouncedTextSearch, debouncing] = useDebounce(textSearch, 500);
+  const loading = fetching || debouncing;
 
   useEffect(() => {
-    console.log('query server for search matches now');
-  }, [debouncedTextSearch]);
-
-  useEffect(() => {
-    if (!columns || !columns.length) {
-      setOrderBy(null);
-      return;
-    }
+    if (!columns || !columns.length) return setOrderBy(null);
     setOrderBy({ field: columns[0], direction: 'ASC' });
   }, [columns]);
 
   useEffect(() => {
+    if (!sobject || !columns || !orderBy) return;
+
     async function fetchRows() {
-      if (!sobject || !columns || !orderBy) return;
+      setFetching(true);
 
-      const fieldNames = getFieldNames(columns, staticFilters);
-      const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
-      soql.push(getWhereClause(filters, staticFilters));
-      soql.push(getOrderBy(orderBy));
-      soql.push('LIMIT 100');
-
-      setLoading(true);
-      const items = await api.query(soql.join(' '));
+      const items = await query(
+        api,
+        sobject,
+        columns,
+        orderBy,
+        staticFilters,
+        filters,
+        debouncedTextSearch
+      );
       setItems(items);
-      setLoading(false);
+      setFetching(false);
     }
 
     fetchRows();
-  }, [api, sobject, columns, filters, orderBy, staticFilters]);
-
-  if (!columns || !items) return null;
+  }, [
+    api,
+    sobject,
+    columns,
+    orderBy,
+    staticFilters,
+    filters,
+    debouncedTextSearch
+  ]);
 
   function updateSort(field) {
     if (orderBy && orderBy.field === field) {
@@ -67,46 +70,19 @@ const FilterTable = props => {
     setOrderBy({ field, direction: 'ASC' });
   }
 
-  const searchFields = settings.textSearchColumns.split(',').map(x => x.trim());
-  const keywords = textSearch
-    ? textSearch
-        .trim()
-        .split(' ')
-        .map(x => new RegExp(x.trim(), 'i'))
-    : [];
+  if (!columns) return null;
 
-  if (keywords.length > 0) {
-    items.forEach(item => {
-      if (item._keywords) return;
-      item._keywords = columns
-        .map(field => {
-          switch (field.type) {
-            case 'reference':
-              return item[field.name] && item[field.relationshipName].Name;
-            default:
-              return item[field.name];
-          }
-        })
-        .filter(value => value)
-        .join(' ');
-    });
-  }
-
-  const filteredItems =
-    textSearch && textSearch.length > 2
-      ? items
-          .filter(item =>
-            keywords.reduce(
-              (result, search) => search.test(item._keywords) && result,
-              true
-            )
-          )
-          .slice(0, 50)
-      : items.slice(0, 50);
+  const filteredItems = loading
+    ? localSearch(columns, items, textSearch)
+    : items;
 
   return (
-    <div className="filter-table">
-      {loading && <Spinner size="small" variant="base" />}
+    <div
+      className={`filter-table ${
+        loading && items.length > 0 ? 'refreshing' : ''
+      }`}
+    >
+      {loading && items.length === 0 && <Spinner size="small" variant="base" />}
       <StickyTable stickyColumnCount={1}>
         <Row>
           <Cell></Cell>
@@ -147,5 +123,43 @@ const FilterTable = props => {
     </div>
   );
 };
+
+function localSearch(columns, items, textSearch) {
+  const keywords = textSearch
+    ? textSearch
+        .trim()
+        .split(' ')
+        .map(x => new RegExp(x.trim(), 'i'))
+    : [];
+
+  if (keywords.length > 0) {
+    items.forEach(item => {
+      if (item._keywords) return;
+
+      item._keywords = columns
+        .filter(({ type }) => type === 'string' || type === 'reference')
+        .map(({ type, name, relationshipName }) =>
+          type === 'reference'
+            ? item[name] && item[relationshipName].Name
+            : item[name]
+        )
+        .join(' ');
+    });
+  }
+
+  const filteredItems =
+    textSearch && textSearch.length > 2
+      ? items
+          .filter(item =>
+            keywords.reduce(
+              (result, search) => search.test(item._keywords) && result,
+              true
+            )
+          )
+          .slice(0, 50)
+      : items.slice(0, 50);
+
+  return filteredItems;
+}
 
 export default FilterTable;

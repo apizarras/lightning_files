@@ -42,7 +42,6 @@ const ItemPicker = () => {
   }, [api, settings]);
 
   function onAddFilter(field, item) {
-    console.log({ field, item });
     const value = item[field.name];
     if (!value) return;
 

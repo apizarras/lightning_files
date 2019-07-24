@@ -3,7 +3,7 @@ import { useSettings, getDefaultSettings } from './Settings';
 import { DESIGN_ATTRIBUTES } from '../../constants';
 import {
   Card,
-  Input,
+  Textarea,
   Checkbox,
   RadioGroup,
   Radio,
@@ -85,7 +85,7 @@ const Editor = ({ config, settings, onChange }) => {
       );
     default:
       return (
-        <Input
+        <Textarea
           label={label}
           value={settings[name]}
           onChange={e => onChange(name, e.target.value)}

@@ -66,6 +66,14 @@
   height: 350px;
   margin-bottom: -0.75rem;
 
+  &.refreshing {
+    opacity: 0.5;
+  }
+
+  .slds-checkbox_faux {
+    margin-right: 0 !important;
+  }
+
   [data-type='address'] span {
     margin-right: 1em;
 
@@ -133,10 +141,6 @@
     content: '%';
     margin-left: 0.25em;
     opacity: 0.5;
-  }
-
-  .slds-checkbox_faux {
-    margin-right: 0 !important;
   }
 }
 
