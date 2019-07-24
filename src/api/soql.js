@@ -68,15 +68,15 @@ function searchClause(fields, keyword) {
   return `(${clauses})`;
 }
 
-export async function query(
-  api,
-  sobject,
-  columns,
-  orderBy,
-  staticFilters,
-  filters,
-  searchText
-) {
+export async function executeQuery(api, query) {
+  const {
+    sobject,
+    columns,
+    orderBy,
+    staticFilters,
+    filters,
+    searchText
+  } = query;
   if (!sobject || !columns || !orderBy) return;
 
   const fieldNames = getFieldNames(columns, staticFilters);
@@ -90,4 +90,86 @@ export async function query(
   soql.push(getOrderBy(orderBy));
   soql.push(`LIMIT 100`);
   return api.query(soql.join(' '));
+}
+
+export function executeLocalSearch(query, items, textSearch) {
+  const keywords = textSearch
+    ? textSearch
+        .trim()
+        .split(' ')
+        .map(x => new RegExp(x.trim(), 'i'))
+    : [];
+
+  if (keywords.length > 0) {
+    items.forEach(item => {
+      if (item._keywords) return;
+
+      item._keywords = query.columns
+        .filter(({ type }) => type === 'string' || type === 'reference')
+        .map(({ type, name, relationshipName }) =>
+          type === 'reference'
+            ? item[name] && item[relationshipName].Name
+            : item[name]
+        )
+        .join(' ');
+    });
+  }
+
+  const filteredItems =
+    textSearch && textSearch.length > 2
+      ? items
+          .filter(item =>
+            keywords.reduce(
+              (result, search) => search.test(item._keywords) && result,
+              true
+            )
+          )
+          .slice(0, 50)
+      : items.slice(0, 50);
+
+  return filteredItems;
+}
+
+export function queryReducer(state, action) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case 'UPDATE_COLUMNS':
+      return {
+        ...state,
+        columns: payload,
+        orderBy: !state.columns
+          ? { field: payload[0], direction: 'ASC' }
+          : state.orderBy
+      };
+    case 'UPDATE_SORT':
+      const direction =
+        state.orderBy.field === payload
+          ? state.orderBy.direction === 'ASC'
+            ? 'DESC'
+            : 'ASC'
+          : 'ASC';
+
+      return { ...state, orderBy: { field: payload, direction } };
+    case 'ADD_FILTER':
+      return { ...state, filters: state.filters.concat(payload) };
+    case 'REMOVE_FILTER':
+      return { ...state, filters: state.filters.filter(x => x !== payload) };
+    case 'UPDATE_SEARCH_TEXT':
+      if (state.searchText === payload) return state;
+      return { ...state, searchText: payload };
+    default:
+      return state;
+  }
+}
+
+export function getInitialQuery(settings) {
+  return {
+    sobject: settings.sobject,
+    columns: undefined,
+    orderBy: undefined,
+    staticFilters: settings.staticFilters,
+    filters: [],
+    searchText: undefined
+  };
 }

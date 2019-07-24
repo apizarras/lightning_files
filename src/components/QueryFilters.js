@@ -4,7 +4,8 @@ import { Pill, Icon } from '@salesforce/design-system-react';
 import './QueryFilters.scss';
 
 const QueryFilters = props => {
-  const { filters, onRemoveFilter } = props;
+  const { query, onRemoveFilter } = props;
+  const { filters } = query;
 
   if (!filters || !filters.length)
     return (

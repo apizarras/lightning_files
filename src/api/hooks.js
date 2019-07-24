@@ -74,18 +74,12 @@ export function useThunk([state, dispatch]) {
 }
 
 export function useDebounce(value, delay) {
-  const [debouncing, setDebouncing] = useState(false);
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    setDebouncing(true);
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-      setDebouncing(false);
-    }, delay);
-
-    return () => clearTimeout(handler);
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
   }, [value, delay]);
 
-  return [debouncedValue, debouncing];
+  return debouncedValue;
 }
