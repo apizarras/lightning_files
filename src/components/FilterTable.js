@@ -29,7 +29,7 @@ const FilterTable = props => {
     }
 
     fetchRows();
-  }, [api, query]);
+  }, [api, settings, query]);
 
   useEffect(() => {
     if (query.searchText === textSearch) return;
