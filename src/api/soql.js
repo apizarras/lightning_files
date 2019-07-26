@@ -6,6 +6,16 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
+function getSettingsFields(fields, setting) {
+  return (
+    setting &&
+    setting
+      .split(',')
+      .map(name => fields.find(field => field.name === name.trim()))
+      .filter(field => field)
+  );
+}
+
 function criteria(field, item) {
   const value = item[field.name];
   if (!value) return 'NULL';
@@ -36,7 +46,7 @@ function getFieldNames(fields) {
       if (type === 'reference') names.push(`${relationshipName}.Name`);
       return names;
     },
-    ['Id', 'CurrencyIsoCode'] // TODO: verify CurrencyIsoCode exists
+    ['Id', 'CurrencyIsoCode'] // TODO: verify CurrencyIsoCode exists (multicurrency enabled)
   );
   return fieldNames;
 }
@@ -82,16 +92,6 @@ function searchClause(fields, keyword) {
   return `(${clauses})`;
 }
 
-function getSettingsFields(fields, setting) {
-  return (
-    setting &&
-    setting
-      .split(',')
-      .map(name => fields.find(field => field.name === name.trim()))
-      .filter(field => field)
-  );
-}
-
 export function getColumns(description, settings) {
   if (!description) return null;
 
@@ -122,14 +122,17 @@ export async function executeQuery(api, settings, query) {
   const fieldNames = getFieldNames(columns, staticFilters);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
   const conditions = [];
+
   if (staticFilters) conditions.push(getConditions(staticFilters));
   if (filters) conditions.push(getConditions(filters));
   if (searchText)
     conditions.push(getSearchConditions(settings, columns, searchText));
   if (conditions.filter(x => x).length)
     soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
+
   soql.push(getOrderBy(orderBy));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
+
   return api.query(soql.join(' '));
 }
 
