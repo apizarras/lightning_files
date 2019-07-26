@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { StickyTable, Row, Cell } from 'react-sticky-table';
-import { Checkbox, Spinner } from '@salesforce/design-system-react';
-import FormattedValue from './FormattedValue';
 import { executeQuery, executeLocalSearch } from '../api/soql';
-import 'react-sticky-table/dist/react-sticky-table.css';
+import DataTable from './DataTable';
 import './FilterTable.scss';
 
 const FilterTable = props => {
-  const { query, textSearch, onAddFilter, onUpdateSort } = props;
-  const { api } = useAppContext();
+  const {
+    selectedItems,
+    query,
+    textSearch,
+    onAddFilter,
+    onUpdateSort,
+    onSelectItem,
+    onRemoveItem
+  } = props;
+  const { api, settings } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
 
@@ -18,7 +23,7 @@ const FilterTable = props => {
 
     async function fetchRows() {
       setLoading(true);
-      const items = await executeQuery(api, query);
+      const items = await executeQuery(api, settings, query);
       setItems(items);
       setLoading(false);
     }
@@ -36,52 +41,43 @@ const FilterTable = props => {
 
   if (!query.columns) return null;
 
+  const selectedIds = selectedItems.reduce((ids, x) => {
+    ids[x.Id] = true;
+    return ids;
+  }, {});
+  const availableItems = items.filter(x => !selectedIds[x.Id]);
+
   return (
-    <div
-      className={`filter-table ${
-        loading && items.length > 0 ? 'transient' : ''
-      }`}
-    >
-      {loading && items.length === 0 && <Spinner size="small" variant="base" />}
-      <StickyTable stickyColumnCount={1}>
-        <Row>
-          <Cell></Cell>
-          {query.columns.map(field => (
-            <Cell
-              key={field.name}
-              data-sort={
-                query.orderBy &&
-                query.orderBy.field === field &&
-                query.orderBy.direction
-              }
-              data-type={field.type}
-              data-autonumber={field.autoNumber}
-              data-field={field.name}
-              onClick={() => onUpdateSort(field)}
-            >
-              {field.label}
-            </Cell>
-          ))}
-        </Row>
-        {items.map(item => (
-          <Row key={item.Id}>
-            <Cell>
-              <Checkbox />
-            </Cell>
-            {query.columns.map(field => (
-              <Cell
-                key={field.name}
-                className="filter-item"
-                data-type={field.type}
-                data-autonumber={field.autoNumber}
-                onClick={() => onAddFilter({ field, item })}
-              >
-                <FormattedValue field={field} item={item} />
-              </Cell>
-            ))}
-          </Row>
-        ))}
-      </StickyTable>
+    <div className="filter-table">
+      <DataTable
+        loading={loading}
+        query={query}
+        items={availableItems}
+        onAddFilter={onAddFilter}
+        onUpdateSort={onUpdateSort}
+        onSelectItem={onSelectItem}
+        onRemoveItem={onRemoveItem}
+      />
+
+      {selectedItems.length > 0 && (
+        <>
+          <div className="slds-card__body slds-card__body--inner">
+            <strong>
+              {selectedItems.length} Selected Item
+              {selectedItems.length === 1 ? '' : 's'}
+            </strong>
+          </div>
+
+          <DataTable
+            query={query}
+            items={selectedItems}
+            selectedItems={selectedItems}
+            onAddFilter={onAddFilter}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
+        </>
+      )}
     </div>
   );
 };

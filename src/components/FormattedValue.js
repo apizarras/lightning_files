@@ -8,6 +8,11 @@ function FormattedValue(props) {
 
   let formatted;
 
+  const attrs = {
+    'data-type': field.type,
+    'data-size': value.length > 50 ? 'wide' : null
+  };
+
   switch (field.type) {
     case 'address':
       const { street, city, state, postalCode, country } = value || {};
@@ -37,19 +42,19 @@ function FormattedValue(props) {
       );
       break;
     case 'currency':
-      formatted = (
-        <span>
-          {value.toFixed(field.scale)}
-          <span className="currency-code">{item.CurrencyIsoCode || ''}</span>
-        </span>
-      );
+      attrs['data-currency'] = item.CurrencyIsoCode || null;
+      formatted = value.toFixed(field.scale);
       break;
     case 'date':
     case 'datetime':
       formatted = new Date(value).toLocaleString();
       break;
+    case 'double':
+      formatted = value.toFixed(field.scale);
+      break;
     case 'location':
-      formatted = `${value.latitude}, ${value.longitude}`;
+      const { latitude, longitude } = value;
+      formatted = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
       break;
     case 'multipicklist':
       formatted = (
@@ -70,11 +75,7 @@ function FormattedValue(props) {
       formatted = value.toString();
   }
 
-  return (
-    <span data-type={field.type} data-size={value.length > 50 ? 'wide' : null}>
-      {formatted}
-    </span>
-  );
+  return <span {...attrs}>{formatted}</span>;
 }
 
 export default FormattedValue;

@@ -1,0 +1,149 @@
+.sticky-table {
+  background: #f3f3f3;
+  color: #000;
+  position: relative;
+  height: 100%;
+  font-size: 11px;
+  box-sizing: border-box;
+  overflow: auto;
+
+  .sticky-table-table {
+    display: table;
+    box-sizing: border-box;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .sticky-table-row {
+    display: table-row;
+  }
+  .sticky-table-cell {
+    display: table-cell;
+    box-sizing: border-box;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+}
+
+// zebra striping
+.sticky-table-row {
+  background: #fff;
+
+  // fixed column
+  .sticky-table-cell:first-child {
+    background: #eeeeed;
+    padding: 3px 0 3px 0.5rem;
+    border-right: 1px solid #d9d9d9;
+  }
+
+  &:nth-child(odd) {
+    // striping for rows
+    background: #f3f3f3;
+
+    // fixed column
+    .sticky-table-cell:first-child {
+      background: #e2e2e3;
+    }
+  }
+}
+
+// header row
+.sticky-table-row:first-child {
+  .sticky-table-cell {
+    background: #f3f3f3;
+    font-weight: bold;
+    border-bottom: 1px solid #d9d9d9;
+  }
+
+  // fixed column
+  .sticky-table-cell:first-child {
+    background: #f3f3f3;
+  }
+}
+
+.data-table {
+  position: relative;
+
+  &.transient {
+    opacity: 0.5;
+  }
+
+  .checkbox-cell {
+    .slds-form-element {
+      top: -2px;
+    }
+  }
+
+  [data-type='address'] span {
+    margin-right: 1em;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  [data-type='base64'],
+  [data-type='boolean'] {
+    text-align: center;
+  }
+
+  [data-type='currency'],
+  [data-type='double'],
+  [data-type='date'],
+  [data-type='datetime'],
+  [data-type='int'],
+  [data-type='location'],
+  [data-type='percent'] {
+    text-align: right;
+  }
+
+  [data-size='wide'],
+  [data-type='address'],
+  [data-type='textarea'] {
+    max-width: 50vw;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:not(:empty) {
+      min-width: 35em;
+    }
+  }
+
+  [data-type='multipicklist'] ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+
+  [data-type='address'],
+  [data-type='textarea'] {
+    line-height: 1.4;
+  }
+
+  [data-autonumber='true'] {
+    text-align: right;
+  }
+
+  [data-sort]:hover {
+    background: #def !important;
+    color: #036;
+    cursor: pointer;
+  }
+  [data-sort='ASC'] {
+    box-shadow: inset 0 -3px 0 -1px #0070d2;
+  }
+  [data-sort='DESC'] {
+    box-shadow: inset 0 3px 0 -1px #0070d2;
+  }
+
+  [data-type='percent']:not(:empty):after {
+    content: '%';
+    margin-left: 0.25em;
+    opacity: 0.5;
+  }
+
+  [data-currency]:after {
+    content: attr(data-currency);
+    margin-left: 0.5em;
+    opacity: 0.5;
+  }
+}

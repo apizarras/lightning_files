@@ -1,3 +1,7 @@
+import { SYSTEM_FIELDS } from '../constants';
+
+const BUFFER_SIZE = 100;
+
 function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
@@ -39,7 +43,14 @@ function getFieldNames(fields) {
 
 function getOrderBy(orderBy) {
   const { field, direction } = orderBy;
-  return ` ORDER BY ${field.name} ${direction}`;
+  switch (field.type) {
+    case 'location':
+      return;
+    case 'reference':
+      return ` ORDER BY ${field.relationshipName}.Name ${direction}`;
+    default:
+      return ` ORDER BY ${field.name} ${direction}`;
+  }
 }
 
 function getKeywords(searchText) {
@@ -51,10 +62,11 @@ function getKeywords(searchText) {
     : [];
 }
 
-function getSearchConditions(fields, searchText) {
+function getSearchConditions(settings, fields, searchText) {
   const keywords = getKeywords(searchText);
   if (!keywords.length) return;
-  return keywords.map(keyword => searchClause(fields, keyword)).join(' AND ');
+  const columns = getSettingsFields(fields, settings.searchFields) || fields;
+  return keywords.map(keyword => searchClause(columns, keyword)).join(' AND ');
 }
 
 // salesforce LIKE operator only supports strings
@@ -70,7 +82,33 @@ function searchClause(fields, keyword) {
   return `(${clauses})`;
 }
 
-export async function executeQuery(api, query) {
+function getSettingsFields(fields, setting) {
+  return (
+    setting &&
+    setting
+      .split(',')
+      .map(name => fields.find(field => field.name === name.trim()))
+      .filter(field => field)
+  );
+}
+
+export function getColumns(description, settings) {
+  if (!description) return null;
+
+  const fields =
+    getSettingsFields(description.fields, settings.displayedColumns) ||
+    description.fields;
+
+  return fields
+    .filter(
+      field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
+    )
+    .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
+    .filter(field => !/^(FX5__)?Locked_/.test(field.name))
+    .slice(0, 20); // max 20 columns
+}
+
+export async function executeQuery(api, settings, query) {
   const {
     sobject,
     columns,
@@ -79,18 +117,19 @@ export async function executeQuery(api, query) {
     filters,
     searchText
   } = query;
-  if (!sobject || !columns || !orderBy) return;
+  if (!sobject || !columns || !orderBy) return [];
 
   const fieldNames = getFieldNames(columns, staticFilters);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
   const conditions = [];
   if (staticFilters) conditions.push(getConditions(staticFilters));
   if (filters) conditions.push(getConditions(filters));
-  if (searchText) conditions.push(getSearchConditions(columns, searchText));
+  if (searchText)
+    conditions.push(getSearchConditions(settings, columns, searchText));
   if (conditions.filter(x => x).length)
     soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
   soql.push(getOrderBy(orderBy));
-  soql.push(`LIMIT 100`);
+  soql.push(`LIMIT ${BUFFER_SIZE}`);
   return api.query(soql.join(' '));
 }
 
@@ -118,7 +157,7 @@ export function executeLocalSearch(query, items, textSearch) {
         true
       )
     )
-    .slice(0, 100);
+    .slice(0, BUFFER_SIZE);
 }
 
 export function queryReducer(state, action) {
@@ -126,27 +165,35 @@ export function queryReducer(state, action) {
 
   switch (type) {
     case 'UPDATE_COLUMNS':
-      return {
-        ...state,
-        columns: payload,
-        orderBy: { field: payload[0], direction: 'ASC' }
-      };
+      return { ...state, columns: payload };
     case 'UPDATE_SORT':
-      const direction =
-        state.orderBy.field === payload
+      const direction = state.orderBy
+        ? state.orderBy.field === payload
           ? state.orderBy.direction === 'ASC'
             ? 'DESC'
             : 'ASC'
-          : 'ASC';
+          : 'ASC'
+        : 'ASC';
 
       return { ...state, orderBy: { field: payload, direction } };
     case 'ADD_FILTER':
+      if (
+        state.filters.find(
+          ({ field, item }) =>
+            field.name === payload.field.name &&
+            item[field.name] === payload.item[field.name]
+        )
+      ) {
+        return state;
+      }
       return { ...state, filters: state.filters.concat(payload) };
     case 'REMOVE_FILTER':
       return { ...state, filters: state.filters.filter(x => x !== payload) };
-    case 'UPDATE_SEARCH_TEXT':
+    case 'UPDATE_SEARCH':
       if (state.searchText === payload || payload.length === 1) return state;
       return { ...state, searchText: payload };
+    case 'RESET':
+      return getInitialQuery(payload);
     default:
       return state;
   }

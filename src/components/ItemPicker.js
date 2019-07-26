@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { SYSTEM_FIELDS } from '../constants';
-import { useDebounce } from '../api/hooks';
-import { getInitialQuery, queryReducer } from '../api/soql';
+import { useDebounce, useLogger } from '../api/hooks';
+import { getInitialQuery, queryReducer, getColumns } from '../api/soql';
 import QueryFilters from './QueryFilters';
 import FilterTable from './FilterTable';
 import { Icon, Card, CardFilter } from '@salesforce/design-system-react';
@@ -13,21 +12,34 @@ const ItemPicker = () => {
   const [title, setTitle] = useState();
   const [textSearch, setTextSearch] = useState(undefined);
   const debouncedTextSearch = useDebounce(textSearch, 500);
-  const [query, dispatch] = useReducer(queryReducer, getInitialQuery(settings));
+  const [query, dispatch] = useLogger(
+    useReducer(queryReducer, getInitialQuery(settings))
+  );
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  useEffect(() => {
+    dispatch({ type: 'RESET', payload: settings });
+  }, [dispatch, settings]);
 
   useEffect(() => {
     async function fetchColumns() {
+      if (!settings.sobject) return;
       const description = await api.describe(settings.sobject);
       const columns = getColumns(description, settings);
+      if (!description || !columns) return;
       setTitle(description.label + ' Picker');
       dispatch({ type: 'UPDATE_COLUMNS', payload: columns });
+      dispatch({
+        type: 'UPDATE_SORT',
+        payload: columns.find(x => x.type !== 'location')
+      });
     }
 
     fetchColumns();
   }, [api, settings, dispatch]);
 
   useEffect(() => {
-    dispatch({ type: 'UPDATE_SEARCH_TEXT', payload: debouncedTextSearch });
+    dispatch({ type: 'UPDATE_SEARCH', payload: debouncedTextSearch });
   }, [debouncedTextSearch, dispatch]);
 
   return (
@@ -46,6 +58,11 @@ const ItemPicker = () => {
       <FilterTable
         query={query}
         textSearch={textSearch}
+        selectedItems={selectedItems}
+        onSelectItem={item => setSelectedItems(selectedItems.concat(item))}
+        onRemoveItem={item =>
+          setSelectedItems(selectedItems.filter(x => x !== item))
+        }
         onAddFilter={filter =>
           dispatch({ type: 'ADD_FILTER', payload: filter })
         }
@@ -56,25 +73,5 @@ const ItemPicker = () => {
     </Card>
   );
 };
-
-function getColumns(description, settings) {
-  const defaultColumns = settings.displayedColumns
-    .trim()
-    .split(',')
-    .map(x => x.trim())
-    .filter(x => x);
-
-  const fields = defaultColumns
-    .map(name => description.fields.find(field => field.name === name))
-    .filter(field => field);
-
-  return fields
-    .filter(
-      field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
-    )
-    .filter(field => !~(settings.hiddenColumns || []).indexOf(field.name))
-    .filter(field => !/^(FX5__)?Locked_/.test(field.name))
-    .slice(0, 20); // max 20 columns
-}
 
 export default ItemPicker;
