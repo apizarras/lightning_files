@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { useDebounce, useLogger } from '../api/hooks';
+import { useDebounce } from '../api/hooks';
 import { getInitialQuery, queryReducer, getColumns } from '../api/soql';
+import Header from './Header';
+import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
 import FilterTable from './FilterTable';
-import { Icon, Card, CardFilter } from '@salesforce/design-system-react';
+import { Card } from '@salesforce/design-system-react';
 import './ItemPicker.scss';
 
-const ItemPicker = () => {
+const ItemPicker = props => {
+  const { description } = props;
   const { api, settings } = useAppContext();
-  const [title, setTitle] = useState();
-  const [textSearch, setTextSearch] = useState(undefined);
-  const debouncedTextSearch = useDebounce(textSearch, 500);
-  const [query, dispatch] = useLogger(
-    useReducer(queryReducer, getInitialQuery(settings))
-  );
+  const [searchText, setSearchText] = useState(undefined);
+  const debouncedSearchText = useDebounce(searchText, 500);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [query, dispatch] = useReducer(queryReducer, getInitialQuery(settings));
 
   useEffect(() => {
     dispatch({ type: 'RESET', payload: settings });
@@ -23,11 +23,11 @@ const ItemPicker = () => {
 
   useEffect(() => {
     async function fetchColumns() {
-      if (!settings.sobject) return;
-      const description = await api.describe(settings.sobject);
+      if (!description) return;
+
       const columns = getColumns(description, settings);
-      if (!description || !columns) return;
-      setTitle(description.label + ' Picker');
+      if (!columns) return;
+
       dispatch({ type: 'UPDATE_COLUMNS', payload: columns });
       dispatch({
         type: 'UPDATE_SORT',
@@ -36,19 +36,21 @@ const ItemPicker = () => {
     }
 
     fetchColumns();
-  }, [api, settings, dispatch]);
+  }, [api, settings, description, dispatch]);
 
   useEffect(() => {
-    dispatch({ type: 'UPDATE_SEARCH', payload: debouncedTextSearch });
-  }, [debouncedTextSearch, dispatch]);
+    dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchText });
+  }, [debouncedSearchText, dispatch]);
 
   return (
-    <Card
-      className="item-picker"
-      heading={title}
-      icon={<Icon category="standard" name="multi_select_checkbox" />}
-      filter={<CardFilter onChange={(e, { value }) => setTextSearch(value)} />}
-    >
+    <Card className="item-picker" hasNoHeader={true}>
+      <Header query={query} description={description} />
+      <SearchInput
+        query={query}
+        description={description}
+        value={searchText}
+        onChange={value => setSearchText(value)}
+      />
       <QueryFilters
         query={query}
         onRemoveFilter={filter =>
@@ -57,7 +59,7 @@ const ItemPicker = () => {
       />
       <FilterTable
         query={query}
-        textSearch={textSearch}
+        searchText={searchText}
         selectedItems={selectedItems}
         onSelectItem={item => setSelectedItems(selectedItems.concat(item))}
         onRemoveItem={item =>

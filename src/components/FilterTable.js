@@ -8,7 +8,7 @@ const FilterTable = props => {
   const {
     selectedItems,
     query,
-    textSearch,
+    searchText,
     onAddFilter,
     onUpdateSort,
     onSelectItem,
@@ -32,12 +32,12 @@ const FilterTable = props => {
   }, [api, settings, query]);
 
   useEffect(() => {
-    if (query.searchText === textSearch) return;
-    const filteredItems = executeLocalSearch(query, items, textSearch);
+    if (query.searchText === searchText) return;
+    const filteredItems = executeLocalSearch(query, items, searchText);
     if (filteredItems === items) return;
     setItems(filteredItems);
     setLoading(true);
-  }, [query, items, textSearch]);
+  }, [query, items, searchText]);
 
   if (!query.columns) return null;
 
@@ -49,6 +49,13 @@ const FilterTable = props => {
 
   return (
     <div className="filter-table">
+      <div className="slds-card__body slds-card__body--inner">
+        <strong>
+          {selectedItems.length} Selected Item
+          {selectedItems.length === 1 ? '' : 's'}
+        </strong>
+      </div>
+
       <DataTable
         loading={loading}
         query={query}
@@ -59,24 +66,22 @@ const FilterTable = props => {
         onRemoveItem={onRemoveItem}
       />
 
-      {selectedItems.length > 0 && (
-        <>
-          <div className="slds-card__body slds-card__body--inner">
-            <strong>
-              {selectedItems.length} Selected Item
-              {selectedItems.length === 1 ? '' : 's'}
-            </strong>
-          </div>
+      <div className="slds-card__body slds-card__body--inner">
+        <strong>
+          {selectedItems.length} Selected Item
+          {selectedItems.length === 1 ? '' : 's'}
+        </strong>
+      </div>
 
-          <DataTable
-            query={query}
-            items={selectedItems}
-            selectedItems={selectedItems}
-            onAddFilter={onAddFilter}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </>
+      {selectedItems.length > 0 && (
+        <DataTable
+          query={query}
+          items={selectedItems}
+          selectedItems={selectedItems}
+          onAddFilter={onAddFilter}
+          onSelectItem={onSelectItem}
+          onRemoveItem={onRemoveItem}
+        />
       )}
     </div>
   );

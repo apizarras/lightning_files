@@ -7,19 +7,18 @@ const QueryFilters = props => {
   const { query, onRemoveFilter } = props;
   const { filters } = query;
 
-  if (!filters || !filters.length)
-    return (
-      <div className="slds-card__body slds-card__body--inner">
-        <p style={{ margin: '1.2rem 0' }}>
-          Quickly filter matches by selecting cells with desired values
-        </p>
-      </div>
-    );
+  if (!filters || !filters.length) return null;
+  // return (
+  //   <div className="slds-card__body slds-card__body--inner">
+  //     <p style={{ margin: '1.2rem 0' }}>
+  //       Quickly filter matches by selecting cells with desired values
+  //     </p>
+  //   </div>
+  // );
 
   return (
-    <div className="slds-card__body slds-card__body--inner">
+    <div className="slds-page-header slds-page-header_joined">
       <div className="query-filters">
-        <div className="query-filters-label">Filters:</div>
         {filters.map((filter, i) => (
           <FilterPill key={i} filter={filter} onRemove={onRemoveFilter} />
         ))}

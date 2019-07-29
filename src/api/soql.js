@@ -6,7 +6,7 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-function getSettingsFields(fields, setting) {
+export function getSettingsFields(fields, setting) {
   return (
     setting &&
     setting
@@ -134,6 +134,30 @@ export async function executeQuery(api, settings, query) {
   soql.push(`LIMIT ${BUFFER_SIZE}`);
 
   return api.query(soql.join(' '));
+}
+
+export function executeScalar(api, settings, query) {
+  const {
+    sobject,
+    columns,
+    orderBy,
+    staticFilters,
+    filters,
+    searchText
+  } = query;
+  if (!sobject || !columns || !orderBy) return;
+
+  const soql = [`SELECT COUNT() FROM ${sobject}`];
+  const conditions = [];
+
+  if (staticFilters) conditions.push(getConditions(staticFilters));
+  if (filters) conditions.push(getConditions(filters));
+  if (searchText)
+    conditions.push(getSearchConditions(settings, columns, searchText));
+  if (conditions.filter(x => x).length)
+    soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
+
+  return api.queryScalar(soql.join(' '));
 }
 
 export function executeLocalSearch(query, items, textSearch) {

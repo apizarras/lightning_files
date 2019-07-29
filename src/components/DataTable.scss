@@ -1,46 +1,63 @@
+$header-bg: #fafaf9;
+$header-color: #514f4d;
+$border-color: #dddbda;
+$cell-bg: #fff;
+$stripe-color: #f3f2f2;
+
 .sticky-table {
-  background: #f3f3f3;
-  color: #000;
+  background: $stripe-color;
   position: relative;
+  width: 100%;
   height: 100%;
-  font-size: 11px;
+  font-size: 0.7rem;
   box-sizing: border-box;
   overflow: auto;
 
   .sticky-table-table {
     display: table;
+    min-width: calc(100% + 1px);
     box-sizing: border-box;
-    border-bottom: 1px solid #d9d9d9;
   }
   .sticky-table-row {
     display: table-row;
+
+    &:hover {
+      background: darken($stripe-color, 10%);
+    }
   }
   .sticky-table-cell {
     display: table-cell;
     box-sizing: border-box;
-    padding: 3px 8px;
+    padding: 0.25rem 0.5rem calc(0.25rem - 1px);
+    border-bottom: 1px solid $border-color;
     white-space: nowrap;
   }
 }
 
 // zebra striping
 .sticky-table-row {
-  background: #fff;
+  background: $cell-bg;
 
-  // fixed column
+  // fixed checkbox column
   .sticky-table-cell:first-child {
-    background: #eeeeed;
-    padding: 3px 0 3px 0.5rem;
-    border-right: 1px solid #d9d9d9;
+    background: darken($cell-bg, 5%);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   &:nth-child(odd) {
     // striping for rows
-    background: #f3f3f3;
+    background: $stripe-color;
 
-    // fixed column
+    // fixed checkbox column
     .sticky-table-cell:first-child {
-      background: #e2e2e3;
+      background: darken($stripe-color, 2.5%);
+    }
+  }
+
+  &:hover {
+    // fixed checkbox column
+    .sticky-table-cell:first-child {
+      background: inherit;
     }
   }
 }
@@ -48,14 +65,9 @@
 // header row
 .sticky-table-row:first-child {
   .sticky-table-cell {
-    background: #f3f3f3;
-    font-weight: bold;
-    border-bottom: 1px solid #d9d9d9;
-  }
-
-  // fixed column
-  .sticky-table-cell:first-child {
-    background: #f3f3f3;
+    background: $header-bg !important;
+    color: $header-color;
+    font-weight: 700;
   }
 }
 
@@ -68,7 +80,7 @@
 
   .checkbox-cell {
     .slds-form-element {
-      top: -2px;
+      top: -1px;
     }
   }
 

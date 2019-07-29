@@ -2,9 +2,9 @@
 
 export const dataService = connection => {
   return {
-    theme: () => connection.getJSON('theme'),
     describe: sobject => connection.describe(sobject),
-    query: soql => connection.query(soql).then(r => r.records)
+    query: soql => connection.query(soql).then(r => r.records),
+    queryScalar: soql => connection.query(soql).then(r => r.totalSize)
   };
 };
 

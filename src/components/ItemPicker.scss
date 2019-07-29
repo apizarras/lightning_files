@@ -1,0 +1,10 @@
+.item-picker {
+  & > .slds-card__body {
+    margin: 0;
+  }
+
+  .slds-page-header ~ .slds-page-header {
+    padding-top: 0;
+    border-radius: 0;
+  }
+}
