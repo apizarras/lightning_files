@@ -2,7 +2,17 @@
 
 export const dataService = connection => {
   return {
-    describe: sobject => connection.describe(sobject),
+    describe: sobject =>
+      connection
+        .describe(sobject)
+        .then(({ name, label, labelPlural }) => ({ name, label, labelPlural })),
+    describeFields: sobject =>
+      connection.describe(sobject).then(description =>
+        description.fields.reduce((fields, field) => {
+          fields[field.name] = field;
+          return fields;
+        }, {})
+      ),
     query: soql => connection.query(soql).then(r => r.records),
     queryScalar: soql => connection.query(soql).then(r => r.totalSize)
   };

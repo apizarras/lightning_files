@@ -2,10 +2,21 @@
 
 export const DESIGN_ATTRIBUTES = [
   {
+    name: 'sObjectName',
+    label: 'Page Object API Name',
+    type: 'string'
+  },
+  {
+    name: 'recordId',
+    label: 'Page Record Id',
+    type: 'string'
+  },
+  {
     name: 'sobject',
     label: 'Object API Name',
     type: 'string',
-    defaultValue: 'FX5__Price_Book_Item__c'
+    // defaultValue: 'FX5__Price_Book_Item__c'
+    defaultValue: 'FX5__Equipment__c'
   },
   {
     name: 'displayedColumns',
@@ -13,25 +24,26 @@ export const DESIGN_ATTRIBUTES = [
     description:
       'Columns initially displayed in results table. Defined as a set of comma separated field API names',
     type: 'string',
-    defaultValue:
-      'FX5__Price_Book__c, FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c, FX5__Catalog_Cost__c, FX5__Discounted_Price__c'
+    defaultValue: 'Status__c, Name, Location__c'
+    // defaultValue:
+    //   'FX5__Price_Book__c, FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c, FX5__Catalog_Cost__c, FX5__Discounted_Price__c'
   },
   {
     name: 'searchFields',
     label: 'Search Fields',
     description:
       'Restrict columns used for type-ahead search. Defaults to all displayed columns of type string. Defined as a set of comma separated field API names',
-    type: 'string',
-    defaultValue: 'FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c'
+    type: 'string'
+    // defaultValue: 'FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c'
   },
   {
     name: 'restrictedFields',
     label: 'Restricted Fields',
     description:
       'Hide a set of fields from the user. Defined as a set of comma separated field API names',
-    type: 'string',
-    defaultValue:
-      'FX5__Breadcrumb__c,FX5__Catalog_Classification__c,FX5__CatalogItemPriceBook__c,FX5__Catalog_Price_Book_Index__c,FX5__Enable_Dynamic_Parenting__c,FX5__Catalog_Allow_Dynamic_Parenting__c,FX5__Ticket_Item_Record_Type__c,FX5__Sequence_Number__c,FX5__Requires_Parent_Item__c'
+    type: 'string'
+    // defaultValue:
+    //   'FX5__Breadcrumb__c,FX5__Catalog_Classification__c,FX5__CatalogItemPriceBook__c,FX5__Catalog_Price_Book_Index__c,FX5__Enable_Dynamic_Parenting__c,FX5__Catalog_Allow_Dynamic_Parenting__c,FX5__Ticket_Item_Record_Type__c,FX5__Sequence_Number__c,FX5__Requires_Parent_Item__c'
   },
   {
     name: 'hideSystemFields',

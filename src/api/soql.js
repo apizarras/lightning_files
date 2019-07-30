@@ -1,6 +1,12 @@
 import { SYSTEM_FIELDS } from '../constants';
 
-const BUFFER_SIZE = 100;
+const BUFFER_SIZE = 200;
+const MAX_COLUMNS = 10;
+
+function searchableColumnsFilter(column) {
+  const { type } = column;
+  return type === 'string' || type === 'reference' || type === 'picklist';
+}
 
 function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
@@ -11,7 +17,7 @@ export function getSettingsFields(fields, setting) {
     setting &&
     setting
       .split(',')
-      .map(name => fields.find(field => field.name === name.trim()))
+      .map(name => fields[name.trim()])
       .filter(field => field)
   );
 }
@@ -38,8 +44,8 @@ function getConditions(filters) {
     .join(' AND ');
 }
 
-function getFieldNames(fields) {
-  const fieldNames = fields.reduce(
+function getFieldNames(columns) {
+  const fieldNames = columns.reduce(
     (names, field) => {
       const { type, name, relationshipName } = field;
       names.push(name);
@@ -72,17 +78,16 @@ function getKeywords(searchText) {
     : [];
 }
 
-function getSearchConditions(settings, fields, searchText) {
+function getSearchConditions(columns, searchText) {
   const keywords = getKeywords(searchText);
   if (!keywords.length) return;
-  const columns = getSettingsFields(fields, settings.searchFields) || fields;
   return keywords.map(keyword => searchClause(columns, keyword)).join(' AND ');
 }
 
 // salesforce LIKE operator only supports strings
-function searchClause(fields, keyword) {
-  const clauses = fields
-    .filter(({ type }) => type === 'string' || type === 'reference')
+function searchClause(columns, keyword) {
+  const clauses = columns
+    .filter(searchableColumnsFilter)
     .map(({ type, name, relationshipName }) =>
       type === 'reference' ? `${relationshipName}.Name` : name
     )
@@ -95,17 +100,17 @@ function searchClause(fields, keyword) {
 export function getColumns(description, settings) {
   if (!description) return null;
 
-  const fields =
+  const columns =
     getSettingsFields(description.fields, settings.displayedColumns) ||
-    description.fields;
+    Object.values(description.fields);
 
-  return fields
+  return columns
     .filter(
       field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
     )
     .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name))
-    .slice(0, 20); // max 20 columns
+    .slice(0, MAX_COLUMNS);
 }
 
 export async function executeQuery(api, settings, query) {
@@ -125,8 +130,7 @@ export async function executeQuery(api, settings, query) {
 
   if (staticFilters) conditions.push(getConditions(staticFilters));
   if (filters) conditions.push(getConditions(filters));
-  if (searchText)
-    conditions.push(getSearchConditions(settings, columns, searchText));
+  if (searchText) conditions.push(getSearchConditions(columns, searchText));
   if (conditions.filter(x => x).length)
     soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
 
@@ -152,8 +156,7 @@ export function executeScalar(api, settings, query) {
 
   if (staticFilters) conditions.push(getConditions(staticFilters));
   if (filters) conditions.push(getConditions(filters));
-  if (searchText)
-    conditions.push(getSearchConditions(settings, columns, searchText));
+  if (searchText) conditions.push(getSearchConditions(columns, searchText));
   if (conditions.filter(x => x).length)
     soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
 
@@ -168,7 +171,7 @@ export function executeLocalSearch(query, items, textSearch) {
     if (item._keywords) return;
 
     item._keywords = query.columns
-      .filter(({ type }) => type === 'string' || type === 'reference')
+      .filter(searchableColumnsFilter)
       .map(({ type, name, relationshipName }) =>
         type === 'reference'
           ? item[name] && item[relationshipName].Name

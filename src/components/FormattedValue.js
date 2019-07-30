@@ -69,6 +69,7 @@ function FormattedValue(props) {
       const shallowObject = item && item[field.relationshipName];
       formatted = shallowObject ? shallowObject.Name || value : value;
       break;
+    case 'picklist':
     case 'string':
     case 'textarea':
     default:

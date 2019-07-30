@@ -6,6 +6,9 @@ import './DataTable.scss';
 
 const DataTable = props => {
   const {
+    className,
+    style,
+    compact,
     loading,
     query,
     items = [],
@@ -25,7 +28,10 @@ const DataTable = props => {
 
   return (
     <div
-      className={`data-table ${loading && items.length > 0 ? 'transient' : ''}`}
+      className={`data-table ${compact ? 'compact' : null} ${
+        loading && items.length > 0 ? 'transient' : ''
+      } ${className || ''}`}
+      style={style}
     >
       {loading && items.length === 0 && <Spinner size="small" variant="base" />}
       <StickyTable stickyColumnCount={1}>
@@ -49,15 +55,16 @@ const DataTable = props => {
             </Cell>
           ))}
         </Row>
+
         {items.map(item => (
           <Row key={item.Id}>
-            <Cell className="checkbox-cell">
-              <Checkbox
-                checked={selectedIds[item.Id]}
-                onChange={() =>
-                  selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item)
-                }
-              />
+            <Cell
+              className="checkbox-cell"
+              onClick={() =>
+                selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item)
+              }
+            >
+              <Checkbox checked={selectedIds[item.Id]} />
             </Cell>
             {query.columns.map(field => (
               <Cell

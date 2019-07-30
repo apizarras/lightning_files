@@ -1,6 +1,6 @@
 {
   "homepage": ".",
-  "name": "react_rental",
+  "name": "fx_item_picker",
   "version": "0.1.0",
   "private": true,
   "deploy-path": "../lightning/FX_React_Wrapper/force-app/main/default/staticresources/",

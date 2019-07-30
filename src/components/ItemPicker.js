@@ -11,7 +11,7 @@ import './ItemPicker.scss';
 
 const ItemPicker = props => {
   const { description } = props;
-  const { api, settings } = useAppContext();
+  const { api, settings, eventService } = useAppContext();
   const [searchText, setSearchText] = useState(undefined);
   const debouncedSearchText = useDebounce(searchText, 500);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -23,8 +23,6 @@ const ItemPicker = props => {
 
   useEffect(() => {
     async function fetchColumns() {
-      if (!description) return;
-
       const columns = getColumns(description, settings);
       if (!columns) return;
 
@@ -44,7 +42,24 @@ const ItemPicker = props => {
 
   return (
     <Card className="item-picker" hasNoHeader={true}>
-      <Header query={query} description={description} />
+      <Header
+        query={query}
+        description={description}
+        selectedItems={selectedItems}
+        onConfirm={() =>
+          eventService.triggerLightningEvent({
+            type: 'ITEMS_SELECTED',
+            payload: selectedItems.map(x => x.Id).join(',')
+          })
+        }
+        onClear={() => {
+          setSelectedItems([]);
+          eventService.triggerLightningEvent({
+            type: 'ITEMS_SELECTED',
+            payload: null
+          });
+        }}
+      />
       <SearchInput
         query={query}
         description={description}

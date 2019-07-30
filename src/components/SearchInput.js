@@ -10,7 +10,7 @@ const SearchInput = props => {
   const placeholder = getSearchFieldLabels(settings, description, query);
 
   return (
-    <div className="slds-page-header slds-page-header_joined">
+    <div className="slds-page-header">
       <Input
         iconLeft={
           <InputIcon

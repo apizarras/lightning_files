@@ -22,41 +22,43 @@ export default function LightningComponent(props) {
   );
 }
 
-export function initializeAura(component) {
+export function initialize(component) {
   const aura = window.$A;
 
-  function wrap(method, params, needsParse) {
+  const settings = DESIGN_ATTRIBUTES.reduce((settings, { name }) => {
+    settings[name] = component.get(`v.${name}`);
+    return settings;
+  }, {});
+
+  function wrap(method, params, jsonparse) {
     return new Promise((resolve, reject) => {
       const action = component.get(`c.${method}`);
-
-      action.setParams(params);
-      action.setCallback(this, function(response) {
-        const state = response.getState();
-
-        if (state === 'SUCCESS') {
-          //we have to json parse because metadata types are unsupported by AuraEnabled endpoints
-          const returnValue = response.getReturnValue();
-          resolve(needsParse ? JSON.parse(returnValue) : returnValue);
-        }
-
-        if (state === 'ERROR') {
-          reject(response.getError()[0]);
-        }
-      });
-
-      aura.getCallback(function() {
-        aura.enqueueAction(action);
-      })();
+      if (action) {
+        action.setParams(params);
+        action.setCallback(this, response => {
+          if (response.getState() === 'SUCCESS') {
+            var result = response.getReturnValue();
+            resolve(jsonparse ? JSON.parse(result) : result);
+          }
+          if (response.getState() === 'ERROR') {
+            reject(response.getError()[0]);
+          }
+        });
+        aura.getCallback(function() {
+          aura.enqueueAction(action);
+        })();
+      }
     });
   }
 
-  const settings = DESIGN_ATTRIBUTES.map(({ name }) =>
-    component.get(`v.${name}`)
-  );
-
   const dataService = {
     describe: sobjectType => wrap('describe', { sobjectType }, true),
-    query: soql => wrap('query', { soql })
+    describeFields: sobjectType =>
+      wrap('describeFields', { sobjectType }, true),
+    describePicklist: (sobjectType, fieldName) =>
+      wrap('describePicklist', { sobjectType, fieldName }, true),
+    query: soql => wrap('query', { soql }),
+    queryScalar: soql => wrap('query', { soql })
   };
 
   const eventService = {
@@ -80,8 +82,6 @@ export function initializeAura(component) {
       dataService={dataService}
       eventService={eventService}
     />,
-    component.find('root')
+    component.find('root').getElement()
   );
 }
-
-export function initializeLWC(webComponent) {}

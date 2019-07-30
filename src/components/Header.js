@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { executeScalar } from '../api/soql';
 import {
+  Icon,
   PageHeader,
   PageHeaderControl,
   Dropdown,
@@ -10,106 +11,8 @@ import {
   ButtonGroup
 } from '@salesforce/design-system-react';
 
-// const actions = () => (
-//   <PageHeaderControl>
-//     <ButtonGroup>
-//       <Button label="Clear Selection" />
-//       {/* <Button label="Import Leads" /> */}
-//       {/* <Dropdown
-//         align="right"
-//         assistiveText={{ icon: 'More Options' }}
-//         iconCategory="utility"
-//         iconName="down"
-//         iconVariant="border-filled"
-//         id="page-header-dropdown-object-home-nav-right"
-//         options={[
-//           { label: 'Menu Item One', value: 'A0' },
-//           { label: 'Menu Item Two', value: 'B0' },
-//           { label: 'Menu Item Three', value: 'C0' },
-//           { type: 'divider' },
-//           { label: 'Menu Item Four', value: 'D0' }
-//         ]}
-//       /> */}
-//     </ButtonGroup>
-//   </PageHeaderControl>
-// );
-
-const controls = () => (
-  <React.Fragment>
-    <PageHeaderControl>
-      <Dropdown
-        align="right"
-        id="page-header-dropdown-object-home-content-right"
-        options={[
-          { label: 'Menu Item One', value: 'A0' },
-          { label: 'Menu Item Two', value: 'B0' },
-          { label: 'Menu Item Three', value: 'C0' },
-          { type: 'divider' },
-          { label: 'Menu Item Four', value: 'D0' }
-        ]}
-      >
-        <DropdownTrigger>
-          <Button
-            assistiveText={{ icon: 'List View Controls' }}
-            iconCategory="utility"
-            iconName="settings"
-            iconVariant="more"
-          />
-        </DropdownTrigger>
-      </Dropdown>
-    </PageHeaderControl>
-    <PageHeaderControl>
-      <Dropdown
-        align="right"
-        assistiveText={{ icon: 'Change view' }}
-        iconCategory="utility"
-        iconName="settings"
-        iconVariant="more"
-        id="page-header-dropdown-object-home-content-right-2"
-        options={[
-          { label: 'Menu Item One', value: 'A0' },
-          { label: 'Menu Item Two', value: 'B0' },
-          { label: 'Menu Item Three', value: 'C0' },
-          { type: 'divider' },
-          { label: 'Menu Item Four', value: 'D0' }
-        ]}
-      >
-        <DropdownTrigger>
-          <Button
-            assistiveText={{ icon: 'Change view' }}
-            iconCategory="utility"
-            iconName="table"
-            iconVariant="more"
-            variant="icon"
-          />
-        </DropdownTrigger>
-      </Dropdown>
-    </PageHeaderControl>
-    <PageHeaderControl>
-      <Button
-        assistiveText={{ icon: 'Refresh' }}
-        iconCategory="utility"
-        iconName="refresh"
-        iconVariant="border"
-        variant="icon"
-      />
-    </PageHeaderControl>
-    <PageHeaderControl>
-      <ButtonGroup>
-        <Button
-          assistiveText={{ icon: 'Filters' }}
-          iconCategory="utility"
-          iconName="filterList"
-          iconVariant="border"
-          variant="icon"
-        />
-      </ButtonGroup>
-    </PageHeaderControl>
-  </React.Fragment>
-);
-
 const Header = props => {
-  const { description, query } = props;
+  const { description, query, selectedItems, onConfirm, onClear } = props;
   const { api, settings } = useAppContext();
   const [count, setCount] = useState();
 
@@ -124,25 +27,105 @@ const Header = props => {
     fetchRows();
   }, [api, settings, query]);
 
-  if (!query) return null;
+  if (!query || !query.columns) return null;
+
+  const filterOptions = [
+    { label: 'Add Filter', type: 'header' },
+    ...query.columns.map(({ label, name }) => ({
+      label,
+      value: name
+    }))
+  ];
+
+  const columnOptions = [
+    { label: 'Add Filter', type: 'header' },
+    ...Object.values(description.fields)
+      .map(({ label, name }) => ({
+        label,
+        value: name
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  ];
 
   return (
     <PageHeader
-      // onRenderActions={actions}
-      iconAssistiveText="Item Picker"
-      iconCategory="standard"
-      iconName="multi_select_checkbox"
-      info={
-        count &&
-        `${count} item${count === 1 ? '' : 's'} • sorted by ${query.orderBy &&
-          query.orderBy.field.label}`
-      }
       joined
-      label="Item Picker"
-      onRenderControls={controls}
-      title={description.labelPlural}
       truncate
       variant="object-home"
+      title={description.labelPlural}
+      label="Item Picker"
+      icon={<Icon category="standard" name="multi_select_checkbox" />}
+      info={
+        count &&
+        `${count} search ${
+          count === 1 ? 'result' : 'results'
+        } • sorted by ${query.orderBy && query.orderBy.field.label}`
+      }
+      onRenderActions={() =>
+        selectedItems.length > 0 && (
+          <PageHeaderControl>
+            <Button
+              className="slds-float_right"
+              onClick={onConfirm}
+              disabled={selectedItems.length === 0}
+              variant="brand"
+              label={`Confirm ${selectedItems.length || 'No'} ${
+                selectedItems.length === 1 ? 'Item' : 'Items'
+              }`}
+            />
+            <Button
+              className="slds-m-right_medium slds-float_right"
+              variant="base"
+              label="Clear Selection"
+              onClick={onClear}
+            />
+          </PageHeaderControl>
+        )
+      }
+      onRenderControls={() => (
+        <PageHeaderControl>
+          <ButtonGroup variant="list">
+            <Dropdown
+              align="right"
+              assistiveText={{ icon: 'Edit Columns' }}
+              iconCategory="utility"
+              iconName="settings"
+              iconVariant="more"
+              id="page-header-dropdown-object-home-content-right-2"
+              options={columnOptions}
+            >
+              <DropdownTrigger>
+                <Button
+                  assistiveText={{ icon: 'Edit Columns' }}
+                  iconCategory="utility"
+                  iconName="table"
+                  iconVariant="more"
+                  variant="icon"
+                />
+              </DropdownTrigger>
+            </Dropdown>
+            <Dropdown
+              align="right"
+              assistiveText={{ icon: 'Add Filter' }}
+              iconCategory="utility"
+              iconName="filterList"
+              iconVariant="more"
+              id="page-header-dropdown-object-home-content-right-2"
+              options={filterOptions}
+            >
+              <DropdownTrigger>
+                <Button
+                  assistiveText={{ icon: 'Add Filter' }}
+                  iconCategory="utility"
+                  iconName="filterList"
+                  iconVariant="more"
+                  variant="icon"
+                />
+              </DropdownTrigger>
+            </Dropdown>
+          </ButtonGroup>
+        </PageHeaderControl>
+      )}
     />
   );
 };

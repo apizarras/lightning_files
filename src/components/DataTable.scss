@@ -9,7 +9,6 @@ $stripe-color: #f3f2f2;
   position: relative;
   width: 100%;
   height: 100%;
-  font-size: 0.7rem;
   box-sizing: border-box;
   overflow: auto;
 
@@ -28,7 +27,7 @@ $stripe-color: #f3f2f2;
   .sticky-table-cell {
     display: table-cell;
     box-sizing: border-box;
-    padding: 0.25rem 0.5rem calc(0.25rem - 1px);
+    padding: 0.25rem 0.6rem calc(0.25rem - 1px);
     border-bottom: 1px solid $border-color;
     white-space: nowrap;
   }
@@ -73,14 +72,26 @@ $stripe-color: #f3f2f2;
 
 .data-table {
   position: relative;
+  border: 1px solid $border-color;
+
+  &.compact {
+    font-size: 0.7rem;
+  }
 
   &.transient {
     opacity: 0.5;
   }
 
   .checkbox-cell {
+    width: 1rem;
+
     .slds-form-element {
-      top: -1px;
+      width: 1rem;
+      height: 1rem;
+
+      .slds-checkbox_faux {
+        margin: -3px 0 0 !important;
+      }
     }
   }
 
