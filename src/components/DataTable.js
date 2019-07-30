@@ -2,6 +2,7 @@ import React from 'react';
 import { StickyTable, Row, Cell } from 'react-sticky-table';
 import { Checkbox, Spinner } from '@salesforce/design-system-react';
 import FormattedValue from './FormattedValue';
+import { motion, AnimatePresence } from 'framer-motion';
 import './DataTable.scss';
 
 const DataTable = props => {
@@ -56,29 +57,45 @@ const DataTable = props => {
           ))}
         </Row>
 
-        {items.map(item => (
-          <Row key={item.Id}>
-            <Cell
-              className="checkbox-cell"
-              onClick={() =>
-                selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item)
-              }
-            >
-              <Checkbox checked={selectedIds[item.Id]} />
-            </Cell>
-            {query.columns.map(field => (
+        <AnimatePresence>
+          {items.map(item => (
+            <Row key={item.Id}>
               <Cell
-                key={field.name}
-                className={onAddFilter ? 'filter-cell' : null}
-                data-type={field.type}
-                data-autonumber={field.autoNumber}
-                onClick={() => onAddFilter && onAddFilter({ field, item })}
+                className="checkbox-cell"
+                onClick={() =>
+                  selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item)
+                }
               >
-                <FormattedValue field={field} item={item} />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <Checkbox checked={selectedIds[item.Id]} />
+                </motion.div>
               </Cell>
-            ))}
-          </Row>
-        ))}
+              {query.columns.map(field => (
+                <Cell
+                  key={field.name}
+                  className={onAddFilter ? 'filter-cell' : null}
+                  data-type={field.type}
+                  data-autonumber={field.autoNumber}
+                  onClick={() => onAddFilter && onAddFilter({ field, item })}
+                >
+                  {item[field.name] && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <FormattedValue field={field} item={item} />
+                    </motion.div>
+                  )}
+                </Cell>
+              ))}
+            </Row>
+          ))}
+        </AnimatePresence>
       </StickyTable>
     </div>
   );
