@@ -82,9 +82,7 @@ const DataTable = props => {
                   data-autonumber={field.autoNumber}
                   onClick={() => onAddFilter && onAddFilter({ field, item })}
                 >
-                  {item[field.name] !== undefined && (
-                    <FormattedValue field={field} item={item} />
-                  )}
+                  <FormattedValue field={field} item={item} />
                 </Cell>
               ))}
             </Row>
