@@ -46,13 +46,6 @@ export const DESIGN_ATTRIBUTES = [
     //   'FX5__Breadcrumb__c,FX5__Catalog_Classification__c,FX5__CatalogItemPriceBook__c,FX5__Catalog_Price_Book_Index__c,FX5__Enable_Dynamic_Parenting__c,FX5__Catalog_Allow_Dynamic_Parenting__c,FX5__Ticket_Item_Record_Type__c,FX5__Sequence_Number__c,FX5__Requires_Parent_Item__c'
   },
   {
-    name: 'staticFilters',
-    label: 'Filters',
-    description: 'Fixed set of criteria to filter results',
-    type: 'string',
-    defaultValue: ''
-  },
-  {
     name: 'hideSystemFields',
     label: 'Hide System Fields',
     description:

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce } from '../api/hooks';
-import { getColumns, getStaticFilters } from '../api/query';
+import { getColumns } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -121,7 +121,6 @@ function queryReducer(state, action) {
 
 function getInitialQuery({ description, settings }) {
   const columns = getColumns(description, settings);
-  // const staticFilters = getStaticFilters(description, settings);
 
   return {
     sobject: settings.sobject,
@@ -130,15 +129,10 @@ function getInitialQuery({ description, settings }) {
       field: columns.find(x => x.type !== 'location'),
       direction: 'ASC'
     },
-    staticFilters: parseStaticFilters(description, settings),
+    staticFilters: [],
     filters: [],
     searchParams: undefined
   };
-}
-
-function parseStaticFilters(description, settings) {
-  if (!settings.staticFilters) return;
-  return settings.staticFilters;
 }
 
 export default ItemPicker;

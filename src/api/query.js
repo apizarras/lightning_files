@@ -24,7 +24,7 @@ function getSettingsFields(fields, setting) {
 
 function criteria(field, item) {
   const value = item[field.name];
-  if (!value) return 'NULL';
+  if (value === undefined || value === null) return 'NULL';
 
   switch (field.type) {
     case 'currency':
