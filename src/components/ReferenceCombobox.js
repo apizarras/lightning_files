@@ -11,12 +11,12 @@ const ReferenceCombobox = props => {
   const [options, setOptions] = useState();
 
   useEffect(() => {
-    if (!query || !field || options) return;
+    if (!query || !field) return;
 
     queryLookupOptions(api, query, field).then(values =>
       setOptions(values.map(({ Id, Name }) => ({ id: Id, label: Name })))
     );
-  }, [api, field, options, query]);
+  }, [api, query, field]);
 
   if (!query || !field) return null;
 
@@ -24,7 +24,9 @@ const ReferenceCombobox = props => {
     inputValue,
     limit: 10,
     options: options || [],
-    selection: []
+    selection: query.filters
+      .filter(filter => filter.field.name === field.name)
+      .map(({ field, item }) => ({ id: item[field.name] }))
   });
 
   return (

@@ -50,7 +50,7 @@ const SearchInput = props => {
   if (field && field.type === 'picklist') {
     inputComponent = (
       <PicklistCombobox
-        description={description}
+        query={query}
         field={field}
         onSelect={(event, item) => {
           onAddFilter({ field, item });

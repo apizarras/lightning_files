@@ -207,7 +207,12 @@ export function queryLookupOptions(api, query, field) {
 
   const fields = `${field.name}, ${field.relationshipName}.Name`;
   const soql = [`SELECT ${fields} FROM ${sobject}`];
-  soql.push(getWhereClause(query));
+  soql.push(
+    getWhereClause({
+      ...query,
+      filters: query.filters.filter(filter => filter.field.name !== field.name)
+    })
+  );
   soql.push(`GROUP BY ${fields}`);
   soql.push(`ORDER BY ${field.relationshipName}.Name`);
 
