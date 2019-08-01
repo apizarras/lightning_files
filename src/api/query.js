@@ -39,8 +39,19 @@ function criteria(field, item) {
 function getConditions(filters) {
   if (!filters || !filters.length) return;
 
-  return filters
-    .map(({ field, item }) => `${field.name} = ${criteria(field, item)}`)
+  const grouped = filters.reduce((byField, filter) => {
+    const fieldName = filter.field.name;
+    byField[fieldName] = byField[fieldName] || [];
+    byField[fieldName].push(filter);
+    return byField;
+  }, {});
+
+  return Object.values(grouped)
+    .map(filters => {
+      return filters
+        .map(({ field, item }) => `${field.name} = ${criteria(field, item)}`)
+        .join(' OR ');
+    })
     .join(' AND ');
 }
 
@@ -103,7 +114,6 @@ function searchClause(columns, keyword) {
 
 function getWhereClause(query) {
   const { columns, staticFilters, filters, searchParams } = query;
-
   const conditions = [];
 
   if (staticFilters) conditions.push(getConditions(staticFilters));

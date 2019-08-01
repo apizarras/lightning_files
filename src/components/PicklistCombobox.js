@@ -47,7 +47,6 @@ const PicklistCombobox = props => {
             console.log('onSelect', event, data);
           }
           setInputValue('');
-          setIsOpen(false);
         }
       }}
       options={availableOptions}
