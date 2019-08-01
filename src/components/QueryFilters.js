@@ -1,6 +1,7 @@
 import React from 'react';
 import FormattedValue from './FormattedValue';
-import { Pill, Icon } from '@salesforce/design-system-react';
+import { Pill } from '@salesforce/design-system-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './QueryFilters.scss';
 
 const QueryFilters = props => {
@@ -12,9 +13,11 @@ const QueryFilters = props => {
   return (
     <div className="slds-page-header slds-page-header_joined">
       <div className="query-filters">
-        {filters.map((filter, i) => (
-          <FilterPill key={i} filter={filter} onRemove={onRemoveFilter} />
-        ))}
+        <AnimatePresence>
+          {filters.map((filter, i) => (
+            <FilterPill key={i} filter={filter} onRemove={onRemoveFilter} />
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -24,17 +27,22 @@ const FilterPill = ({ filter, onRemove }) => {
   const { field, item } = filter;
 
   return (
-    <Pill
+    <motion.span
       className="query-filter"
-      icon={<Icon category="utility" name="filterList" size="xx-small" />}
-      labels={{
-        label: <FormattedValue field={field} item={item} />,
-        title: field.label,
-        removeTitle: 'Remove Filter'
-      }}
-      onClick={() => onRemove(filter)}
-      onRemove={() => onRemove(filter)}
-    />
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Pill
+        labels={{
+          label: <FormattedValue field={field} item={item} />,
+          title: field.label,
+          removeTitle: 'Remove Filter'
+        }}
+        onClick={() => onRemove(filter)}
+        onRemove={() => onRemove(filter)}
+      />
+    </motion.span>
   );
 };
 

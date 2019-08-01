@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { executeScalar } from '../api/soql';
+import { executeScalar } from '../api/query';
 import {
   Icon,
   PageHeader,
   PageHeaderControl,
-  Dropdown,
-  DropdownTrigger,
-  Button,
-  ButtonGroup
+  Button
+  // Dropdown,
+  // DropdownTrigger,
+  // ButtonGroup
 } from '@salesforce/design-system-react';
 
 const Header = props => {
   const { description, query, selectedItems, onConfirm, onClear } = props;
   const { api, settings } = useAppContext();
-  const [count, setCount] = useState();
+  const [count, setCount] = useState(null);
 
   useEffect(() => {
     if (!query || !query.columns) return;
@@ -29,23 +29,27 @@ const Header = props => {
 
   if (!query || !query.columns) return null;
 
-  const filterOptions = [
-    { label: 'Add Filter', type: 'header' },
-    ...query.columns.map(({ label, name }) => ({
-      label,
-      value: name
-    }))
-  ];
+  // const filterOptions = [
+  //   { label: 'Add Filter', type: 'header' },
+  //   ...query.columns.map(({ label, name }) => ({
+  //     label,
+  //     value: name,
+  //     leftIcon: {
+  //       category: 'utility',
+  //       name: 'filterList'
+  //     }
+  //   }))
+  // ];
 
-  const columnOptions = [
-    { label: 'Add Filter', type: 'header' },
-    ...Object.values(description.fields)
-      .map(({ label, name }) => ({
-        label,
-        value: name
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label))
-  ];
+  // const columnOptions = [
+  //   { label: 'Add Filter', type: 'header' },
+  //   ...Object.values(description.fields)
+  //     .map(({ label, name }) => ({
+  //       label,
+  //       value: name
+  //     }))
+  //     .sort((a, b) => a.label.localeCompare(b.label))
+  // ];
 
   return (
     <PageHeader
@@ -56,10 +60,11 @@ const Header = props => {
       label="Item Picker"
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
-        count &&
-        `${count} search ${
-          count === 1 ? 'result' : 'results'
-        } • sorted by ${query.orderBy && query.orderBy.field.label}`
+        count > 0
+          ? `${count} ${
+              count === 1 ? 'item' : 'items'
+            } • sorted by ${query.orderBy && query.orderBy.field.label}`
+          : 'No Matches'
       }
       onRenderActions={() =>
         selectedItems.length > 0 && (
@@ -82,50 +87,50 @@ const Header = props => {
           </PageHeaderControl>
         )
       }
-      onRenderControls={() => (
-        <PageHeaderControl>
-          <ButtonGroup variant="list">
-            <Dropdown
-              align="right"
-              assistiveText={{ icon: 'Edit Columns' }}
-              iconCategory="utility"
-              iconName="settings"
-              iconVariant="more"
-              id="page-header-dropdown-object-home-content-right-2"
-              options={columnOptions}
-            >
-              <DropdownTrigger>
-                <Button
-                  assistiveText={{ icon: 'Edit Columns' }}
-                  iconCategory="utility"
-                  iconName="table"
-                  iconVariant="more"
-                  variant="icon"
-                />
-              </DropdownTrigger>
-            </Dropdown>
-            <Dropdown
-              align="right"
-              assistiveText={{ icon: 'Add Filter' }}
-              iconCategory="utility"
-              iconName="filterList"
-              iconVariant="more"
-              id="page-header-dropdown-object-home-content-right-2"
-              options={filterOptions}
-            >
-              <DropdownTrigger>
-                <Button
-                  assistiveText={{ icon: 'Add Filter' }}
-                  iconCategory="utility"
-                  iconName="filterList"
-                  iconVariant="more"
-                  variant="icon"
-                />
-              </DropdownTrigger>
-            </Dropdown>
-          </ButtonGroup>
-        </PageHeaderControl>
-      )}
+      // onRenderControls={() => (
+      //   <PageHeaderControl>
+      //     <ButtonGroup variant="list">
+      //       {/* <Dropdown
+      //         align="right"
+      //         assistiveText={{ icon: 'Edit Columns' }}
+      //         iconCategory="utility"
+      //         iconName="settings"
+      //         iconVariant="more"
+      //         id="page-header-dropdown-object-home-content-right-2"
+      //         options={columnOptions}
+      //       >
+      //         <DropdownTrigger>
+      //           <Button
+      //             assistiveText={{ icon: 'Edit Columns' }}
+      //             iconCategory="utility"
+      //             iconName="table"
+      //             iconVariant="more"
+      //             variant="icon"
+      //           />
+      //         </DropdownTrigger>
+      //       </Dropdown> */}
+      //       <Dropdown
+      //         align="right"
+      //         assistiveText={{ icon: 'Add Filter' }}
+      //         iconCategory="utility"
+      //         iconName="filterList"
+      //         iconVariant="more"
+      //         id="page-header-dropdown-object-home-content-right-2"
+      //         options={filterOptions}
+      //       >
+      //         <DropdownTrigger>
+      //           <Button
+      //             assistiveText={{ icon: 'Add Filter' }}
+      //             iconCategory="utility"
+      //             iconName="filterList"
+      //             iconVariant="more"
+      //             variant="icon"
+      //           />
+      //         </DropdownTrigger>
+      //       </Dropdown>
+      //     </ButtonGroup>
+      //   </PageHeaderControl>
+      // )}
     />
   );
 };

@@ -17,14 +17,21 @@ module.exports = function override(config, env) {
     }
   ].concat(config.module.rules);
 
+  // Move runtime into bundle instead of separate file
+  config.optimization.runtimeChunk = false;
+
   // don't split bundle
   config.optimization.splitChunks = {
     cacheGroups: {
       default: false
     }
   };
-  // Move runtime into bundle instead of separate file
-  config.optimization.runtimeChunk = false;
+
+  // load React libraries separately
+  config.externals = {
+    react: 'React',
+    'react-dom': 'ReactDOM'
+  };
 
   // Entry Point for npm run build
   config.entry = path.join(__dirname, 'src', 'index-lightning.js');

@@ -12,7 +12,7 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-export function getSettingsFields(fields, setting) {
+function getSettingsFields(fields, setting) {
   return (
     setting &&
     setting
@@ -69,19 +69,23 @@ function getOrderBy(orderBy) {
   }
 }
 
-function getKeywords(searchText) {
-  return searchText
-    ? searchText
+function getKeywords(searchParams) {
+  return searchParams
+    ? searchParams.searchText
         .split(' ')
         .map(x => x.trim())
         .filter(x => x && x.length > 1)
     : [];
 }
 
-function getSearchConditions(columns, searchText) {
-  const keywords = getKeywords(searchText);
+function getSearchConditions(columns, searchParams) {
+  const keywords = getKeywords(searchParams);
   if (!keywords.length) return;
-  return keywords.map(keyword => searchClause(columns, keyword)).join(' AND ');
+  const searchColumns =
+    searchParams && searchParams.field ? [searchParams.field] : columns;
+  return keywords
+    .map(keyword => searchClause(searchColumns, keyword))
+    .join(' AND ');
 }
 
 // salesforce LIKE operator only supports strings
@@ -95,6 +99,21 @@ function searchClause(columns, keyword) {
     .join(' OR ');
 
   return `(${clauses})`;
+}
+
+function getWhereClause(query) {
+  const { columns, staticFilters, filters, searchParams } = query;
+
+  const conditions = [];
+
+  if (staticFilters) conditions.push(getConditions(staticFilters));
+  if (filters) conditions.push(getConditions(filters));
+  if (searchParams) conditions.push(getSearchConditions(columns, searchParams));
+
+  const filtered = conditions.filter(x => x);
+  if (!filtered.length) return;
+
+  return `WHERE ${filtered.join(' AND ')}`;
 }
 
 export function getColumns(description, settings) {
@@ -114,26 +133,12 @@ export function getColumns(description, settings) {
 }
 
 export async function executeQuery(api, settings, query) {
-  const {
-    sobject,
-    columns,
-    orderBy,
-    staticFilters,
-    filters,
-    searchText
-  } = query;
+  const { sobject, columns, orderBy, staticFilters } = query;
   if (!sobject || !columns || !orderBy) return [];
 
   const fieldNames = getFieldNames(columns, staticFilters);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
-  const conditions = [];
-
-  if (staticFilters) conditions.push(getConditions(staticFilters));
-  if (filters) conditions.push(getConditions(filters));
-  if (searchText) conditions.push(getSearchConditions(columns, searchText));
-  if (conditions.filter(x => x).length)
-    soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
-
+  soql.push(getWhereClause(query));
   soql.push(getOrderBy(orderBy));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
 
@@ -141,37 +146,30 @@ export async function executeQuery(api, settings, query) {
 }
 
 export function executeScalar(api, settings, query) {
-  const {
-    sobject,
-    columns,
-    orderBy,
-    staticFilters,
-    filters,
-    searchText
-  } = query;
+  const { sobject, columns, orderBy } = query;
   if (!sobject || !columns || !orderBy) return;
 
   const soql = [`SELECT COUNT() FROM ${sobject}`];
-  const conditions = [];
-
-  if (staticFilters) conditions.push(getConditions(staticFilters));
-  if (filters) conditions.push(getConditions(filters));
-  if (searchText) conditions.push(getSearchConditions(columns, searchText));
-  if (conditions.filter(x => x).length)
-    soql.push(`WHERE ${conditions.filter(x => x).join(' AND ')}`);
+  soql.push(getWhereClause(query));
 
   return api.queryScalar(soql.join(' '));
 }
 
-export function executeLocalSearch(query, items, textSearch) {
-  const keywords = getKeywords(textSearch).map(x => new RegExp(x.trim(), 'i'));
+export function executeLocalSearch(query, items, searchParams) {
+  const keywords = getKeywords(searchParams).map(
+    x => new RegExp(x.trim(), 'i')
+  );
   if (keywords.length === 0) return items;
+
+  const searchColumns = (searchParams && searchParams.field
+    ? [searchParams.field]
+    : query.columns
+  ).filter(searchableColumnsFilter);
 
   items.forEach(item => {
     if (item._keywords) return;
 
-    item._keywords = query.columns
-      .filter(searchableColumnsFilter)
+    item._keywords = searchColumns
       .map(({ type, name, relationshipName }) =>
         type === 'reference'
           ? item[name] && item[relationshipName].Name
@@ -190,52 +188,22 @@ export function executeLocalSearch(query, items, textSearch) {
     .slice(0, BUFFER_SIZE);
 }
 
-export function queryReducer(state, action) {
-  const { type, payload } = action;
+export function queryLookupOptions(api, query, field) {
+  const { sobject } = query;
+  if (!sobject) return [];
 
-  switch (type) {
-    case 'UPDATE_COLUMNS':
-      return { ...state, columns: payload };
-    case 'UPDATE_SORT':
-      const direction = state.orderBy
-        ? state.orderBy.field === payload
-          ? state.orderBy.direction === 'ASC'
-            ? 'DESC'
-            : 'ASC'
-          : 'ASC'
-        : 'ASC';
+  const fields = `${field.name}, ${field.relationshipName}.Name`;
+  const soql = [`SELECT ${fields} FROM ${sobject}`];
+  soql.push(getWhereClause(query));
+  soql.push(`GROUP BY`);
+  soql.push(fields);
+  soql.push('ORDER BY');
+  soql.push(`${field.relationshipName}.Name`);
 
-      return { ...state, orderBy: { field: payload, direction } };
-    case 'ADD_FILTER':
-      if (
-        state.filters.find(
-          ({ field, item }) =>
-            field.name === payload.field.name &&
-            item[field.name] === payload.item[field.name]
-        )
-      ) {
-        return state;
-      }
-      return { ...state, filters: state.filters.concat(payload) };
-    case 'REMOVE_FILTER':
-      return { ...state, filters: state.filters.filter(x => x !== payload) };
-    case 'UPDATE_SEARCH':
-      if (state.searchText === payload || payload.length === 1) return state;
-      return { ...state, searchText: payload };
-    case 'RESET':
-      return getInitialQuery(payload);
-    default:
-      return state;
-  }
-}
-
-export function getInitialQuery(settings) {
-  return {
-    sobject: settings.sobject,
-    columns: undefined,
-    orderBy: undefined,
-    staticFilters: settings.staticFilters,
-    filters: [],
-    searchText: undefined
-  };
+  return api.query(soql.join(' ')).then(results =>
+    results.map(x => ({
+      Id: x[field.name],
+      Name: x.Name
+    }))
+  );
 }

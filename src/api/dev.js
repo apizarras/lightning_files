@@ -13,6 +13,11 @@ export const dataService = connection => {
           return fields;
         }, {})
       ),
+    describePicklist: (sobject, fieldName) =>
+      connection.describe(sobject).then(description => {
+        return description.fields.find(f => f.name === fieldName)
+          .picklistValues;
+      }),
     query: soql => connection.query(soql).then(r => r.records),
     queryScalar: soql => connection.query(soql).then(r => r.totalSize)
   };

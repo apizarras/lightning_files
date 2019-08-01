@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { executeQuery, executeLocalSearch } from '../api/soql';
+import { executeQuery, executeLocalSearch } from '../api/query';
 import DataTable from './DataTable';
 import { Accordion, AccordionPanel } from '@salesforce/design-system-react';
 import './FilterTable.scss';
@@ -9,7 +9,7 @@ const FilterTable = props => {
   const {
     selectedItems,
     query,
-    searchText,
+    searchParams,
     onAddFilter,
     onUpdateSort,
     onSelectItem,
@@ -23,25 +23,29 @@ const FilterTable = props => {
 
   useEffect(() => {
     if (!query.columns) return;
+    let cancelled = false;
 
     async function fetchRows() {
       setLoading(true);
       const items = await executeQuery(api, settings, query);
+      if (cancelled) return;
       setItems(items);
       setLoading(false);
     }
 
     fetchRows();
+    return () => (cancelled = true);
   }, [api, settings, query]);
 
   useEffect(() => {
-    if (query.searchText === searchText) return;
-    const filteredItems = executeLocalSearch(query, items, searchText);
+    if (query.searchParams === searchParams) return;
+    const filteredItems = executeLocalSearch(query, items, searchParams);
     if (filteredItems === items) return;
+
     setItems(filteredItems);
     setLoading(true);
     setShowResults(true);
-  }, [query, items, searchText]);
+  }, [query, items, searchParams]);
 
   if (!query.columns) return null;
 
@@ -55,7 +59,7 @@ const FilterTable = props => {
     <div className="filter-table">
       <Accordion>
         <AccordionPanel
-          id="selected"
+          id="results"
           expanded={showResults}
           onTogglePanel={() => setShowResults(!showResults)}
           summary="Search Results (Top 100)"
@@ -74,21 +78,23 @@ const FilterTable = props => {
         </AccordionPanel>
         <AccordionPanel
           id="selected"
-          expanded={showSelected && selectedItems.length > 0}
+          expanded={showSelected}
           onTogglePanel={() => setShowSelected(!showSelected)}
           summary={`${selectedItems.length || 'No'} Selected Item${
             selectedItems.length === 1 ? '' : 's'
           }`}
         >
-          <DataTable
-            compact={true}
-            query={query}
-            items={selectedItems}
-            selectedItems={selectedItems}
-            onAddFilter={onAddFilter}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
+          {selectedItems.length > 0 && (
+            <DataTable
+              compact={true}
+              query={query}
+              items={selectedItems}
+              selectedItems={selectedItems}
+              onAddFilter={onAddFilter}
+              onSelectItem={onSelectItem}
+              onRemoveItem={onRemoveItem}
+            />
+          )}
         </AccordionPanel>
       </Accordion>
     </div>

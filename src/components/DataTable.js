@@ -83,13 +83,7 @@ const DataTable = props => {
                   onClick={() => onAddFilter && onAddFilter({ field, item })}
                 >
                   {item[field.name] && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <FormattedValue field={field} item={item} />
-                    </motion.div>
+                    <FormattedValue field={field} item={item} />
                   )}
                 </Cell>
               ))}
