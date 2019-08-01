@@ -4,7 +4,7 @@ import { Icon } from '@salesforce/design-system-react';
 function FormattedValue(props) {
   const { field, item } = props;
   const value = item && item[field.name];
-  if (!value) return null;
+  if (value === undefined) return null;
 
   let formatted;
 
