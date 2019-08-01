@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { queryLookupOptions } from '../api/query';
 import { Combobox } from '@salesforce/design-system-react';
@@ -8,37 +8,30 @@ const ReferenceCombobox = props => {
   const { query, field, onSelect } = props;
   const { api } = useAppContext();
   const [inputValue, setInputValue] = useState();
-  const [isOpen, setIsOpen] = useState(false);
-  const [lookupValues, dispatch] = useReducer(updateLookupValues, {});
+  const [options, setOptions] = useState();
 
   useEffect(() => {
-    if (!query || !field || lookupValues[field.name]) return;
+    if (!query || !field || options) return;
 
     queryLookupOptions(api, query, field).then(values =>
-      dispatch({
-        [field.name]: values.map(({ Id, Name }) => ({ id: Id, label: Name }))
-      })
+      setOptions(values.map(({ Id, Name }) => ({ id: Id, label: Name })))
     );
-  }, [api, field, lookupValues, query]);
+  }, [api, field, options, query]);
 
   if (!query || !field) return null;
 
   const availableOptions = comboboxFilterAndLimit({
     inputValue,
     limit: 10,
-    options: lookupValues[field.name] || [],
+    options: options || [],
     selection: []
   });
 
   return (
     <Combobox
-      isOpen={isOpen}
       events={{
-        onFocus: () => setIsOpen(true),
-        onBlur: () => setIsOpen(false),
         onChange: (event, { value }) => {
           setInputValue(value);
-          setIsOpen(true);
         },
         onSelect: (event, data) => {
           if (onSelect) {
@@ -51,7 +44,6 @@ const ReferenceCombobox = props => {
             console.log('onSelect', event, data);
           }
           setInputValue('');
-          setIsOpen(false);
         }
       }}
       options={availableOptions}
@@ -60,9 +52,5 @@ const ReferenceCombobox = props => {
     />
   );
 };
-
-function updateLookupValues(state, values) {
-  return { ...state, ...values };
-}
 
 export default ReferenceCombobox;

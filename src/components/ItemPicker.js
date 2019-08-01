@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce } from '../api/hooks';
-import { getColumns } from '../api/query';
+import { getColumns, getStaticFilters } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -11,30 +11,15 @@ import './ItemPicker.scss';
 
 const ItemPicker = props => {
   const { description } = props;
-  const { api, settings, eventService } = useAppContext();
+  const { settings, eventService } = useAppContext();
   const [searchParams, setSearchParams] = useState(undefined);
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [query, dispatch] = useReducer(queryReducer, getInitialQuery(settings));
+  const [query, dispatch] = useReducer(queryReducer, {});
 
   useEffect(() => {
-    dispatch({ type: 'RESET', payload: settings });
-  }, [dispatch, settings]);
-
-  useEffect(() => {
-    async function fetchColumns() {
-      const columns = getColumns(description, settings);
-      if (!columns) return;
-
-      dispatch({ type: 'UPDATE_COLUMNS', payload: columns });
-      dispatch({
-        type: 'UPDATE_SORT',
-        payload: columns.find(x => x.type !== 'location')
-      });
-    }
-
-    fetchColumns();
-  }, [api, settings, description, dispatch]);
+    dispatch({ type: 'INITIALIZE', payload: { description, settings } });
+  }, [dispatch, description, settings]);
 
   useEffect(() => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
@@ -127,22 +112,33 @@ function queryReducer(state, action) {
       if (state.searchParams === payload) return state;
       if (payload && payload.searchText.length === 1) return state;
       return { ...state, searchParams: payload };
-    case 'RESET':
+    case 'INITIALIZE':
       return getInitialQuery(payload);
     default:
       return state;
   }
 }
 
-function getInitialQuery(settings) {
+function getInitialQuery({ description, settings }) {
+  const columns = getColumns(description, settings);
+  // const staticFilters = getStaticFilters(description, settings);
+
   return {
     sobject: settings.sobject,
-    columns: undefined,
-    orderBy: undefined,
-    staticFilters: settings.staticFilters,
+    columns,
+    orderBy: columns && {
+      field: columns.find(x => x.type !== 'location'),
+      direction: 'ASC'
+    },
+    staticFilters: parseStaticFilters(description, settings),
     filters: [],
     searchParams: undefined
   };
+}
+
+function parseStaticFilters(description, settings) {
+  if (!settings.staticFilters) return;
+  return settings.staticFilters;
 }
 
 export default ItemPicker;

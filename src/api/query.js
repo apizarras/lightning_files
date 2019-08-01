@@ -48,9 +48,11 @@ function getConditions(filters) {
 
   return Object.values(grouped)
     .map(filters => {
-      return filters
+      const group = filters
         .map(({ field, item }) => `${field.name} = ${criteria(field, item)}`)
+        .filter(clause => clause)
         .join(' OR ');
+      return group && `(${group})`;
     })
     .join(' AND ');
 }
@@ -107,9 +109,10 @@ function searchClause(columns, keyword) {
       type === 'reference' ? `${relationshipName}.Name` : name
     )
     .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword)}%'`)
+    .filter(clause => clause)
     .join(' OR ');
 
-  return `(${clauses})`;
+  return clauses && `(${clauses})`;
 }
 
 function getWhereClause(query) {
@@ -205,10 +208,8 @@ export function queryLookupOptions(api, query, field) {
   const fields = `${field.name}, ${field.relationshipName}.Name`;
   const soql = [`SELECT ${fields} FROM ${sobject}`];
   soql.push(getWhereClause(query));
-  soql.push(`GROUP BY`);
-  soql.push(fields);
-  soql.push('ORDER BY');
-  soql.push(`${field.relationshipName}.Name`);
+  soql.push(`GROUP BY ${fields}`);
+  soql.push(`ORDER BY ${field.relationshipName}.Name`);
 
   return api.query(soql.join(' ')).then(results =>
     results.map(x => ({

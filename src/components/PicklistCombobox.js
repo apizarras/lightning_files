@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { Combobox } from '@salesforce/design-system-react';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
@@ -6,38 +6,33 @@ import comboboxFilterAndLimit from '@salesforce/design-system-react/components/c
 const PicklistCombobox = props => {
   const { description, field, onSelect } = props;
   const { api } = useAppContext();
-  const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState();
-  const [picklistValues, dispatch] = useReducer(updatePicklistValues, {});
+  const [options, setOptions] = useState();
 
   useEffect(() => {
-    if (!field || picklistValues[field.name]) return;
+    if (!field || options) return;
 
-    api.describePicklist(description.name, field.name).then(values =>
-      dispatch({
-        [field.name]: values.map(({ value }) => ({ id: value, label: value }))
-      })
-    );
-  }, [api, description, field, picklistValues]);
+    api
+      .describePicklist(description.name, field.name)
+      .then(values =>
+        setOptions(values.map(({ value }) => ({ id: value, label: value })))
+      );
+  }, [api, description, field, options]);
 
   if (!description || !field) return null;
 
   const availableOptions = comboboxFilterAndLimit({
     inputValue,
     limit: 10,
-    options: picklistValues[field.name] || [],
+    options: options || [],
     selection: []
   });
 
   return (
     <Combobox
-      isOpen={isOpen}
       events={{
-        onFocus: () => setIsOpen(true),
-        onBlur: () => setIsOpen(false),
         onChange: (event, { value }) => {
           setInputValue(value);
-          setIsOpen(true);
         },
         onSelect: (event, data) => {
           if (onSelect) {
@@ -50,14 +45,11 @@ const PicklistCombobox = props => {
         }
       }}
       options={availableOptions}
+      predefinedOptionsOnly={true}
       selection={[]}
       value={inputValue}
     />
   );
 };
-
-function updatePicklistValues(state, values) {
-  return { ...state, ...values };
-}
 
 export default PicklistCombobox;
