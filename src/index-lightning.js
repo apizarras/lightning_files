@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContextProvider } from './contexts/AppContext';
-import { IconSettings } from '@salesforce/design-system-react';
+import { Settings, IconSettings } from '@salesforce/design-system-react';
 import { DESIGN_ATTRIBUTES } from './constants';
 import { handleAppEvent } from './api/events';
 import App from './App';
@@ -76,12 +76,15 @@ export function initialize(component) {
     handleAppEvent(event.getParams())
   );
 
+  const appElement = component.find('root').getElement();
+  Settings.appElement(appElement);
+
   ReactDOM.render(
     <LightningComponent
       settings={settings}
       dataService={dataService}
       eventService={eventService}
     />,
-    component.find('root').getElement()
+    appElement
   );
 }

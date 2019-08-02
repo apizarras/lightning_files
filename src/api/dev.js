@@ -18,6 +18,8 @@ export const dataService = connection => {
         return description.fields.find(f => f.name === fieldName)
           .picklistValues;
       }),
+    searchLayout: sobject =>
+      connection.getJSON(`search/layout/?q=${sobject}`).then(r => r[0]),
     query: soql => connection.query(soql).then(r => r.records),
     queryScalar: soql => connection.query(soql).then(r => r.totalSize)
   };

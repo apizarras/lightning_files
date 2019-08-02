@@ -62,9 +62,7 @@ const FilterTable = props => {
           id="results"
           expanded={showResults}
           onTogglePanel={() => setShowResults(!showResults)}
-          summary={`Search Results ${
-            availableItems.length === 100 ? ' ( Top 100 Matches )' : ''
-          }`}
+          summary="Available Items (Top 100 Results)"
         >
           <DataTable
             compact={true}

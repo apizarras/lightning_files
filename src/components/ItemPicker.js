@@ -11,15 +11,21 @@ import './ItemPicker.scss';
 
 const ItemPicker = props => {
   const { description } = props;
-  const { settings, eventService } = useAppContext();
+  const { api, settings, eventService } = useAppContext();
   const [searchParams, setSearchParams] = useState(undefined);
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
   const [query, dispatch] = useReducer(queryReducer, {});
 
   useEffect(() => {
-    dispatch({ type: 'INITIALIZE', payload: { description, settings } });
-  }, [dispatch, description, settings]);
+    async function init() {
+      // const columns = getColumns(description, settings);
+      const layout = await api.searchLayout(description.name);
+      const columns = getColumnsFromSearchLayout(description, layout);
+      dispatch({ type: 'INITIALIZE', payload: { columns, settings } });
+    }
+    init();
+  }, [api, dispatch, description, settings]);
 
   useEffect(() => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
@@ -119,12 +125,11 @@ function queryReducer(state, action) {
   }
 }
 
-function getInitialQuery({ description, settings }) {
-  const columns = getColumns(description, settings);
-
+function getInitialQuery({ columns, settings }) {
   return {
     sobject: settings.sobject,
     columns,
+    selectedColumns: columns,
     orderBy: columns && {
       field: columns.find(x => x.type !== 'location'),
       direction: 'ASC'
@@ -133,6 +138,18 @@ function getInitialQuery({ description, settings }) {
     filters: [],
     searchParams: undefined
   };
+}
+
+function getColumnsFromSearchLayout(description, layout) {
+  return layout.searchColumns
+    .map(({ name, format, label }) => {
+      const fieldName = name
+        .replace('r.Name', 'c')
+        .replace('toLabel(', '')
+        .replace(')', '');
+      return description.fields[fieldName];
+    })
+    .filter(field => field);
 }
 
 export default ItemPicker;

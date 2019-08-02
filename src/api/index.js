@@ -8,6 +8,7 @@ export function createApi(dataService) {
     },
     describePicklist: (sobject, fieldName) =>
       dataService.describePicklist(sobject, fieldName),
+    searchLayout: sobject => dataService.searchLayout(sobject),
     query: soql => dataService.query(soql),
     queryScalar: soql => dataService.queryScalar(soql)
   };

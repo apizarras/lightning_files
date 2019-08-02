@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import { ConnectionProvider, useConnection, useSettings } from './contexts/dev';
 import { dataService, eventService } from './api/dev';
 import LightningComponent from './index-lightning';
+import { Settings } from '@salesforce/design-system-react';
+
+const appElement = document.getElementById('root');
+Settings.setAppElement(appElement);
 
 // stubs out AppContext params for local dev
 const Component = props => {
@@ -22,5 +26,5 @@ ReactDOM.render(
   <ConnectionProvider>
     <Component />
   </ConnectionProvider>,
-  document.getElementById('root')
+  appElement
 );

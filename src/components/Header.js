@@ -5,10 +5,10 @@ import {
   Icon,
   PageHeader,
   PageHeaderControl,
-  Button
-  // Dropdown,
-  // DropdownTrigger,
-  // ButtonGroup
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  ButtonGroup
 } from '@salesforce/design-system-react';
 
 const Header = props => {
@@ -87,50 +87,51 @@ const Header = props => {
           </PageHeaderControl>
         )
       }
-      // onRenderControls={() => (
-      //   <PageHeaderControl>
-      //     <ButtonGroup variant="list">
-      //       {/* <Dropdown
-      //         align="right"
-      //         assistiveText={{ icon: 'Edit Columns' }}
-      //         iconCategory="utility"
-      //         iconName="settings"
-      //         iconVariant="more"
-      //         id="page-header-dropdown-object-home-content-right-2"
-      //         options={columnOptions}
-      //       >
-      //         <DropdownTrigger>
-      //           <Button
-      //             assistiveText={{ icon: 'Edit Columns' }}
-      //             iconCategory="utility"
-      //             iconName="table"
-      //             iconVariant="more"
-      //             variant="icon"
-      //           />
-      //         </DropdownTrigger>
-      //       </Dropdown> */}
-      //       <Dropdown
-      //         align="right"
-      //         assistiveText={{ icon: 'Add Filter' }}
-      //         iconCategory="utility"
-      //         iconName="filterList"
-      //         iconVariant="more"
-      //         id="page-header-dropdown-object-home-content-right-2"
-      //         options={filterOptions}
-      //       >
-      //         <DropdownTrigger>
-      //           <Button
-      //             assistiveText={{ icon: 'Add Filter' }}
-      //             iconCategory="utility"
-      //             iconName="filterList"
-      //             iconVariant="more"
-      //             variant="icon"
-      //           />
-      //         </DropdownTrigger>
-      //       </Dropdown>
-      //     </ButtonGroup>
-      //   </PageHeaderControl>
-      // )}
+      onRenderControls={() => (
+        <PageHeaderControl>
+          <ButtonGroup variant="list">
+            <Dropdown
+              align="right"
+              assistiveText={{ icon: 'Edit Columns' }}
+              iconCategory="utility"
+              iconName="settings"
+              iconVariant="more"
+              id="page-header-dropdown-object-home-content-right-2"
+              options={query.columns}
+              onClose={() => console.log('closed')}
+            >
+              <DropdownTrigger>
+                <Button
+                  assistiveText={{ icon: 'Edit Columns' }}
+                  iconCategory="utility"
+                  iconName="table"
+                  iconVariant="more"
+                  variant="icon"
+                />
+              </DropdownTrigger>
+            </Dropdown>
+            {/* <Dropdown
+              align="right"
+              assistiveText={{ icon: 'Add Filter' }}
+              iconCategory="utility"
+              iconName="filterList"
+              iconVariant="more"
+              id="page-header-dropdown-object-home-content-right-2"
+              options={filterOptions}
+            >
+              <DropdownTrigger>
+                <Button
+                  assistiveText={{ icon: 'Add Filter' }}
+                  iconCategory="utility"
+                  iconName="filterList"
+                  iconVariant="more"
+                  variant="icon"
+                />
+              </DropdownTrigger>
+            </Dropdown> */}
+          </ButtonGroup>
+        </PageHeaderControl>
+      )}
     />
   );
 };
