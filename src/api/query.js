@@ -4,6 +4,7 @@ const BUFFER_SIZE = 200;
 const MAX_COLUMNS = 10;
 
 function searchableColumnsFilter(column) {
+  // salesforce LIKE operator only supports strings
   const { type } = column;
   return type === 'string' || type === 'reference' || type === 'picklist';
 }
@@ -33,7 +34,7 @@ function createFilterClause(filter) {
   return `${field.name} = ${formatted}`;
 }
 
-function getConditions(filters) {
+function createGroupedFiltersClause(filters) {
   if (!filters || !filters.length) return;
 
   const grouped = filters.reduce((groupsByField, filter) => {
@@ -52,50 +53,20 @@ function getConditions(filters) {
     .join(' AND ');
 }
 
-function getFieldNames(columns) {
-  const fieldNames = columns.reduce((names, field) => {
-    const { type, name, relationshipName } = field;
-    names.push(name);
-    if (type === 'reference') names.push(`${relationshipName}.Name`);
-    return names;
-  }, []);
-  return fieldNames;
-}
-
-function getOrderBy(orderBy) {
+function createOrderBy(orderBy) {
   const { field, direction } = orderBy;
 
   switch (field.type) {
     case 'location':
       return;
     case 'reference':
-      return ` ORDER BY ${field.relationshipName}.Name ${direction}`;
+      return `ORDER BY ${field.relationshipName}.Name ${direction}`;
     default:
-      return ` ORDER BY ${field.name} ${direction}`;
+      return `ORDER BY ${field.name} ${direction}`;
   }
 }
 
-function getKeywords(searchParams) {
-  return searchParams
-    ? searchParams.searchText
-        .split(' ')
-        .map(x => x.trim())
-        .filter(x => x && x.length > 1)
-    : [];
-}
-
-function getSearchConditions(columns, searchParams) {
-  const keywords = getKeywords(searchParams);
-  if (!keywords.length) return;
-  const searchColumns =
-    searchParams && searchParams.field ? [searchParams.field] : columns;
-  return keywords
-    .map(keyword => searchClause(searchColumns, keyword))
-    .join(' AND ');
-}
-
-// salesforce LIKE operator only supports strings
-function searchClause(columns, keyword) {
+function createGroupedSearchClause(columns, keyword) {
   const clauses = columns
     .filter(searchableColumnsFilter)
     .map(({ type, name, relationshipName }) =>
@@ -108,18 +79,46 @@ function searchClause(columns, keyword) {
   return clauses && `(${clauses})`;
 }
 
-function getWhereClause(query) {
+function createSearchClause(columns, searchParams) {
+  const keywords = splitKeywords(searchParams);
+  if (!keywords.length) return;
+  const searchColumns =
+    searchParams && searchParams.field ? [searchParams.field] : columns;
+  return keywords
+    .map(keyword => createGroupedSearchClause(searchColumns, keyword))
+    .join(' AND ');
+}
+
+function createWhereClause(query) {
   const { columns, staticFilters, filters, searchParams } = query;
   const conditions = [];
 
-  if (staticFilters) conditions.push(getConditions(staticFilters));
-  if (filters) conditions.push(getConditions(filters));
-  if (searchParams) conditions.push(getSearchConditions(columns, searchParams));
+  if (staticFilters) conditions.push(createGroupedFiltersClause(staticFilters));
+  if (filters) conditions.push(createGroupedFiltersClause(filters));
+  if (searchParams) conditions.push(createSearchClause(columns, searchParams));
 
   const filtered = conditions.filter(x => x);
   if (!filtered.length) return;
 
   return `WHERE ${filtered.join(' AND ')}`;
+}
+
+function getFieldNames(columns) {
+  return columns.reduce((names, field) => {
+    const { type, name, relationshipName } = field;
+    names.push(name);
+    if (type === 'reference') names.push(`${relationshipName}.Name`);
+    return names;
+  }, []);
+}
+
+function splitKeywords(searchParams) {
+  return searchParams
+    ? searchParams.searchText
+        .split(' ')
+        .map(x => x.trim())
+        .filter(x => x && x.length > 1)
+    : [];
 }
 
 export function getDisplayedColumns(description, settings, columns) {
@@ -140,8 +139,8 @@ export async function executeQuery(api, query) {
 
   const fieldNames = getFieldNames(columns, staticFilters);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
-  soql.push(getWhereClause(query));
-  soql.push(getOrderBy(orderBy));
+  soql.push(createWhereClause(query));
+  soql.push(createOrderBy(orderBy));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
 
   return api.query(soql.join(' '));
@@ -152,13 +151,13 @@ export function executeScalar(api, query) {
   if (!sobject || !columns || !orderBy) return;
 
   const soql = [`SELECT COUNT() FROM ${sobject}`];
-  soql.push(getWhereClause(query));
+  soql.push(createWhereClause(query));
 
   return api.queryScalar(soql.join(' '));
 }
 
 export function executeLocalSearch(query, items, searchParams) {
-  const keywords = getKeywords(searchParams).map(
+  const keywords = splitKeywords(searchParams).map(
     x => new RegExp(x.trim(), 'i')
   );
   if (keywords.length === 0) return items;
@@ -197,7 +196,7 @@ export function queryLookupOptions(api, query, field) {
   const fields = `${field.name}, ${field.relationshipName}.Name`;
   const soql = [`SELECT ${fields} FROM ${sobject}`];
   soql.push(
-    getWhereClause({
+    createWhereClause({
       ...query,
       filters: query.filters.filter(filter => filter.field.name !== field.name)
     })

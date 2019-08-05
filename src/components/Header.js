@@ -65,26 +65,28 @@ const Header = props => {
             } • sorted by ${query.orderBy && query.orderBy.field.label}`
           : 'No Matches'
       }
-      onRenderActions={() =>
-        selectedItems.length > 0 && (
-          <PageHeaderControl>
-            <Button
-              className="slds-float_right"
-              onClick={onConfirm}
-              disabled={selectedItems.length === 0}
-              variant="brand"
-              label={`Confirm ${selectedItems.length || 'No'} ${
-                selectedItems.length === 1 ? 'Item' : 'Items'
-              }`}
-            />
-            <Button
-              className="slds-m-right_medium slds-float_right"
-              variant="base"
-              label="Clear Selection"
-              onClick={onClear}
-            />
-          </PageHeaderControl>
-        )
+      onRenderActions={
+        selectedItems.length > 0
+          ? () => (
+              <PageHeaderControl>
+                <Button
+                  className="slds-float_right"
+                  onClick={onConfirm}
+                  disabled={selectedItems.length === 0}
+                  variant="brand"
+                  label={`Confirm ${selectedItems.length || 'No'} ${
+                    selectedItems.length === 1 ? 'Item' : 'Items'
+                  }`}
+                />
+                <Button
+                  className="slds-m-right_medium slds-float_right"
+                  variant="base"
+                  label="Clear Selection"
+                  onClick={onClear}
+                />
+              </PageHeaderControl>
+            )
+          : undefined
       }
       onRenderControls={() => (
         <PageHeaderControl>

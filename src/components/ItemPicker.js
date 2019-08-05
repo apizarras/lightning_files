@@ -27,12 +27,16 @@ const ItemPicker = props => {
         settings,
         columns
       );
+      const orderBy = displayedColumns && {
+        field: displayedColumns.find(x => x.type !== 'location'),
+        direction: 'ASC'
+      };
       setDisplayedColumns(
         displayedColumns.map(field => ({ field, visible: true }))
       );
       dispatch({
         type: 'INITIALIZE',
-        payload: { columns, settings }
+        payload: { sobject: settings.sobject, columns, orderBy }
       });
     }
     init();
@@ -139,14 +143,11 @@ function queryReducer(state, action) {
   }
 }
 
-function getInitialQuery({ columns, settings }) {
+function getInitialQuery({ sobject, columns, orderBy }) {
   return {
-    sobject: settings.sobject,
+    sobject,
     columns,
-    orderBy: columns && {
-      field: columns.find(x => x.type !== 'location'),
-      direction: 'ASC'
-    },
+    orderBy,
     staticFilters: [],
     filters: [],
     searchParams: undefined
