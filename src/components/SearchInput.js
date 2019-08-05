@@ -24,7 +24,7 @@ const SearchInput = props => {
     onChange({ field, searchText });
   }, [value, field, searchText, onChange]);
 
-  if (!description || !query || !query.columns) return null;
+  if (!query.columns) return null;
 
   let inputComponent = (
     <Input

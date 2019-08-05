@@ -23,7 +23,6 @@ const FilterTable = props => {
   const [showSelected, setShowSelected] = useState(false);
 
   useEffect(() => {
-    if (!query.columns) return;
     let cancelled = false;
 
     async function fetchRows() {

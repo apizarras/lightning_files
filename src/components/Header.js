@@ -25,8 +25,6 @@ const Header = props => {
   const [count, setCount] = useState(null);
 
   useEffect(() => {
-    if (!query || !query.columns) return;
-
     async function fetchRows() {
       const count = await executeScalar(api, query);
       setCount(count);
@@ -35,7 +33,7 @@ const Header = props => {
     fetchRows();
   }, [api, query]);
 
-  if (!query || !query.columns) return null;
+  if (!query.columns) return null;
 
   function onColumnSelect({ value }) {
     const found = displayedColumns.find(({ field }) => field.name === value);

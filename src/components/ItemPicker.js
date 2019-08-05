@@ -27,8 +27,13 @@ const ItemPicker = props => {
         settings,
         columns
       );
-      setDisplayedColumns(displayedColumns);
-      dispatch({ type: 'INITIALIZE', payload: { columns, settings } });
+      setDisplayedColumns(
+        displayedColumns.map(field => ({ field, visible: true }))
+      );
+      dispatch({
+        type: 'INITIALIZE',
+        payload: { columns, settings }
+      });
     }
     init();
   }, [api, dispatch, description, settings]);

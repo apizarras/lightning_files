@@ -131,8 +131,7 @@ export function getDisplayedColumns(description, settings, columns) {
     )
     .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name))
-    .slice(0, MAX_COLUMNS)
-    .map(field => ({ visible: true, field }));
+    .slice(0, MAX_COLUMNS);
 }
 
 export async function executeQuery(api, query) {
