@@ -20,7 +20,6 @@ const ItemPicker = props => {
 
   useEffect(() => {
     async function init() {
-      // const columns = getColumns(description, settings);
       const layout = await api.searchLayout(description.name);
       const columns = getColumnsFromSearchLayout(description, layout);
       const displayedColumns = getDisplayedColumns(
@@ -151,13 +150,18 @@ function getInitialQuery({ columns, settings }) {
 
 function getColumnsFromSearchLayout(description, layout) {
   return layout.searchColumns
-    .map(({ name, format, label }) => {
-      const fieldName = name
-        .replace('r.Name', 'c')
-        .replace('toLabel(', '')
-        .replace(')', '');
-      return description.fields[fieldName];
-    })
+    .reduce(
+      (names, { name }) => {
+        const fieldName = name
+          .replace('r.Name', 'c')
+          .replace('toLabel(', '')
+          .replace(')', '');
+        names.push(fieldName);
+        return names;
+      },
+      ['Id', 'CurrencyIsoCode']
+    )
+    .map(name => description.fields[name])
     .filter(field => field);
 }
 

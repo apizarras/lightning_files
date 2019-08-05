@@ -38,43 +38,19 @@ const Header = props => {
   if (!query || !query.columns) return null;
 
   function onColumnSelect({ value }) {
-    const found = displayedColumns.find(({ name }) => name === value);
-    if (found) {
-      onColumnsChange(displayedColumns.filter(({ name }) => name !== value));
-    } else {
-      const columnNames = [...displayedColumns.map(x => x.name), value];
-      onColumnsChange(
-        query.columns.filter(({ name }) => !!~columnNames.indexOf(name))
-      );
-    }
+    const found = displayedColumns.find(({ field }) => field.name === value);
+    found.visible = !found.visible;
+    onColumnsChange([...displayedColumns]);
   }
 
-  // const filterOptions = [
-  //   { label: 'Add Filter', type: 'header' },
-  //   ...query.columns.map(({ label, name }) => ({
-  //     label,
-  //     value: name,
-  //     leftIcon: {
-  //       category: 'utility',
-  //       name: 'filterList'
-  //     }
-  //   }))
-  // ];
-
-  // const columnOptions = [
-  //   { label: 'Add Filter', type: 'header' },
-  //   ...Object.values(description.fields)
-  //     .map(({ label, name }) => ({
-  //       label,
-  //       value: name
-  //     }))
-  //     .sort((a, b) => a.label.localeCompare(b.label))
-  // ];
-
-  const options = query.columns.map(column => ({
-    value: column.name,
-    label: column.label
+  const options = displayedColumns.map(({ visible, field }) => ({
+    value: field.name,
+    label: field.label
   }));
+
+  const selected = displayedColumns
+    .filter(x => x.visible)
+    .map(({ field }) => field.name);
 
   return (
     <PageHeader
@@ -123,7 +99,7 @@ const Header = props => {
               iconVariant="more"
               id="page-header-dropdown-object-home-content-right-2"
               options={options}
-              value={displayedColumns.map(x => x.name)}
+              value={selected}
               checkmark={true}
               multiple={true}
               onSelect={onColumnSelect}

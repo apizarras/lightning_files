@@ -21,8 +21,10 @@ function criteria(field, item) {
       return value;
     case 'reference':
       return `'${value}'`;
-    default:
+    case 'string':
       return `'${escapeSOQLString(value)}'`;
+    default:
+      return value.toString();
   }
 }
 
@@ -48,15 +50,12 @@ function getConditions(filters) {
 }
 
 function getFieldNames(columns) {
-  const fieldNames = columns.reduce(
-    (names, field) => {
-      const { type, name, relationshipName } = field;
-      names.push(name);
-      if (type === 'reference') names.push(`${relationshipName}.Name`);
-      return names;
-    },
-    ['Id', 'CurrencyIsoCode'] // TODO: verify CurrencyIsoCode exists (multicurrency enabled)
-  );
+  const fieldNames = columns.reduce((names, field) => {
+    const { type, name, relationshipName } = field;
+    names.push(name);
+    if (type === 'reference') names.push(`${relationshipName}.Name`);
+    return names;
+  }, []);
   return fieldNames;
 }
 
@@ -128,7 +127,8 @@ export function getDisplayedColumns(description, settings, columns) {
     )
     .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name))
-    .slice(0, MAX_COLUMNS);
+    .slice(0, MAX_COLUMNS)
+    .map(field => ({ visible: true, field }));
 }
 
 export async function executeQuery(api, settings, query) {

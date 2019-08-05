@@ -57,6 +57,7 @@ export const ACTION_TYPES = ['I did something good', 'I did something bad'];
 
 export const SYSTEM_FIELDS = [
   'Id',
+  'CurrencyIsoCode',
   'IsDeleted',
   'CreatedBy',
   'CreatedById',

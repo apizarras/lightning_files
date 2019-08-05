@@ -28,6 +28,8 @@ const DataTable = props => {
     return ids;
   }, {});
 
+  const columns = displayedColumns.filter(x => x.visible).map(x => x.field);
+
   return (
     <div
       className={`data-table ${compact ? 'compact' : null} ${
@@ -39,7 +41,7 @@ const DataTable = props => {
       <StickyTable stickyColumnCount={1}>
         <Row>
           <Cell className="checkbox-cell"></Cell>
-          {displayedColumns.map(field => (
+          {columns.map(field => (
             <Cell
               key={field.name}
               data-sort={
@@ -75,7 +77,7 @@ const DataTable = props => {
                   <Checkbox checked={selectedIds[item.Id]} />
                 </motion.div>
               </Cell>
-              {displayedColumns.map(field => (
+              {columns.map(field => (
                 <Cell
                   key={field.name}
                   className={onAddFilter ? 'filter-cell' : null}
