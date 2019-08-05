@@ -21,19 +21,19 @@ const Header = props => {
     onClear,
     onColumnsChange
   } = props;
-  const { api, settings } = useAppContext();
+  const { api } = useAppContext();
   const [count, setCount] = useState(null);
 
   useEffect(() => {
     if (!query || !query.columns) return;
 
     async function fetchRows() {
-      const count = await executeScalar(api, settings, query);
+      const count = await executeScalar(api, query);
       setCount(count);
     }
 
     fetchRows();
-  }, [api, settings, query]);
+  }, [api, query]);
 
   if (!query || !query.columns) return null;
 

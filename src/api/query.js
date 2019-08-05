@@ -12,40 +12,43 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-function criteria(field, item) {
+function createFilterClause(filter) {
+  const { field, item } = filter;
   const value = item[field.name];
-  if (value === undefined || value === null) return 'NULL';
+  if (value === undefined || value === null) return `${field.name} = NULL`;
+
+  let formatted;
 
   switch (field.type) {
-    case 'currency':
-      return value;
     case 'reference':
-      return `'${value}'`;
+      formatted = `'${value}'`;
+      break;
     case 'string':
-      return `'${escapeSOQLString(value)}'`;
+      formatted = `'${escapeSOQLString(value)}'`;
+      break;
     default:
-      return value.toString();
+      formatted = value.toString();
   }
+
+  return `${field.name} = ${formatted}`;
 }
 
 function getConditions(filters) {
   if (!filters || !filters.length) return;
 
-  const grouped = filters.reduce((byField, filter) => {
+  const grouped = filters.reduce((groupsByField, filter) => {
     const fieldName = filter.field.name;
-    byField[fieldName] = byField[fieldName] || [];
-    byField[fieldName].push(filter);
-    return byField;
+    groupsByField[fieldName] = groupsByField[fieldName] || [];
+    groupsByField[fieldName].push(filter);
+    return groupsByField;
   }, {});
 
   return Object.values(grouped)
     .map(filters => {
-      const group = filters
-        .map(({ field, item }) => `${field.name} = ${criteria(field, item)}`)
-        .filter(clause => clause)
-        .join(' OR ');
-      return group && `(${group})`;
+      const groupClause = filters.map(createFilterClause).join(' OR ');
+      return groupClause && `(${groupClause})`;
     })
+    .filter(clause => clause)
     .join(' AND ');
 }
 
@@ -61,6 +64,7 @@ function getFieldNames(columns) {
 
 function getOrderBy(orderBy) {
   const { field, direction } = orderBy;
+
   switch (field.type) {
     case 'location':
       return;
@@ -131,7 +135,7 @@ export function getDisplayedColumns(description, settings, columns) {
     .map(field => ({ visible: true, field }));
 }
 
-export async function executeQuery(api, settings, query) {
+export async function executeQuery(api, query) {
   const { sobject, columns, orderBy, staticFilters } = query;
   if (!sobject || !columns || !orderBy) return [];
 
@@ -144,7 +148,7 @@ export async function executeQuery(api, settings, query) {
   return api.query(soql.join(' '));
 }
 
-export function executeScalar(api, settings, query) {
+export function executeScalar(api, query) {
   const { sobject, columns, orderBy } = query;
   if (!sobject || !columns || !orderBy) return;
 

@@ -16,7 +16,7 @@ const FilterTable = props => {
     onSelectItem,
     onRemoveItem
   } = props;
-  const { api, settings } = useAppContext();
+  const { api } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [showResults, setShowResults] = useState(true);
@@ -28,7 +28,7 @@ const FilterTable = props => {
 
     async function fetchRows() {
       setLoading(true);
-      const items = await executeQuery(api, settings, query);
+      const items = await executeQuery(api, query);
       if (cancelled) return;
       setItems(items);
       setLoading(false);
@@ -36,7 +36,7 @@ const FilterTable = props => {
 
     fetchRows();
     return () => (cancelled = true);
-  }, [api, settings, query]);
+  }, [api, query]);
 
   useEffect(() => {
     if (query.searchParams === searchParams) return;
