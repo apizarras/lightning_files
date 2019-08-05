@@ -101,7 +101,6 @@ const Header = props => {
               checkmark={true}
               multiple={true}
               onSelect={onColumnSelect}
-              onClose={() => console.log('closed')}
             >
               <DropdownTrigger>
                 <Button
