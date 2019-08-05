@@ -12,7 +12,7 @@ import './ItemPicker.scss';
 const ItemPicker = props => {
   const { description } = props;
   const { api, settings, eventService } = useAppContext();
-  const [searchParams, setSearchParams] = useState(undefined);
+  const [searchParams, setSearchParams] = useState('');
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
   const [displayedColumns, setDisplayedColumns] = useState([]);
