@@ -12,7 +12,15 @@ import {
 } from '@salesforce/design-system-react';
 
 const Header = props => {
-  const { description, query, selectedItems, onConfirm, onClear } = props;
+  const {
+    description,
+    query,
+    displayedColumns,
+    selectedItems,
+    onConfirm,
+    onClear,
+    onColumnsChange
+  } = props;
   const { api, settings } = useAppContext();
   const [count, setCount] = useState(null);
 
@@ -28,6 +36,18 @@ const Header = props => {
   }, [api, settings, query]);
 
   if (!query || !query.columns) return null;
+
+  function onColumnSelect({ value }) {
+    const found = displayedColumns.find(({ name }) => name === value);
+    if (found) {
+      onColumnsChange(displayedColumns.filter(({ name }) => name !== value));
+    } else {
+      const columnNames = [...displayedColumns.map(x => x.name), value];
+      onColumnsChange(
+        query.columns.filter(({ name }) => !!~columnNames.indexOf(name))
+      );
+    }
+  }
 
   // const filterOptions = [
   //   { label: 'Add Filter', type: 'header' },
@@ -50,6 +70,11 @@ const Header = props => {
   //     }))
   //     .sort((a, b) => a.label.localeCompare(b.label))
   // ];
+
+  const options = query.columns.map(column => ({
+    value: column.name,
+    label: column.label
+  }));
 
   return (
     <PageHeader
@@ -97,7 +122,11 @@ const Header = props => {
               iconName="settings"
               iconVariant="more"
               id="page-header-dropdown-object-home-content-right-2"
-              options={query.columns}
+              options={options}
+              value={displayedColumns.map(x => x.name)}
+              checkmark={true}
+              multiple={true}
+              onSelect={onColumnSelect}
               onClose={() => console.log('closed')}
             >
               <DropdownTrigger>

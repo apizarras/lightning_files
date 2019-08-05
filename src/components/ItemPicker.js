@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce } from '../api/hooks';
-import { getColumns } from '../api/query';
+import { getDisplayedColumns } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -15,6 +15,7 @@ const ItemPicker = props => {
   const [searchParams, setSearchParams] = useState(undefined);
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [displayedColumns, setDisplayedColumns] = useState([]);
   const [query, dispatch] = useReducer(queryReducer, {});
 
   useEffect(() => {
@@ -22,6 +23,12 @@ const ItemPicker = props => {
       // const columns = getColumns(description, settings);
       const layout = await api.searchLayout(description.name);
       const columns = getColumnsFromSearchLayout(description, layout);
+      const displayedColumns = getDisplayedColumns(
+        description,
+        settings,
+        columns
+      );
+      setDisplayedColumns(displayedColumns);
       dispatch({ type: 'INITIALIZE', payload: { columns, settings } });
     }
     init();
@@ -35,6 +42,7 @@ const ItemPicker = props => {
     <Card className="item-picker" hasNoHeader={true}>
       <Header
         query={query}
+        displayedColumns={displayedColumns}
         description={description}
         selectedItems={selectedItems}
         onConfirm={() =>
@@ -50,6 +58,7 @@ const ItemPicker = props => {
             payload: null
           });
         }}
+        onColumnsChange={setDisplayedColumns}
       />
       <SearchInput
         query={query}
@@ -68,6 +77,7 @@ const ItemPicker = props => {
       />
       <FilterTable
         query={query}
+        displayedColumns={displayedColumns}
         searchParams={searchParams}
         selectedItems={selectedItems}
         onSelectItem={item => setSelectedItems(selectedItems.concat(item))}
@@ -129,7 +139,6 @@ function getInitialQuery({ columns, settings }) {
   return {
     sobject: settings.sobject,
     columns,
-    selectedColumns: columns,
     orderBy: columns && {
       field: columns.find(x => x.type !== 'location'),
       direction: 'ASC'

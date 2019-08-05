@@ -12,16 +12,6 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-function getSettingsFields(fields, setting) {
-  return (
-    setting &&
-    setting
-      .split(',')
-      .map(name => fields[name.trim()])
-      .filter(field => field)
-  );
-}
-
 function criteria(field, item) {
   const value = item[field.name];
   if (value === undefined || value === null) return 'NULL';
@@ -129,12 +119,8 @@ function getWhereClause(query) {
   return `WHERE ${filtered.join(' AND ')}`;
 }
 
-export function getColumns(description, settings) {
+export function getDisplayedColumns(description, settings, columns) {
   if (!description) return null;
-
-  const columns =
-    getSettingsFields(description.fields, settings.displayedColumns) ||
-    Object.values(description.fields);
 
   return columns
     .filter(

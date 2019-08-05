@@ -19,16 +19,6 @@ export const DESIGN_ATTRIBUTES = [
     // defaultValue: 'FX5__Equipment__c'
   },
   {
-    name: 'displayedColumns',
-    label: 'Displayed Columns',
-    description:
-      'Columns initially displayed in results table. Defined as a set of comma separated field API names',
-    type: 'string',
-    // defaultValue: 'Status__c, Name, Location__c'
-    defaultValue:
-      'FX5__Price_Book__c, FX5__Pricing_Method__c, FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c, FX5__Catalog_Cost__c, FX5__Discounted_Price__c'
-  },
-  {
     name: 'searchFields',
     label: 'Search Fields',
     description:

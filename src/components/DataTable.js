@@ -11,7 +11,8 @@ const DataTable = props => {
     style,
     compact,
     loading,
-    query,
+    displayedColumns,
+    orderBy,
     items = [],
     selectedItems = [],
     onAddFilter,
@@ -20,7 +21,7 @@ const DataTable = props => {
     onRemoveItem
   } = props;
 
-  if (!query.columns) return null;
+  if (!displayedColumns) return null;
 
   const selectedIds = selectedItems.reduce((ids, x) => {
     ids[x.Id] = true;
@@ -38,14 +39,14 @@ const DataTable = props => {
       <StickyTable stickyColumnCount={1}>
         <Row>
           <Cell className="checkbox-cell"></Cell>
-          {query.columns.map(field => (
+          {displayedColumns.map(field => (
             <Cell
               key={field.name}
               data-sort={
                 onUpdateSort &&
-                query.orderBy &&
-                query.orderBy.field === field &&
-                query.orderBy.direction
+                orderBy &&
+                orderBy.field === field &&
+                orderBy.direction
               }
               data-type={field.type}
               data-autonumber={field.autoNumber}
@@ -74,7 +75,7 @@ const DataTable = props => {
                   <Checkbox checked={selectedIds[item.Id]} />
                 </motion.div>
               </Cell>
-              {query.columns.map(field => (
+              {displayedColumns.map(field => (
                 <Cell
                   key={field.name}
                   className={onAddFilter ? 'filter-cell' : null}
