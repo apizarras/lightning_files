@@ -49,6 +49,14 @@ const FilterTable = props => {
     setShowResults(true);
   }, [query, items, searchParams]);
 
+  useEffect(() => {
+    if (selectedItems.length) {
+      setShowSelected(true);
+    } else {
+      setShowResults(true);
+    }
+  }, []);
+
   if (!query.columns) return null;
 
   const selectedIds = selectedItems.reduce((ids, x) => {
@@ -63,6 +71,26 @@ const FilterTable = props => {
   return (
     <div className="filter-table">
       <Accordion>
+        <AccordionPanel
+          id="selected"
+          expanded={showSelected}
+          onTogglePanel={() => setShowSelected(!showSelected)}
+          summary={`${selectedItems.length || 'No'} Selected Item${
+            selectedItems.length === 1 ? '' : 's'
+          }`}
+        >
+          <DataTable
+            compact={true}
+            style={{ height: 150 }}
+            orderBy={query.orderBy}
+            displayedColumns={displayedColumns}
+            items={selectedItems}
+            selectedItems={selectedItems}
+            onAddFilter={onAddFilter}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
+        </AccordionPanel>
         <AccordionPanel
           id="results"
           expanded={showResults}
@@ -93,26 +121,6 @@ const FilterTable = props => {
             style={{ height: 150 }}
             displayedColumns={displayedColumns}
             items={availableRecentItems}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </AccordionPanel>
-        <AccordionPanel
-          id="selected"
-          expanded={showSelected}
-          onTogglePanel={() => setShowSelected(!showSelected)}
-          summary={`${selectedItems.length || 'No'} Selected Item${
-            selectedItems.length === 1 ? '' : 's'
-          }`}
-        >
-          <DataTable
-            compact={true}
-            style={{ height: 150 }}
-            orderBy={query.orderBy}
-            displayedColumns={displayedColumns}
-            items={selectedItems}
-            selectedItems={selectedItems}
-            onAddFilter={onAddFilter}
             onSelectItem={onSelectItem}
             onRemoveItem={onRemoveItem}
           />

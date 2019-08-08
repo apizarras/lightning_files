@@ -1,6 +1,6 @@
 import { SYSTEM_FIELDS } from '../constants';
 
-const BUFFER_SIZE = 200;
+const BUFFER_SIZE = 100;
 const MAX_COLUMNS = 10;
 
 function searchableColumnsFilter(column) {

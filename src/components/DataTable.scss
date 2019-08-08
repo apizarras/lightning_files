@@ -73,6 +73,7 @@ $stripe-color: #f3f2f2;
 .data-table {
   position: relative;
   border: 1px solid $border-color;
+  transition: opacity 0.5s ease-in-out;
 
   &.compact {
     font-size: 0.7rem;

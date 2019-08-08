@@ -10,7 +10,7 @@ import { Card } from '@salesforce/design-system-react';
 import './ItemPicker.scss';
 
 const ItemPicker = props => {
-  const { description } = props;
+  const { description, isMultiSelect, onSelect } = props;
   const { api, settings, eventService } = useAppContext();
   const [searchParams, setSearchParams] = useState('');
   const debouncedSearchParams = useDebounce(searchParams, 150);
@@ -50,6 +50,19 @@ const ItemPicker = props => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
   }, [debouncedSearchParams, dispatch]);
 
+  function confirmSelection(items) {
+    if (onSelect) {
+      onSelect(isMultiSelect ? items : items[0]);
+    } else if (console) {
+      console.log('onSelect', items);
+    }
+    setRecentItems([...items.map(x => x.Id), ...recentItems]);
+    eventService.triggerLightningEvent({
+      type: 'ITEMS_SELECTED',
+      payload: items.map(x => x.Id).join(',')
+    });
+  }
+
   return (
     <Card className="item-picker" hasNoHeader={true}>
       <Header
@@ -57,13 +70,7 @@ const ItemPicker = props => {
         displayedColumns={displayedColumns}
         description={description}
         selectedItems={selectedItems}
-        onConfirm={() => {
-          setRecentItems([...selectedItems.map(x => x.Id), ...recentItems]);
-          eventService.triggerLightningEvent({
-            type: 'ITEMS_SELECTED',
-            payload: selectedItems.map(x => x.Id).join(',')
-          });
-        }}
+        onConfirm={() => confirmSelection(selectedItems)}
         onClear={() => {
           setSelectedItems([]);
           eventService.triggerLightningEvent({
@@ -94,7 +101,11 @@ const ItemPicker = props => {
         searchParams={searchParams}
         recentItems={recentItems}
         selectedItems={selectedItems}
-        onSelectItem={item => setSelectedItems(selectedItems.concat(item))}
+        onSelectItem={item => {
+          isMultiSelect
+            ? setSelectedItems(selectedItems.concat(item))
+            : confirmSelection(selectedItems.concat(item));
+        }}
         onRemoveItem={item =>
           setSelectedItems(selectedItems.filter(x => x !== item))
         }
