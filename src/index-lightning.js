@@ -25,10 +25,13 @@ export default function LightningComponent(props) {
 export function initialize(component) {
   const aura = window.$A;
 
-  const settings = DESIGN_ATTRIBUTES.reduce((settings, { name }) => {
-    settings[name] = component.get(`v.${name}`);
-    return settings;
-  }, {});
+  const settings = DESIGN_ATTRIBUTES.reduce(
+    (settings, { name }) => {
+      settings[name] = component.get(`v.${name}`);
+      return settings;
+    },
+    { componentId: component.getGlobalId() }
+  );
 
   function wrap(method, params, jsonparse) {
     return new Promise((resolve, reject) => {

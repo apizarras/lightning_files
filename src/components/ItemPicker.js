@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-import { useDebounce } from '../api/hooks';
+import { useDebounce, useSessionStorage } from '../api/hooks';
 import { getDisplayedColumns } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
@@ -17,6 +17,10 @@ const ItemPicker = props => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [displayedColumns, setDisplayedColumns] = useState([]);
   const [query, dispatch] = useReducer(queryReducer, {});
+  const [recentItems, setRecentItems] = useSessionStorage(
+    `recents-${description.name}`,
+    []
+  );
 
   useEffect(() => {
     async function init() {
@@ -53,12 +57,13 @@ const ItemPicker = props => {
         displayedColumns={displayedColumns}
         description={description}
         selectedItems={selectedItems}
-        onConfirm={() =>
+        onConfirm={() => {
+          setRecentItems([...selectedItems.map(x => x.Id), ...recentItems]);
           eventService.triggerLightningEvent({
             type: 'ITEMS_SELECTED',
             payload: selectedItems.map(x => x.Id).join(',')
-          })
-        }
+          });
+        }}
         onClear={() => {
           setSelectedItems([]);
           eventService.triggerLightningEvent({
@@ -87,6 +92,7 @@ const ItemPicker = props => {
         query={query}
         displayedColumns={displayedColumns}
         searchParams={searchParams}
+        recentItems={recentItems}
         selectedItems={selectedItems}
         onSelectItem={item => setSelectedItems(selectedItems.concat(item))}
         onRemoveItem={item =>

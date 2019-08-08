@@ -17,10 +17,13 @@ export const SettingsProvider = ({ children }) => {
 };
 
 export function getDefaultSettings() {
-  return DESIGN_ATTRIBUTES.reduce((settings, config) => {
-    settings[config.name] = config.defaultValue;
-    return settings;
-  }, {});
+  return DESIGN_ATTRIBUTES.reduce(
+    (settings, config) => {
+      settings[config.name] = config.defaultValue;
+      return settings;
+    },
+    { componentId: 'DEV' }
+  );
 }
 
 function applyChanges(state, action) {

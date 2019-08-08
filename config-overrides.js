@@ -40,7 +40,7 @@ module.exports = function override(config, env) {
   // Universal Module Definition
   config.output.libraryTarget = 'umd';
   // JS
-  config.output.filename = `${packageJSON.name}.resource`;
+  config.output.filename = `${packageJSON.name}.resource.js`;
   // CSS. "5" is MiniCssPlugin
   config.plugins[5].options.filename = `${packageJSON.name}_style.resource.css`;
 

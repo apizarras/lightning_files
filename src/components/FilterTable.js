@@ -7,6 +7,7 @@ import './FilterTable.scss';
 
 const FilterTable = props => {
   const {
+    recentItems,
     selectedItems,
     query,
     displayedColumns,
@@ -19,7 +20,8 @@ const FilterTable = props => {
   const { api } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
-  const [showResults, setShowResults] = useState(true);
+  const [showResults, setShowResults] = useState(false);
+  const [showRecents, setShowRecents] = useState(false);
   const [showSelected, setShowSelected] = useState(false);
 
   useEffect(() => {
@@ -54,6 +56,9 @@ const FilterTable = props => {
     return ids;
   }, {});
   const availableItems = items.filter(x => !selectedIds[x.Id]).slice(0, 100);
+  const availableRecentItems = availableItems.filter(
+    x => !!~recentItems.indexOf(x.Id)
+  );
 
   return (
     <div className="filter-table">
@@ -78,6 +83,21 @@ const FilterTable = props => {
           />
         </AccordionPanel>
         <AccordionPanel
+          id="recents"
+          expanded={showRecents}
+          onTogglePanel={() => setShowRecents(!showRecents)}
+          summary="Recently Selected Items"
+        >
+          <DataTable
+            compact={true}
+            style={{ height: 150 }}
+            displayedColumns={displayedColumns}
+            items={availableRecentItems}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
+        </AccordionPanel>
+        <AccordionPanel
           id="selected"
           expanded={showSelected}
           onTogglePanel={() => setShowSelected(!showSelected)}
@@ -85,18 +105,17 @@ const FilterTable = props => {
             selectedItems.length === 1 ? '' : 's'
           }`}
         >
-          {selectedItems.length > 0 && (
-            <DataTable
-              compact={true}
-              orderBy={query.orderBy}
-              displayedColumns={displayedColumns}
-              items={selectedItems}
-              selectedItems={selectedItems}
-              onAddFilter={onAddFilter}
-              onSelectItem={onSelectItem}
-              onRemoveItem={onRemoveItem}
-            />
-          )}
+          <DataTable
+            compact={true}
+            style={{ height: 150 }}
+            orderBy={query.orderBy}
+            displayedColumns={displayedColumns}
+            items={selectedItems}
+            selectedItems={selectedItems}
+            onAddFilter={onAddFilter}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
         </AccordionPanel>
       </Accordion>
     </div>
