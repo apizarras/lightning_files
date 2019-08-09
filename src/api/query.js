@@ -60,9 +60,9 @@ function createOrderBy(orderBy) {
     case 'location':
       return;
     case 'reference':
-      return `ORDER BY ${field.relationshipName}.Name ${direction}`;
+      return `ORDER BY ${field.relationshipName}.Name ${direction}, Id`;
     default:
-      return `ORDER BY ${field.name} ${direction}`;
+      return `ORDER BY ${field.name} ${direction}, Id`;
   }
 }
 
@@ -202,7 +202,7 @@ export function queryLookupOptions(api, query, field) {
     })
   );
   soql.push(`GROUP BY ${fields}`);
-  soql.push(`ORDER BY ${field.relationshipName}.Name`);
+  soql.push(`ORDER BY ${field.relationshipName}.Name, Id`);
 
   return api.query(soql.join(' ')).then(results =>
     results.map(x => ({
@@ -210,4 +210,32 @@ export function queryLookupOptions(api, query, field) {
       Name: x.Name
     }))
   );
+}
+
+export function sortItems(query, items) {
+  if (!items || items.length < 2) return items;
+
+  const {
+    orderBy: { field, direction }
+  } = query;
+
+  let sorter, key;
+
+  switch (field.type) {
+    case 'location':
+      sorter = () => 0;
+      break;
+    case 'reference':
+      key = field.relationshipName;
+      sorter = (a, b) =>
+        (a[key] ? a[key].Name : '').localeCompare(b[key] ? b[key].Name : '');
+      break;
+    default:
+      key = field.name;
+      sorter = (a, b) => (a[key] || '').localeCompare(b[key] || '');
+  }
+
+  items.sort(sorter);
+  if (direction === 'DESC') items.reverse();
+  return items;
 }

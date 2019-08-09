@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce, useSessionStorage } from '../api/hooks';
-import { getDisplayedColumns } from '../api/query';
+import { getDisplayedColumns, sortItems } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -56,11 +56,31 @@ const ItemPicker = props => {
     } else if (console) {
       console.log('onSelect', items);
     }
-    setRecentItems([...items.map(x => x.Id), ...recentItems]);
+
+    setRecentItems([...items, ...recentItems].slice(0, 10));
+
     eventService.triggerLightningEvent({
       type: 'ITEMS_SELECTED',
       payload: items.map(x => x.Id).join(',')
     });
+  }
+
+  function onClear() {
+    setSelectedItems([]);
+    eventService.triggerLightningEvent({
+      type: 'ITEMS_SELECTED',
+      payload: null
+    });
+  }
+
+  function onSelectItem(item) {
+    const selected = selectedItems.filter(x => x.Id !== item.Id).concat(item);
+    setSelectedItems(sortItems(query, selected));
+    if (!isMultiSelect) confirmSelection(selected);
+  }
+
+  function onRemoveItem(item) {
+    setSelectedItems(selectedItems.filter(x => x.Id !== item.Id));
   }
 
   return (
@@ -71,13 +91,7 @@ const ItemPicker = props => {
         description={description}
         selectedItems={selectedItems}
         onConfirm={() => confirmSelection(selectedItems)}
-        onClear={() => {
-          setSelectedItems([]);
-          eventService.triggerLightningEvent({
-            type: 'ITEMS_SELECTED',
-            payload: null
-          });
-        }}
+        onClear={onClear}
         onColumnsChange={setDisplayedColumns}
       />
       <SearchInput
@@ -101,14 +115,8 @@ const ItemPicker = props => {
         searchParams={searchParams}
         recentItems={recentItems}
         selectedItems={selectedItems}
-        onSelectItem={item => {
-          isMultiSelect
-            ? setSelectedItems(selectedItems.concat(item))
-            : confirmSelection(selectedItems.concat(item));
-        }}
-        onRemoveItem={item =>
-          setSelectedItems(selectedItems.filter(x => x !== item))
-        }
+        onSelectItem={onSelectItem}
+        onRemoveItem={onRemoveItem}
         onAddFilter={filter =>
           dispatch({ type: 'ADD_FILTER', payload: filter })
         }

@@ -20,9 +20,9 @@ const FilterTable = props => {
   const { api } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [showRecents, setShowRecents] = useState(false);
   const [showSelected, setShowSelected] = useState(false);
+  const [showResults, setShowResults] = useState(true);
+  const [showRecents, setShowRecents] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,28 +49,50 @@ const FilterTable = props => {
     setShowResults(true);
   }, [query, items, searchParams]);
 
-  useEffect(() => {
-    if (selectedItems.length) {
-      setShowSelected(true);
-    } else {
-      setShowResults(true);
-    }
-  }, []);
-
   if (!query.columns) return null;
-
-  const selectedIds = selectedItems.reduce((ids, x) => {
-    ids[x.Id] = true;
-    return ids;
-  }, {});
-  const availableItems = items.filter(x => !selectedIds[x.Id]).slice(0, 100);
-  const availableRecentItems = availableItems.filter(
-    x => !!~recentItems.indexOf(x.Id)
-  );
 
   return (
     <div className="filter-table">
       <Accordion>
+        <AccordionPanel
+          id="results"
+          expanded={showResults}
+          onTogglePanel={() => setShowResults(!showResults)}
+          summary="Top Search Results"
+        >
+          <DataTable
+            compact={true}
+            style={{ height: 350 }}
+            loading={loading}
+            displayedColumns={displayedColumns}
+            orderBy={query.orderBy}
+            items={items}
+            selectedItems={selectedItems}
+            onAddFilter={onAddFilter}
+            onUpdateSort={onUpdateSort}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
+        </AccordionPanel>
+
+        <AccordionPanel
+          id="recents"
+          expanded={showRecents}
+          onTogglePanel={() => setShowRecents(!showRecents)}
+          summary="Recent Items"
+        >
+          <DataTable
+            compact={true}
+            style={{ height: 150 }}
+            displayedColumns={displayedColumns}
+            orderBy={query.orderBy}
+            items={recentItems}
+            selectedItems={selectedItems}
+            onSelectItem={onSelectItem}
+            onRemoveItem={onRemoveItem}
+          />
+        </AccordionPanel>
+
         <AccordionPanel
           id="selected"
           expanded={showSelected}
@@ -81,46 +103,13 @@ const FilterTable = props => {
         >
           <DataTable
             compact={true}
-            style={{ height: 150 }}
-            orderBy={query.orderBy}
+            style={{ height: 350 }}
             displayedColumns={displayedColumns}
+            orderBy={query.orderBy}
             items={selectedItems}
             selectedItems={selectedItems}
             onAddFilter={onAddFilter}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </AccordionPanel>
-        <AccordionPanel
-          id="results"
-          expanded={showResults}
-          onTogglePanel={() => setShowResults(!showResults)}
-          summary="Available Items (Top 100 Results)"
-        >
-          <DataTable
-            compact={true}
-            style={{ height: 350 }}
-            loading={loading}
-            orderBy={query.orderBy}
-            displayedColumns={displayedColumns}
-            items={availableItems}
-            onAddFilter={onAddFilter}
             onUpdateSort={onUpdateSort}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </AccordionPanel>
-        <AccordionPanel
-          id="recents"
-          expanded={showRecents}
-          onTogglePanel={() => setShowRecents(!showRecents)}
-          summary="Recently Selected Items"
-        >
-          <DataTable
-            compact={true}
-            style={{ height: 150 }}
-            displayedColumns={displayedColumns}
-            items={availableRecentItems}
             onSelectItem={onSelectItem}
             onRemoveItem={onRemoveItem}
           />
