@@ -76,7 +76,10 @@ const SearchInput = props => {
       <ButtonGroup variant="list">
         <Dropdown
           options={getFilterOptions(query)}
-          onSelect={option => setField(description.fields[option.value])}
+          onSelect={option => {
+            setSearchText('');
+            setField(description.fields[option.value]);
+          }}
         >
           <DropdownTrigger>
             <Button
