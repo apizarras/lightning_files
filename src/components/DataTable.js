@@ -10,7 +10,7 @@ const DataTable = props => {
     style,
     compact,
     loading,
-    displayedColumns,
+    columns,
     orderBy,
     items = [],
     selectedItems = [],
@@ -20,9 +20,9 @@ const DataTable = props => {
     onRemoveItem
   } = props;
 
-  if (!displayedColumns) return null;
+  if (!columns) return null;
 
-  const columns = displayedColumns.filter(x => x.visible).map(x => x.field);
+  const visibleColumns = columns.filter(x => x.visible).map(x => x.field);
   const selectedIds = selectedItems.reduce((ids, x) => {
     ids[x.Id] = true;
     return ids;
@@ -39,7 +39,7 @@ const DataTable = props => {
       <StickyTable stickyColumnCount={1}>
         <Row>
           <Cell className="checkbox-cell"></Cell>
-          {columns.map(field => (
+          {visibleColumns.map(field => (
             <Cell
               key={field.name}
               data-sort={
@@ -69,7 +69,7 @@ const DataTable = props => {
             >
               <Checkbox checked={selectedIds[item.Id]} readOnly={true} />
             </Cell>
-            {columns.map(field => (
+            {visibleColumns.map(field => (
               <Cell
                 key={field.name}
                 className={onAddFilter ? 'filter-cell' : null}

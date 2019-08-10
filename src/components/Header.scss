@@ -1,0 +1,27 @@
+.column-editor {
+  position: relative;
+
+  section {
+    position: absolute;
+    right: 0;
+    top: 2rem;
+    max-height: 200px;
+    overflow: auto;
+  }
+
+  .column-selection {
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    margin: 0 -0.75rem;
+
+    &:hover {
+      background: #def;
+    }
+
+    label {
+      flex: 1;
+    }
+  }
+}

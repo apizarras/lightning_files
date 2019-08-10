@@ -202,7 +202,7 @@ export function queryLookupOptions(api, query, field) {
     })
   );
   soql.push(`GROUP BY ${fields}`);
-  soql.push(`ORDER BY ${field.relationshipName}.Name, Id`);
+  soql.push(`ORDER BY ${field.relationshipName}.Name`);
 
   return api.query(soql.join(' ')).then(results =>
     results.map(x => ({

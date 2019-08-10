@@ -10,7 +10,7 @@ const FilterTable = props => {
     recentItems,
     selectedItems,
     query,
-    displayedColumns,
+    columns,
     searchParams,
     onAddFilter,
     onUpdateSort,
@@ -64,7 +64,7 @@ const FilterTable = props => {
             compact={true}
             style={{ height: 350 }}
             loading={loading}
-            displayedColumns={displayedColumns}
+            columns={columns}
             orderBy={query.orderBy}
             items={items}
             selectedItems={selectedItems}
@@ -84,7 +84,7 @@ const FilterTable = props => {
           <DataTable
             compact={true}
             style={{ height: 150 }}
-            displayedColumns={displayedColumns}
+            columns={columns}
             orderBy={query.orderBy}
             items={recentItems}
             selectedItems={selectedItems}
@@ -104,7 +104,7 @@ const FilterTable = props => {
           <DataTable
             compact={true}
             style={{ height: 350 }}
-            displayedColumns={displayedColumns}
+            columns={columns}
             orderBy={query.orderBy}
             items={selectedItems}
             selectedItems={selectedItems}

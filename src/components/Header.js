@@ -6,16 +6,36 @@ import {
   PageHeader,
   PageHeaderControl,
   Button,
-  Dropdown,
-  DropdownTrigger,
-  ButtonGroup
+  Checkbox,
+  Popover
 } from '@salesforce/design-system-react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import './Header.scss';
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  userSelect: 'none',
+
+  // change background colour if dragging
+  background: isDragging ? '#def' : '',
+  boxShadow: isDragging ? '0 0 4px 2px rgba(0,0,0,.2)' : '',
+
+  // styles we need to apply on draggables
+  ...draggableStyle
+});
 
 const Header = props => {
   const {
     description,
     query,
-    displayedColumns,
+    columns,
     selectedItems,
     onConfirm,
     onClear,
@@ -35,20 +55,25 @@ const Header = props => {
 
   if (!query.columns) return null;
 
-  function onColumnSelect({ value }) {
-    const found = displayedColumns.find(({ field }) => field.name === value);
+  function onColumnSelect(column) {
+    const found = columns.find(x => x === column);
     found.visible = !found.visible;
-    onColumnsChange([...displayedColumns]);
+    onColumnsChange([...columns]);
   }
 
-  const options = displayedColumns.map(({ visible, field }) => ({
-    value: field.name,
-    label: field.label
-  }));
+  function onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
 
-  const selected = displayedColumns
-    .filter(x => x.visible)
-    .map(({ field }) => field.name);
+    const reordered = reorder(
+      columns,
+      result.source.index,
+      result.destination.index
+    );
+    onColumnsChange([...reordered]);
+  }
 
   return (
     <PageHeader
@@ -90,50 +115,62 @@ const Header = props => {
       }
       onRenderControls={() => (
         <PageHeaderControl>
-          <ButtonGroup variant="list">
-            <Dropdown
-              align="right"
+          <Popover
+            triggerClassName="column-editor"
+            hasNoCloseButton={true}
+            position="relative"
+            align="bottom right"
+            body={
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided, snapshot) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {columns.map((column, index) => (
+                        <Draggable
+                          key={column.field.name}
+                          draggableId={column.field.name}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              className="column-selection"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}
+                            >
+                              <Checkbox
+                                checked={column.visible}
+                                onChange={() => onColumnSelect(column)}
+                              />
+                              <label>{column.field.label}</label>
+                              <Icon
+                                category="utility"
+                                name="drag_and_drop"
+                                size="xx-small"
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            }
+          >
+            <Button
               assistiveText={{ icon: 'Edit Columns' }}
               iconCategory="utility"
-              iconName="settings"
+              iconName="table"
               iconVariant="more"
-              id="page-header-dropdown-object-home-content-right-2"
-              options={options}
-              value={selected}
-              checkmark={true}
-              multiple={true}
-              onSelect={onColumnSelect}
-            >
-              <DropdownTrigger>
-                <Button
-                  assistiveText={{ icon: 'Edit Columns' }}
-                  iconCategory="utility"
-                  iconName="table"
-                  iconVariant="more"
-                  variant="icon"
-                />
-              </DropdownTrigger>
-            </Dropdown>
-            {/* <Dropdown
-              align="right"
-              assistiveText={{ icon: 'Add Filter' }}
-              iconCategory="utility"
-              iconName="filterList"
-              iconVariant="more"
-              id="page-header-dropdown-object-home-content-right-2"
-              options={filterOptions}
-            >
-              <DropdownTrigger>
-                <Button
-                  assistiveText={{ icon: 'Add Filter' }}
-                  iconCategory="utility"
-                  iconName="filterList"
-                  iconVariant="more"
-                  variant="icon"
-                />
-              </DropdownTrigger>
-            </Dropdown> */}
-          </ButtonGroup>
+              variant="icon"
+            />
+          </Popover>
         </PageHeaderControl>
       )}
     />

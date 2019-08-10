@@ -15,7 +15,7 @@ const ItemPicker = props => {
   const [searchParams, setSearchParams] = useState('');
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [displayedColumns, setDisplayedColumns] = useState([]);
+  const [columns, setColumns] = useState([]);
   const [query, dispatch] = useReducer(queryReducer, {});
   const [recentItems, setRecentItems] = useSessionStorage(
     `recents-${description.name}`,
@@ -35,9 +35,7 @@ const ItemPicker = props => {
         field: displayedColumns.find(x => x.type !== 'location'),
         direction: 'ASC'
       };
-      setDisplayedColumns(
-        displayedColumns.map(field => ({ field, visible: true }))
-      );
+      setColumns(displayedColumns.map(field => ({ field, visible: true })));
       dispatch({
         type: 'INITIALIZE',
         payload: { sobject: settings.sobject, columns, orderBy }
@@ -87,12 +85,12 @@ const ItemPicker = props => {
     <Card className="item-picker" hasNoHeader={true}>
       <Header
         query={query}
-        displayedColumns={displayedColumns}
+        columns={columns}
         description={description}
         selectedItems={selectedItems}
         onConfirm={() => confirmSelection(selectedItems)}
         onClear={onClear}
-        onColumnsChange={setDisplayedColumns}
+        onColumnsChange={setColumns}
       />
       <SearchInput
         query={query}
@@ -111,7 +109,7 @@ const ItemPicker = props => {
       />
       <FilterTable
         query={query}
-        displayedColumns={displayedColumns}
+        columns={columns}
         searchParams={searchParams}
         recentItems={recentItems}
         selectedItems={selectedItems}
