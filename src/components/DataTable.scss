@@ -158,16 +158,4 @@ $stripe-color: #f3f2f2;
   [data-sort='DESC'] {
     box-shadow: inset 0 3px 0 -1px #0070d2;
   }
-
-  [data-type='percent']:not(:empty):after {
-    content: '%';
-    margin-left: 0.25em;
-    opacity: 0.5;
-  }
-
-  [data-currency]:after {
-    content: attr(data-currency);
-    margin-left: 0.5em;
-    opacity: 0.5;
-  }
 }

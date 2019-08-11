@@ -18,16 +18,4 @@
   .slds-pill__action {
     padding-left: 0.5rem;
   }
-
-  [data-type='percent']:not(:empty):after {
-    content: '%';
-    margin-left: 0.25em;
-    opacity: 0.5;
-  }
-
-  [data-currency]:after {
-    content: attr(data-currency);
-    margin-left: 0.5em;
-    opacity: 0.5;
-  }
 }
