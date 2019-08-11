@@ -87,7 +87,7 @@ const Header = props => {
             position="relative"
             align="bottom right"
             body={columns.map((column, index) => (
-              <div className="column-selection">
+              <div className="column-selection" key={column.field.name}>
                 <label>
                   <Checkbox
                     checked={column.visible}

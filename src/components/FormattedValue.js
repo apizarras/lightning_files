@@ -2,13 +2,14 @@ import React from 'react';
 import { Icon } from '@salesforce/design-system-react';
 
 function FormattedValue(props) {
-  const { field, item } = props;
+  const { className, field, item } = props;
   const value = item && item[field.name];
   if (value === undefined || value === null) return null;
 
   let formatted;
 
   const attrs = {
+    className,
     'data-type': field.type,
     'data-size': value.length > 50 ? 'wide' : null
   };

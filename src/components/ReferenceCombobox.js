@@ -5,7 +5,7 @@ import { Combobox } from '@salesforce/design-system-react';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
 
 const ReferenceCombobox = props => {
-  const { query, field, onSelect } = props;
+  const { className, query, field, onSelect } = props;
   const { api } = useAppContext();
   const [inputValue, setInputValue] = useState();
   const [options, setOptions] = useState();
@@ -31,6 +31,7 @@ const ReferenceCombobox = props => {
 
   return (
     <Combobox
+      className={className}
       events={{
         onChange: (event, { value }) => {
           setInputValue(value);

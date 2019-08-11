@@ -1,15 +1,14 @@
 .item-picker-search {
-  .slds-button-group-list {
+  .search-bar {
     width: 100%;
 
     li:last-child {
       flex: 1;
-
-      .slds-input {
-        border-left-color: #eee;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
     }
+  }
+  .search-input input {
+    border-left-color: #eee;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 }

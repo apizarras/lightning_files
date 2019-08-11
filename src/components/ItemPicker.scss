@@ -1,7 +1,7 @@
 .item-picker {
   height: 100%;
 
-  & > .slds-card__body {
+  .item-picker-contents {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -14,7 +14,8 @@
     }
   }
 
-  .slds-page-header ~ .slds-page-header {
+  .item-picker-search,
+  .item-picker-filters {
     padding-top: 0;
     border-radius: 0;
   }

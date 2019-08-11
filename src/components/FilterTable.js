@@ -75,25 +75,25 @@ const FilterTable = props => {
             onRemoveItem={onRemoveItem}
           />
         </AccordionPanel>
-
-        <AccordionPanel
-          id="recents"
-          expanded={showRecents}
-          onTogglePanel={() => setShowRecents(!showRecents)}
-          summary="Recent Items"
-        >
-          <DataTable
-            compact={compact}
-            style={{ height: 150 }}
-            columns={columns}
-            orderBy={query.orderBy}
-            items={recentItems}
-            selectedItems={selectedItems}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </AccordionPanel>
-
+        {recentItems.length > 0 && (
+          <AccordionPanel
+            id="recents"
+            expanded={showRecents}
+            onTogglePanel={() => setShowRecents(!showRecents)}
+            summary="Recent Items"
+          >
+            <DataTable
+              compact={compact}
+              style={{ height: 150 }}
+              columns={columns}
+              orderBy={query.orderBy}
+              items={recentItems}
+              selectedItems={selectedItems}
+              onSelectItem={onSelectItem}
+              onRemoveItem={onRemoveItem}
+            />
+          </AccordionPanel>
+        )}
         <AccordionPanel
           id="selected"
           expanded={showSelected}

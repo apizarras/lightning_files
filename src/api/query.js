@@ -1,7 +1,6 @@
 import { SYSTEM_FIELDS } from '../constants';
 
 const BUFFER_SIZE = 100;
-const MAX_COLUMNS = 10;
 
 function searchableColumnsFilter(column) {
   // salesforce LIKE operator only supports strings
@@ -24,6 +23,7 @@ function createFilterClause(filter) {
     case 'reference':
       formatted = `'${value}'`;
       break;
+    case 'picklist':
     case 'string':
       formatted = `'${escapeSOQLString(value)}'`;
       break;
@@ -103,13 +103,19 @@ function createWhereClause(query) {
   return `WHERE ${filtered.join(' AND ')}`;
 }
 
-function getFieldNames(columns) {
-  return columns.reduce((names, field) => {
+function getFieldNames(description, columns, staticFilters) {
+  const fields = [
+    'Id',
+    'CurrencyIsoCode',
+    ...(staticFilters && staticFilters.map(({ field }) => field.name))
+  ].filter(name => description.fields[name]);
+
+  columns.forEach(field => {
     const { type, name, relationshipName } = field;
-    names.push(name);
-    if (type === 'reference') names.push(`${relationshipName}.Name`);
-    return names;
+    fields.push(name);
+    if (type === 'reference') fields.push(`${relationshipName}.Name`);
   }, []);
+  return fields;
 }
 
 function splitKeywords(searchParams) {
@@ -121,41 +127,39 @@ function splitKeywords(searchParams) {
     : [];
 }
 
-function getColumnsFromSearchLayout(description, layout) {
-  return layout.searchColumns
-    .reduce(
-      (names, { name }) => {
-        const fieldName = name
-          .replace('r.Name', 'c')
-          .replace('toLabel(', '')
-          .replace(')', '');
-        names.push(fieldName);
-        return names;
-      },
-      ['Id', 'CurrencyIsoCode']
-    )
-    .map(name => description.fields[name])
-    .filter(field => field);
+async function getColumnNamesFromSearchLayout(api, description) {
+  const layout = await api.searchLayout(description.name);
+
+  return layout.searchColumns.reduce((names, { name }) => {
+    const fieldName = name
+      .replace('r.Name', 'c')
+      .replace('.Name', '')
+      .replace('toLabel(', '')
+      .replace(')', '');
+    names.push(fieldName);
+    return names;
+  }, []);
 }
 
 export async function getSearchColumns(api, settings, description) {
-  const layout = await api.searchLayout(description.name);
-  const columns = getColumnsFromSearchLayout(description, layout);
-  return columns
+  const columnNames = await getColumnNamesFromSearchLayout(api, description);
+
+  return columnNames
+    .map(name => description.fields[name])
+    .filter(field => field)
     .filter(
       field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
     )
     .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
-    .filter(field => !/^(FX5__)?Locked_/.test(field.name))
-    .slice(0, MAX_COLUMNS);
+    .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
 
 export async function executeQuery(api, query) {
-  const { sobject, columns, orderBy, staticFilters } = query;
-  if (!sobject || !columns || !orderBy) return [];
+  const { description, columns, orderBy, staticFilters } = query;
+  if (!description || !columns || !orderBy) return [];
 
-  const fieldNames = getFieldNames(columns, staticFilters);
-  const soql = [`SELECT ${fieldNames.join(',')} FROM ${sobject}`];
+  const fieldNames = getFieldNames(description, columns, staticFilters);
+  const soql = [`SELECT ${fieldNames.join(',')} FROM ${description.name}`];
   soql.push(createWhereClause(query));
   soql.push(createOrderBy(orderBy));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
@@ -164,10 +168,10 @@ export async function executeQuery(api, query) {
 }
 
 export function executeScalar(api, query) {
-  const { sobject, columns, orderBy } = query;
-  if (!sobject || !columns || !orderBy) return;
+  const { description, columns, orderBy } = query;
+  if (!description || !columns || !orderBy) return;
 
-  const soql = [`SELECT COUNT() FROM ${sobject}`];
+  const soql = [`SELECT COUNT() FROM ${description.name}`];
   soql.push(createWhereClause(query));
 
   return api.queryScalar(soql.join(' '));
@@ -207,11 +211,11 @@ export function executeLocalSearch(query, items, searchParams) {
 }
 
 export function queryLookupOptions(api, query, field) {
-  const { sobject } = query;
-  if (!sobject) return [];
+  const { description } = query;
+  if (!description) return [];
 
   const fields = `${field.name}, ${field.relationshipName}.Name`;
-  const soql = [`SELECT ${fields} FROM ${sobject}`];
+  const soql = [`SELECT ${fields} FROM ${description.name}`];
   soql.push(
     createWhereClause({
       ...query,

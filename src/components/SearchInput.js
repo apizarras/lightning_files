@@ -28,7 +28,7 @@ const SearchInput = props => {
 
   let inputComponent = (
     <Input
-      className="search-text"
+      className="search-input"
       iconRight={
         searchText && (
           <InputIcon
@@ -50,6 +50,7 @@ const SearchInput = props => {
   if (field && field.type === 'picklist') {
     inputComponent = (
       <PicklistCombobox
+        className="search-input"
         query={query}
         field={field}
         onSelect={(event, item) => {
@@ -62,6 +63,7 @@ const SearchInput = props => {
   if (field && field.type === 'reference') {
     inputComponent = (
       <ReferenceCombobox
+        className="search-input"
         query={query}
         field={field}
         onSelect={(event, item) => {
@@ -73,7 +75,7 @@ const SearchInput = props => {
 
   return (
     <div className="slds-page-header item-picker-search">
-      <ButtonGroup variant="list">
+      <ButtonGroup variant="list" className="search-bar">
         <Dropdown
           options={getFilterOptions(query)}
           onSelect={option => {

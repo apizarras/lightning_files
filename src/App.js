@@ -12,6 +12,16 @@ const App = () => {
   const [multiSelected, setMultiSelected] = useState();
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const field = { name: 'FX5__Catalog_Description__c', type: 'string' };
+  const staticFilters = [
+    {
+      field: { name: 'FX5__Ticket_Item_Record_Type__c', type: 'string' },
+      item: { FX5__Ticket_Item_Record_Type__c: 'Labor' }
+    },
+    {
+      field: { name: 'FX5__Price_Book__c', type: 'reference' },
+      item: { FX5__Price_Book__c: 'a0Ji0000001sfVzEAI' }
+    }
+  ];
 
   useEffect(() => {
     async function fetch() {
@@ -38,7 +48,6 @@ const App = () => {
         size="medium"
       >
         <ItemPicker
-          key={description.name}
           settings={settings}
           description={description}
           isMultiSelect={isMultiSelect}
@@ -68,7 +77,7 @@ const App = () => {
         )}
       </Card>
 
-      <Card heading="Multi Select Modal" bodyClassName="slds-card__body_inner">
+      {/* <Card heading="Multi Select Modal" bodyClassName="slds-card__body_inner">
         <Button
           onClick={() => {
             setIsMultiSelect(true);
@@ -89,11 +98,20 @@ const App = () => {
       </Card>
 
       <ItemPicker
-        key={description.name}
         settings={settings}
         description={description}
         isMultiSelect={true}
-      />
+      /> */}
+
+      {/* <ItemPicker
+        settings={{
+          ...settings,
+          staticFilters,
+          restrictedFields: staticFilters.map(({ field }) => field.name)
+        }}
+        description={description}
+        isMultiSelect={true}
+      /> */}
     </>
   );
 };

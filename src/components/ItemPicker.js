@@ -32,7 +32,12 @@ const ItemPicker = props => {
       setColumns(searchColumns.map(field => ({ field, visible: true })));
       dispatch({
         type: 'INITIALIZE',
-        payload: { sobject: description.name, columns: searchColumns, orderBy }
+        payload: {
+          description,
+          columns: searchColumns,
+          orderBy,
+          staticFilters: settings.staticFilters
+        }
       });
     }
     init();
@@ -77,7 +82,11 @@ const ItemPicker = props => {
   }
 
   return (
-    <Card className="item-picker" hasNoHeader={true}>
+    <Card
+      className="item-picker"
+      hasNoHeader={true}
+      bodyClassName="item-picker-contents"
+    >
       <Header
         query={query}
         columns={columns}
@@ -162,12 +171,12 @@ function queryReducer(state, action) {
   }
 }
 
-function getInitialQuery({ sobject, columns, orderBy }) {
+function getInitialQuery({ description, columns, orderBy, staticFilters }) {
   return {
-    sobject,
+    description,
     columns,
     orderBy,
-    staticFilters: [],
+    staticFilters: staticFilters || [],
     filters: [],
     searchParams: undefined
   };

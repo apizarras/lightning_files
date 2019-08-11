@@ -11,7 +11,7 @@ const QueryFilters = props => {
   if (!filters || !filters.length) return null;
 
   return (
-    <div className="slds-page-header slds-page-header_joined">
+    <div className="item-picker-filters slds-page-header slds-page-header_joined">
       <div className="query-filters">
         <AnimatePresence>
           {filters.map((filter, i) => (
@@ -35,7 +35,13 @@ const FilterPill = ({ filter, onRemove }) => {
     >
       <Pill
         labels={{
-          label: <FormattedValue field={field} item={item} />,
+          label: (
+            <FormattedValue
+              className="filter-value"
+              field={field}
+              item={item}
+            />
+          ),
           title: field.label,
           removeTitle: 'Remove Filter'
         }}

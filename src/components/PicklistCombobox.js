@@ -4,7 +4,7 @@ import { Combobox } from '@salesforce/design-system-react';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
 
 const PicklistCombobox = props => {
-  const { query, field, onSelect } = props;
+  const { className, query, field, onSelect } = props;
   const { api } = useAppContext();
   const [inputValue, setInputValue] = useState();
   const [options, setOptions] = useState();
@@ -13,7 +13,7 @@ const PicklistCombobox = props => {
     if (!query || !field) return;
 
     api
-      .describePicklist(query.sobject, field.name)
+      .describePicklist(query.description.name, field.name)
       .then(values =>
         setOptions(values.map(({ value }) => ({ id: value, label: value })))
       );
@@ -32,6 +32,7 @@ const PicklistCombobox = props => {
 
   return (
     <Combobox
+      className={className}
       events={{
         onChange: (event, { value }) => {
           setInputValue(value);
