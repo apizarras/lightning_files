@@ -1,6 +1,17 @@
 .item-picker {
+  height: 100%;
+
   & > .slds-card__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     margin: 0;
+
+    .filter-table {
+      flex: 1;
+      overflow: hidden;
+      overflow-y: auto;
+    }
   }
 
   .slds-page-header ~ .slds-page-header {

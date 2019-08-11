@@ -39,6 +39,7 @@ const App = () => {
       >
         <ItemPicker
           key={description.name}
+          settings={settings}
           description={description}
           isMultiSelect={isMultiSelect}
           onSelect={onSelect}
@@ -89,6 +90,7 @@ const App = () => {
 
       <ItemPicker
         key={description.name}
+        settings={settings}
         description={description}
         isMultiSelect={true}
       />

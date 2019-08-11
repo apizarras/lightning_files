@@ -9,27 +9,7 @@ import {
   Checkbox,
   Popover
 } from '@salesforce/design-system-react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './Header.scss';
-
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
-
-const getItemStyle = (isDragging, draggableStyle) => ({
-  userSelect: 'none',
-
-  // change background colour if dragging
-  background: isDragging ? '#def' : '',
-  boxShadow: isDragging ? '0 0 4px 2px rgba(0,0,0,.2)' : '',
-
-  // styles we need to apply on draggables
-  ...draggableStyle
-});
 
 const Header = props => {
   const {
@@ -59,20 +39,6 @@ const Header = props => {
     const found = columns.find(x => x === column);
     found.visible = !found.visible;
     onColumnsChange([...columns]);
-  }
-
-  function onDragEnd(result) {
-    // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
-
-    const reordered = reorder(
-      columns,
-      result.source.index,
-      result.destination.index
-    );
-    onColumnsChange([...reordered]);
   }
 
   return (
@@ -120,48 +86,17 @@ const Header = props => {
             hasNoCloseButton={true}
             position="relative"
             align="bottom right"
-            body={
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="droppable">
-                  {(provided, snapshot) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                      {columns.map((column, index) => (
-                        <Draggable
-                          key={column.field.name}
-                          draggableId={column.field.name}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              className="column-selection"
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )}
-                            >
-                              <Checkbox
-                                checked={column.visible}
-                                onChange={() => onColumnSelect(column)}
-                              />
-                              <label>{column.field.label}</label>
-                              <Icon
-                                category="utility"
-                                name="drag_and_drop"
-                                size="xx-small"
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            }
+            body={columns.map((column, index) => (
+              <div className="column-selection">
+                <label>
+                  <Checkbox
+                    checked={column.visible}
+                    onChange={() => onColumnSelect(column)}
+                  />
+                  {column.field.label}
+                </label>
+              </div>
+            ))}
           >
             <Button
               assistiveText={{ icon: 'Edit Columns' }}

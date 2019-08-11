@@ -10,8 +10,8 @@ import { Card } from '@salesforce/design-system-react';
 import './ItemPicker.scss';
 
 const ItemPicker = props => {
-  const { description, isMultiSelect, onSelect } = props;
-  const { api, settings, eventService } = useAppContext();
+  const { settings, description, isMultiSelect, onSelect } = props;
+  const { api, eventService } = useAppContext();
   const [searchParams, setSearchParams] = useState('');
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -38,7 +38,7 @@ const ItemPicker = props => {
       setColumns(displayedColumns.map(field => ({ field, visible: true })));
       dispatch({
         type: 'INITIALIZE',
-        payload: { sobject: settings.sobject, columns, orderBy }
+        payload: { sobject: description.name, columns, orderBy }
       });
     }
     init();
@@ -65,6 +65,7 @@ const ItemPicker = props => {
 
   function onClear() {
     setSelectedItems([]);
+
     eventService.triggerLightningEvent({
       type: 'ITEMS_SELECTED',
       payload: null
