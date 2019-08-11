@@ -43,6 +43,7 @@ const App = () => {
   return (
     <>
       <Modal
+        align="top"
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
         size="medium"
@@ -77,7 +78,7 @@ const App = () => {
         )}
       </Card>
 
-      {/* <Card heading="Multi Select Modal" bodyClassName="slds-card__body_inner">
+      <Card heading="Multi Select Modal" bodyClassName="slds-card__body_inner">
         <Button
           onClick={() => {
             setIsMultiSelect(true);
@@ -101,7 +102,7 @@ const App = () => {
         settings={settings}
         description={description}
         isMultiSelect={true}
-      /> */}
+      />
 
       {/* <ItemPicker
         settings={{

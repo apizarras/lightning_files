@@ -33,13 +33,23 @@ const Header = props => {
     fetchRows();
   }, [api, query]);
 
-  if (!query.columns) return null;
-
   function onColumnSelect(column) {
     const found = columns.find(x => x === column);
     found.visible = !found.visible;
     onColumnsChange([...columns]);
   }
+
+  if (!query.columns)
+    return (
+      <PageHeader
+        joined
+        truncate
+        variant="object-home"
+        title={description.labelPlural}
+        label="Item Picker"
+        icon={<Icon category="standard" name="multi_select_checkbox" />}
+      />
+    );
 
   return (
     <PageHeader

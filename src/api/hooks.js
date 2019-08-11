@@ -85,7 +85,6 @@ export function useDebounce(value, delay) {
 }
 
 export function useSessionStorage(key, initialValue) {
-  console.log(key);
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
   const [storedValue, setStoredValue] = useState(() => {

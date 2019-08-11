@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { executeQuery, executeLocalSearch } from '../api/query';
 import DataTable from './DataTable';
-import { Accordion, AccordionPanel } from '@salesforce/design-system-react';
+import {
+  Spinner,
+  Accordion,
+  AccordionPanel
+} from '@salesforce/design-system-react';
 import './FilterTable.scss';
 
 const FilterTable = props => {
@@ -50,7 +54,16 @@ const FilterTable = props => {
     setShowResults(true);
   }, [query, items, searchParams]);
 
-  if (!query.columns) return null;
+  if (!query.columns)
+    return (
+      <div style={{ position: 'relative', height: '5rem' }}>
+        <Spinner
+          size="small"
+          variant="base"
+          assistiveText={{ label: 'Small spinner' }}
+        />
+      </div>
+    );
 
   return (
     <div className="filter-table">
