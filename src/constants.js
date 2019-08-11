@@ -16,7 +16,6 @@ export const DESIGN_ATTRIBUTES = [
     label: 'Object API Name',
     type: 'string',
     defaultValue: 'FX5__Price_Book_Item__c'
-    // defaultValue: 'FX5__Equipment__c'
   },
   {
     name: 'searchFields',
@@ -40,6 +39,13 @@ export const DESIGN_ATTRIBUTES = [
     label: 'Hide System Fields',
     description:
       'Prevent system fields like IsDeleted and CreatedBy from appearing to the user',
+    type: 'boolean',
+    defaultValue: true
+  },
+  {
+    name: 'compact',
+    label: 'Compact',
+    description: 'Display condensed rows in data table',
     type: 'boolean',
     defaultValue: true
   }

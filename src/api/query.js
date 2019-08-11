@@ -121,9 +121,26 @@ function splitKeywords(searchParams) {
     : [];
 }
 
-export function getDisplayedColumns(description, settings, columns) {
-  if (!description) return null;
+function getColumnsFromSearchLayout(description, layout) {
+  return layout.searchColumns
+    .reduce(
+      (names, { name }) => {
+        const fieldName = name
+          .replace('r.Name', 'c')
+          .replace('toLabel(', '')
+          .replace(')', '');
+        names.push(fieldName);
+        return names;
+      },
+      ['Id', 'CurrencyIsoCode']
+    )
+    .map(name => description.fields[name])
+    .filter(field => field);
+}
 
+export async function getSearchColumns(api, settings, description) {
+  const layout = await api.searchLayout(description.name);
+  const columns = getColumnsFromSearchLayout(description, layout);
   return columns
     .filter(
       field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)

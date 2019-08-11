@@ -14,13 +14,13 @@ const App = () => {
   const field = { name: 'FX5__Catalog_Description__c', type: 'string' };
 
   useEffect(() => {
-    async function fetchColumns() {
+    async function fetch() {
       if (!settings.sobject) return;
       const description = await api.describe(settings.sobject);
       setDescription(description);
     }
 
-    fetchColumns();
+    fetch();
   }, [api, settings]);
 
   function onSelect(value) {

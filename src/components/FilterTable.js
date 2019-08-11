@@ -7,6 +7,7 @@ import './FilterTable.scss';
 
 const FilterTable = props => {
   const {
+    compact,
     recentItems,
     selectedItems,
     query,
@@ -61,7 +62,7 @@ const FilterTable = props => {
           summary="Top Search Results"
         >
           <DataTable
-            compact={true}
+            compact={compact}
             style={{ height: 350 }}
             loading={loading}
             columns={columns}
@@ -82,7 +83,7 @@ const FilterTable = props => {
           summary="Recent Items"
         >
           <DataTable
-            compact={true}
+            compact={compact}
             style={{ height: 150 }}
             columns={columns}
             orderBy={query.orderBy}
@@ -102,7 +103,7 @@ const FilterTable = props => {
           }`}
         >
           <DataTable
-            compact={true}
+            compact={compact}
             style={{ height: 350 }}
             columns={columns}
             orderBy={query.orderBy}

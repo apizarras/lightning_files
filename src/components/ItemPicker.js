@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce, useSessionStorage } from '../api/hooks';
-import { getDisplayedColumns, sortItems } from '../api/query';
+import { getSearchColumns, sortItems } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -12,11 +12,11 @@ import './ItemPicker.scss';
 const ItemPicker = props => {
   const { settings, description, isMultiSelect, onSelect } = props;
   const { api, eventService } = useAppContext();
+  const [query, dispatch] = useReducer(queryReducer, {});
+  const [columns, setColumns] = useState([]);
   const [searchParams, setSearchParams] = useState('');
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const [query, dispatch] = useReducer(queryReducer, {});
   const [recentItems, setRecentItems] = useSessionStorage(
     `recents-${description.name}`,
     []
@@ -24,21 +24,15 @@ const ItemPicker = props => {
 
   useEffect(() => {
     async function init() {
-      const layout = await api.searchLayout(description.name);
-      const columns = getColumnsFromSearchLayout(description, layout);
-      const displayedColumns = getDisplayedColumns(
-        description,
-        settings,
-        columns
-      );
-      const orderBy = displayedColumns && {
-        field: displayedColumns.find(x => x.type !== 'location'),
+      const searchColumns = await getSearchColumns(api, settings, description);
+      const orderBy = searchColumns && {
+        field: searchColumns.find(x => x.type !== 'location'),
         direction: 'ASC'
       };
-      setColumns(displayedColumns.map(field => ({ field, visible: true })));
+      setColumns(searchColumns.map(field => ({ field, visible: true })));
       dispatch({
         type: 'INITIALIZE',
-        payload: { sobject: description.name, columns, orderBy }
+        payload: { sobject: description.name, columns: searchColumns, orderBy }
       });
     }
     init();
@@ -49,13 +43,13 @@ const ItemPicker = props => {
   }, [debouncedSearchParams, dispatch]);
 
   function confirmSelection(items) {
+    setRecentItems([...items, ...recentItems].slice(0, 10));
+
     if (onSelect) {
       onSelect(isMultiSelect ? items : items[0]);
     } else if (console) {
       console.log('onSelect', items);
     }
-
-    setRecentItems([...items, ...recentItems].slice(0, 10));
 
     eventService.triggerLightningEvent({
       type: 'ITEMS_SELECTED',
@@ -109,6 +103,7 @@ const ItemPicker = props => {
         }
       />
       <FilterTable
+        compact={settings.compact}
         query={query}
         columns={columns}
         searchParams={searchParams}
@@ -176,23 +171,6 @@ function getInitialQuery({ sobject, columns, orderBy }) {
     filters: [],
     searchParams: undefined
   };
-}
-
-function getColumnsFromSearchLayout(description, layout) {
-  return layout.searchColumns
-    .reduce(
-      (names, { name }) => {
-        const fieldName = name
-          .replace('r.Name', 'c')
-          .replace('toLabel(', '')
-          .replace(')', '');
-        names.push(fieldName);
-        return names;
-      },
-      ['Id', 'CurrencyIsoCode']
-    )
-    .map(name => description.fields[name])
-    .filter(field => field);
 }
 
 export default ItemPicker;
