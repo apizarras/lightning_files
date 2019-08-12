@@ -44,6 +44,11 @@ const SearchInput = props => {
       value={searchText}
       type="search"
       onChange={(e, { value }) => setSearchText(value)}
+      onKeyPress={event => {
+        if (field && event.key === 'Enter') {
+          onAddFilter({ field, item: { [field.name]: searchText } });
+        }
+      }}
     />
   );
 
