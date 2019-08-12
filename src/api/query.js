@@ -94,7 +94,16 @@ function createWhereClause(query) {
   const conditions = [];
 
   if (staticFilters) conditions.push(createGroupedFiltersClause(staticFilters));
-  if (filters) conditions.push(createGroupedFiltersClause(filters));
+  if (filters)
+    conditions.push(
+      createGroupedFiltersClause(
+        filters.filter(
+          x =>
+            !staticFilters ||
+            !staticFilters.find(({ field }) => field.name === x.field.name)
+        )
+      )
+    );
   if (searchParams) conditions.push(createSearchClause(columns, searchParams));
 
   const filtered = conditions.filter(x => x);
@@ -115,7 +124,8 @@ function getFieldNames(description, columns, staticFilters) {
     fields.push(name);
     if (type === 'reference') fields.push(`${relationshipName}.Name`);
   }, []);
-  return fields;
+
+  return [...new Set(fields)]; // distinct fields
 }
 
 function splitKeywords(searchParams) {
@@ -142,15 +152,19 @@ async function getColumnNamesFromSearchLayout(api, description) {
 }
 
 export async function getSearchColumns(api, settings, description) {
-  const columnNames = await getColumnNamesFromSearchLayout(api, description);
+  const { hideSystemFields, restrictedFields, staticFilters } = settings;
 
+  const columnNames = await getColumnNamesFromSearchLayout(api, description);
   return columnNames
     .map(name => description.fields[name])
     .filter(field => field)
     .filter(
-      field => !settings.hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name)
+      field =>
+        !staticFilters ||
+        !staticFilters.find(filter => filter.field.name === field.name)
     )
-    .filter(field => !~(settings.restrictedFields || []).indexOf(field.name))
+    .filter(field => !hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name))
+    .filter(field => !~(restrictedFields || []).indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
 

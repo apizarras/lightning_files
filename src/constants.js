@@ -18,14 +18,6 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'FX5__Price_Book_Item__c'
   },
   {
-    name: 'searchFields',
-    label: 'Search Fields',
-    description:
-      'Restrict columns used for type-ahead search. Defaults to all displayed columns of type string. Defined as a set of comma separated field API names',
-    type: 'string'
-    // defaultValue: 'FX5__Catalog_Item_Code__c, FX5__Catalog_Description__c'
-  },
-  {
     name: 'restrictedFields',
     label: 'Restricted Fields',
     description:

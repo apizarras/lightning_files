@@ -1,5 +1,7 @@
 .item-picker {
-  height: 100%;
+  .slds-modal__content & {
+    height: 100%;
+  }
 
   .item-picker-contents {
     display: flex;

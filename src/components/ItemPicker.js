@@ -36,7 +36,7 @@ const ItemPicker = props => {
           description,
           columns: searchColumns,
           orderBy,
-          staticFilters: settings.staticFilters
+          settings
         }
       });
     }
@@ -171,12 +171,16 @@ function queryReducer(state, action) {
   }
 }
 
-function getInitialQuery({ description, columns, orderBy, staticFilters }) {
+function getInitialQuery({ description, columns, orderBy, settings = {} }) {
+  const { staticFilters } = settings;
+
   return {
     description,
     columns,
     orderBy,
     staticFilters: staticFilters || [],
+    restrictedFields:
+      staticFilters && staticFilters.map(({ field }) => field.name),
     filters: [],
     searchParams: undefined
   };

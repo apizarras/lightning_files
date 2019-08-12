@@ -107,8 +107,7 @@ const App = () => {
       {/* <ItemPicker
         settings={{
           ...settings,
-          staticFilters,
-          restrictedFields: staticFilters.map(({ field }) => field.name)
+          staticFilters
         }}
         description={description}
         isMultiSelect={true}
