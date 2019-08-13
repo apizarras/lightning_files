@@ -6,10 +6,11 @@ export function createApi(dataService) {
         dataService.describeFields(sobject)
       ]).then(([description, fields]) => ({ ...description, fields }));
     },
-    describePicklist: (sobject, fieldName) =>
-      dataService.describePicklist(sobject, fieldName),
+    describePicklist: dataService.describePicklist,
+    describeLookupFilter: dataService.describeLookupFilter,
     searchLayout: sobject => dataService.searchLayout(sobject),
     query: soql => dataService.query(soql),
-    queryScalar: soql => dataService.queryScalar(soql)
+    queryCount: soql => dataService.queryCount(soql),
+    recordInfo: recordId => dataService.recordInfo(recordId)
   };
 }

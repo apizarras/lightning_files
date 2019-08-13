@@ -21,7 +21,34 @@ export const dataService = connection => {
     searchLayout: sobject =>
       connection.getJSON(`search/layout/?q=${sobject}`).then(r => r[0]),
     query: soql => connection.query(soql).then(r => r.records),
-    queryScalar: soql => connection.query(soql).then(r => r.totalSize)
+    queryCount: soql => connection.query(soql).then(r => r.totalSize),
+    describeLookupFilter: async (objectInfo, fieldName) => {
+      const field = objectInfo.fields[fieldName];
+
+      const sourceEntity = await connection.tooling
+        .sobject('EntityDefinition')
+        .find({ QualifiedApiName: objectInfo.apiName });
+
+      const sourceField = await connection.tooling
+        .sobject('FieldDefinition')
+        .find({
+          EntityDefinitionId: sourceEntity[0].DurableId,
+          QualifiedApiName: field.apiName
+        });
+
+      const targetEntity = await connection.tooling
+        .sobject('EntityDefinition')
+        .find({ QualifiedApiName: field.referenceToInfos[0].apiName });
+
+      const filters = await connection.tooling.sobject('LookupFilter').find({
+        TargetEntityDefinitionId: targetEntity[0].DurableId
+      });
+
+      return filters.find(
+        x => x.SourceFieldDefinitionId === sourceField[0].DurableId
+      );
+    },
+    recordInfo: recordId => connection.getJSON(`ui-api/record-ui/${recordId}`)
   };
 };
 

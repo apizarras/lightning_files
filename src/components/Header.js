@@ -39,18 +39,6 @@ const Header = props => {
     onColumnsChange([...columns]);
   }
 
-  if (!query.columns)
-    return (
-      <PageHeader
-        joined
-        truncate
-        variant="object-home"
-        title={description.labelPlural}
-        label="Item Picker"
-        icon={<Icon category="standard" name="multi_select_checkbox" />}
-      />
-    );
-
   return (
     <PageHeader
       joined
@@ -60,11 +48,10 @@ const Header = props => {
       label="Item Picker"
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
-        count > 0
-          ? `${count} ${
-              count === 1 ? 'item' : 'items'
-            } • sorted by ${query.orderBy && query.orderBy.field.label}`
-          : 'No Matches'
+        count > 0 &&
+        `${count} ${
+          count === 1 ? 'item' : 'items'
+        } • sorted by ${query.orderBy && query.orderBy.field.label}`
       }
       onRenderActions={
         selectedItems.length > 0

@@ -61,7 +61,7 @@ export function initialize(component) {
     describePicklist: (sobjectType, fieldName) =>
       wrap('describePicklist', { sobjectType, fieldName }, true),
     query: soql => wrap('query', { soql }),
-    queryScalar: soql => wrap('query', { soql })
+    queryCount: soql => wrap('query', { soql })
   };
 
   const eventService = {

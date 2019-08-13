@@ -84,15 +84,13 @@ $stripe-color: #f3f2f2;
   }
 
   .checkbox-cell {
-    width: 1rem;
+    padding: 0;
 
-    .slds-form-element {
-      width: 1rem;
-      height: 1rem;
-
-      .slds-checkbox_faux {
-        margin: -3px 0 0 !important;
-      }
+    label {
+      position: relative;
+      top: -1px;
+      display: block;
+      padding: 0.2rem 0 calc(0.25rem - 1px) 0.5rem;
     }
   }
 

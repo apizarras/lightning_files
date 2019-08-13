@@ -3,19 +3,27 @@
 export const DESIGN_ATTRIBUTES = [
   {
     name: 'sObjectName',
-    label: 'Page Object API Name',
-    type: 'string'
+    label: 'Page Object API Name (from Salesforce)',
+    type: 'string',
+    defaultValue: 'FX5__Job__c'
   },
   {
     name: 'recordId',
-    label: 'Page Record Id',
-    type: 'string'
+    label: 'Page Record Id (from Salesforce)',
+    type: 'string',
+    defaultValue: 'a0G0H00000WKByDUAX'
   },
   {
-    name: 'sobject',
-    label: 'Object API Name',
+    name: 'fieldName',
+    label: 'Field API Name',
     type: 'string',
-    defaultValue: 'FX5__Price_Book_Item__c'
+    defaultValue: 'FX5__Price_Book__c'
+  },
+  {
+    name: 'pickerSobject',
+    label: 'Picker Object API Name',
+    type: 'string',
+    defaultValue: 'FX5__Price_Book__c'
   },
   {
     name: 'restrictedFields',

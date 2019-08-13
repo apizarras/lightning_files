@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PicklistCombobox from './PicklistCombobox';
 import ReferenceCombobox from './ReferenceCombobox';
 import {
@@ -12,19 +12,14 @@ import {
 import './SearchInput.scss';
 
 const SearchInput = props => {
-  const { query, description, value, onChange, onAddFilter } = props;
+  const { query, description, onChange, onAddFilter } = props;
   const [field, setField] = useState();
   const [searchText, setSearchText] = useState('');
 
-  useEffect(() => {
-    if (value) {
-      if (searchText === '' && value.searchText === searchText) return;
-      if (value.field === field && value.searchText === searchText) return;
-    }
+  function onSearchChange(searchText) {
+    setSearchText(searchText);
     onChange({ field, searchText });
-  }, [value, field, searchText, onChange]);
-
-  if (!query.columns) return null;
+  }
 
   let inputComponent = (
     <Input
@@ -37,13 +32,15 @@ const SearchInput = props => {
             }}
             category="utility"
             name="clear"
-            onClick={() => setSearchText('')}
+            onClick={() => onSearchChange('')}
           />
         )
       }
-      value={searchText}
       type="search"
-      onChange={(e, { value }) => setSearchText(value)}
+      value={searchText}
+      onChange={(e, { value }) => {
+        onSearchChange(value);
+      }}
       onKeyPress={event => {
         if (field && event.key === 'Enter') {
           onAddFilter({ field, item: { [field.name]: searchText } });
@@ -84,7 +81,7 @@ const SearchInput = props => {
         <Dropdown
           options={getFilterOptions(query)}
           onSelect={option => {
-            setSearchText('');
+            onSearchChange('');
             setField(description.fields[option.value]);
           }}
         >
@@ -104,22 +101,29 @@ const SearchInput = props => {
 };
 
 function getFilterOptions(query) {
-  return [
-    { label: 'Search', leftIcon: { category: 'utility', name: 'search' } },
-    ...query.columns
-      .filter(
-        ({ type }) =>
-          type === 'string' || type === 'reference' || type === 'picklist'
-      )
-      .map(({ label, name }) => ({
-        label,
-        value: name,
-        leftIcon: {
-          category: 'utility',
-          name: 'filterList'
-        }
-      }))
+  const options = [
+    { label: 'Search', leftIcon: { category: 'utility', name: 'search' } }
   ];
+
+  if (query.columns) {
+    options.push(
+      ...query.columns
+        .filter(
+          ({ type }) =>
+            type === 'string' || type === 'reference' || type === 'picklist'
+        )
+        .map(({ label, name }) => ({
+          label,
+          value: name,
+          leftIcon: {
+            category: 'utility',
+            name: 'filterList'
+          }
+        }))
+    );
+  }
+
+  return options;
 }
 
 export default SearchInput;

@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { executeQuery, executeLocalSearch } from '../api/query';
 import DataTable from './DataTable';
-import {
-  Spinner,
-  Accordion,
-  AccordionPanel
-} from '@salesforce/design-system-react';
+import { Accordion, AccordionPanel } from '@salesforce/design-system-react';
 import './FilterTable.scss';
 
 const FilterTable = props => {
@@ -23,17 +19,19 @@ const FilterTable = props => {
     onRemoveItem
   } = props;
   const { api } = useAppContext();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
-  const [showSelected, setShowSelected] = useState(false);
-  const [showResults, setShowResults] = useState(true);
+  const [showResults, setShowResults] = useState(false);
   const [showRecents, setShowRecents] = useState(false);
+  const [showSelected, setShowSelected] = useState(false);
 
   useEffect(() => {
+    if (!query.columns) return;
     let cancelled = false;
 
     async function fetchRows() {
       setLoading(true);
+      if (query.searchParams) setShowResults(true);
       const items = await executeQuery(api, query);
       if (cancelled) return;
       setItems(items);
@@ -45,6 +43,7 @@ const FilterTable = props => {
   }, [api, query]);
 
   useEffect(() => {
+    if (!query.columns) return;
     if (query.searchParams === searchParams) return;
     const filteredItems = executeLocalSearch(query, items, searchParams);
     if (filteredItems === items) return;
@@ -53,17 +52,6 @@ const FilterTable = props => {
     setLoading(true);
     setShowResults(true);
   }, [query, items, searchParams]);
-
-  if (!query.columns)
-    return (
-      <div style={{ position: 'relative', height: '5rem' }}>
-        <Spinner
-          size="small"
-          variant="base"
-          assistiveText={{ label: 'Small spinner' }}
-        />
-      </div>
-    );
 
   return (
     <div className="filter-table">

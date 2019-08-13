@@ -7,27 +7,21 @@ import { Card, Modal, Button } from '@salesforce/design-system-react';
 const App = () => {
   const { api, settings } = useAppContext();
   const [description, setDescription] = useState();
+  const [displayField, setDisplayField] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [singleSelected, setSingleSelected] = useState();
   const [multiSelected, setMultiSelected] = useState();
   const [isMultiSelect, setIsMultiSelect] = useState(false);
-  const field = { name: 'FX5__Catalog_Description__c', type: 'string' };
-  const staticFilters = [
-    {
-      field: { name: 'FX5__Ticket_Item_Record_Type__c', type: 'string' },
-      item: { FX5__Ticket_Item_Record_Type__c: 'Labor' }
-    },
-    {
-      field: { name: 'FX5__Price_Book__c', type: 'reference' },
-      item: { FX5__Price_Book__c: 'a0Ji0000001sfVzEAI' }
-    }
-  ];
 
   useEffect(() => {
     async function fetch() {
-      if (!settings.sobject) return;
-      const description = await api.describe(settings.sobject);
+      if (!settings) return;
+      const { pickerSobject } = settings;
+      if (!pickerSobject) return;
+
+      const description = await api.describe(pickerSobject);
       setDescription(description);
+      setDisplayField(description.fields['Name']);
     }
 
     fetch();
@@ -64,7 +58,7 @@ const App = () => {
           }}
         >
           {!singleSelected && 'Select Item'}
-          <FormattedValue field={field} item={singleSelected} />
+          <FormattedValue field={displayField} item={singleSelected} />
         </Button>
         {singleSelected && (
           <Button
@@ -91,7 +85,7 @@ const App = () => {
           <ul>
             {multiSelected.map(item => (
               <li>
-                <FormattedValue field={field} item={item} />
+                <FormattedValue field={displayField} item={item} />
               </li>
             ))}
           </ul>
@@ -103,15 +97,6 @@ const App = () => {
         description={description}
         isMultiSelect={true}
       />
-
-      {/* <ItemPicker
-        settings={{
-          ...settings,
-          staticFilters
-        }}
-        description={description}
-        isMultiSelect={true}
-      /> */}
     </>
   );
 };

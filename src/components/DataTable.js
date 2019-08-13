@@ -60,14 +60,15 @@ const DataTable = props => {
 
         {items.map(item => (
           <Row key={item.Id}>
-            <Cell
-              className="checkbox-cell"
-              onClick={e => {
-                e.preventDefault();
-                selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item);
-              }}
-            >
-              <Checkbox checked={selectedIds[item.Id]} readOnly={true} />
+            <Cell className="checkbox-cell">
+              <Checkbox
+                checked={selectedIds[item.Id]}
+                onChange={e => {
+                  selectedIds[item.Id]
+                    ? onRemoveItem(item)
+                    : onSelectItem(item);
+                }}
+              />
             </Cell>
             {visibleColumns.map(field => (
               <Cell

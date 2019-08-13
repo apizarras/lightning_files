@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce, useSessionStorage } from '../api/hooks';
-import { getSearchColumns, sortItems } from '../api/query';
+import {
+  getSearchColumns,
+  sortItems,
+  createLookupFilterClause
+} from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -10,11 +14,17 @@ import { Card } from '@salesforce/design-system-react';
 import './ItemPicker.scss';
 
 const ItemPicker = props => {
-  const { settings, description, isMultiSelect, onSelect } = props;
+  const {
+    settings,
+    description,
+    isMultiSelect,
+    staticFilter,
+    onSelect
+  } = props;
   const { api, eventService } = useAppContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
-  const [searchParams, setSearchParams] = useState('');
+  const [searchParams, setSearchParams] = useState();
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
   const [recentItems, setRecentItems] = useSessionStorage(
@@ -25,23 +35,30 @@ const ItemPicker = props => {
   useEffect(() => {
     async function init() {
       const searchColumns = await getSearchColumns(api, settings, description);
+      const columns = searchColumns.map(field => ({ field, visible: true }));
       const orderBy = searchColumns && {
         field: searchColumns.find(x => x.type !== 'location'),
         direction: 'ASC'
       };
-      setColumns(searchColumns.map(field => ({ field, visible: true })));
+      setColumns(columns);
+
+      const staticFilter = await createLookupFilterClause(
+        api,
+        settings.recordId,
+        settings.fieldName
+      );
       dispatch({
         type: 'INITIALIZE',
         payload: {
           description,
           columns: searchColumns,
           orderBy,
-          settings
+          staticFilter
         }
       });
     }
     init();
-  }, [api, dispatch, description, settings]);
+  }, [api, dispatch, description, settings, staticFilter]);
 
   useEffect(() => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
@@ -99,7 +116,6 @@ const ItemPicker = props => {
       <SearchInput
         query={query}
         description={description}
-        value={searchParams}
         onChange={value => setSearchParams(value)}
         onAddFilter={filter =>
           dispatch({ type: 'ADD_FILTER', payload: filter })
@@ -161,28 +177,22 @@ function queryReducer(state, action) {
     case 'REMOVE_FILTER':
       return { ...state, filters: state.filters.filter(x => x !== payload) };
     case 'UPDATE_SEARCH':
-      if (state.searchParams === payload) return state;
       if (payload && payload.searchText.length === 1) return state;
       return { ...state, searchParams: payload };
     case 'INITIALIZE':
-      return getInitialQuery(payload);
+      return { ...state, ...getInitialQuery(payload) };
     default:
       return state;
   }
 }
 
-function getInitialQuery({ description, columns, orderBy, settings = {} }) {
-  const { staticFilters } = settings;
-
+function getInitialQuery({ description, columns, orderBy, staticFilter }) {
   return {
     description,
     columns,
     orderBy,
-    staticFilters: staticFilters || [],
-    restrictedFields:
-      staticFilters && staticFilters.map(({ field }) => field.name),
-    filters: [],
-    searchParams: undefined
+    staticFilter,
+    filters: []
   };
 }
 

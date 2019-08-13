@@ -34,6 +34,104 @@ function createFilterClause(filter) {
   return `${field.name} = ${formatted}`;
 }
 
+export async function createLookupFilterClause(api, recordId, lookupFieldName) {
+  if (!recordId || !lookupFieldName) return;
+
+  const recordInfo = await api.recordInfo(recordId);
+  const { records, objectInfos } = recordInfo;
+  const record = records[recordId];
+  const { Active, IsOptional, Metadata } = await api.describeLookupFilter(
+    objectInfos[record.apiName],
+    lookupFieldName
+  );
+  if (!Active || IsOptional) return;
+
+  const { booleanFilter, filterItems } = Metadata;
+  const parentInfo = objectInfos[record.apiName];
+  const lookupInfo = objectInfos[parentInfo.fields[lookupFieldName].apiName];
+  const re = new RegExp(`^${lookupInfo.apiName}.`);
+
+  function clean(str) {
+    if (!str) return str;
+    return str.replace(re, ''); // strip root object api name
+  }
+
+  function getValue(obj, [name, ...rest]) {
+    if (name === '$Source') return getValue(obj, rest);
+    const value = obj.fields[name];
+    if (rest.length === 0) return value.value;
+    return getValue(value, rest);
+  }
+
+  function toSOQL($Source, filter) {
+    const { field, operation, value, valueField } = filter;
+    const val = valueField ? getValue($Source, valueField.split('.')) : value;
+    const formatted = val ? `'${escapeSOQLString(val)}'` : 'NULL';
+
+    switch (operation) {
+      case 'equals':
+        return `${field}=${formatted}`;
+      case 'notEqual':
+        return `${field}!=${formatted}`;
+      case 'lessThan':
+        return `${field}<${formatted}`;
+      case 'greaterThan':
+        return `${field}>${formatted}`;
+      case 'lessOrEqual':
+        return `${field}<=${formatted}`;
+      case 'greaterOrEqual':
+        return `${field}>=${formatted}`;
+      case 'contains':
+        return `${field} IN ${formatted}`;
+      case 'notContain':
+        return `${field} NOT IN ${formatted}`;
+      case 'startsWith':
+        return `${field} LIKE ${formatted}`;
+      case 'includes':
+        return `${field} INCLUDES ${formatted}`;
+      case 'excludes':
+        return `${field} EXCLUDES ${formatted}`;
+      default:
+    }
+  }
+
+  function interpolate(booleanFilter, clauses) {
+    if (booleanFilter) {
+      return booleanFilter.replace(
+        /(\d+)/g,
+        (match, offset, string) => clauses[parseInt(match, 10) - 1]
+      );
+    } else {
+      return clauses.join(' AND ');
+    }
+  }
+
+  function organizeFilters(filterItems) {
+    return filterItems.map(({ field, operation, value, valueField }) => {
+      if (!!~field.indexOf('$Source')) {
+        return {
+          field: clean(valueField),
+          operation,
+          value,
+          valueField: field
+        };
+      } else {
+        return {
+          field: clean(field),
+          operation,
+          value,
+          valueField: clean(valueField)
+        };
+      }
+    });
+  }
+
+  const filters = organizeFilters(filterItems);
+  const clauses = filters.map(filter => toSOQL(record, filter));
+
+  return `(${interpolate(booleanFilter, clauses)})`;
+}
+
 function createGroupedFiltersClause(filters) {
   if (!filters || !filters.length) return;
 
@@ -90,20 +188,11 @@ function createSearchClause(columns, searchParams) {
 }
 
 function createWhereClause(query) {
-  const { columns, staticFilters, filters, searchParams } = query;
+  const { columns, staticFilter, filters, searchParams } = query;
   const conditions = [];
 
-  if (staticFilters) conditions.push(createGroupedFiltersClause(staticFilters));
-  if (filters)
-    conditions.push(
-      createGroupedFiltersClause(
-        filters.filter(
-          x =>
-            !staticFilters ||
-            !staticFilters.find(({ field }) => field.name === x.field.name)
-        )
-      )
-    );
+  if (staticFilter) conditions.push(staticFilter);
+  if (filters) conditions.push(createGroupedFiltersClause(filters));
   if (searchParams) conditions.push(createSearchClause(columns, searchParams));
 
   const filtered = conditions.filter(x => x);
@@ -112,12 +201,10 @@ function createWhereClause(query) {
   return `WHERE ${filtered.join(' AND ')}`;
 }
 
-function getFieldNames(description, columns, staticFilters) {
-  const fields = [
-    'Id',
-    'CurrencyIsoCode',
-    ...(staticFilters && staticFilters.map(({ field }) => field.name))
-  ].filter(name => description.fields[name]);
+function getFieldNames(description, columns) {
+  const fields = ['Id', 'CurrencyIsoCode'].filter(
+    name => description.fields[name]
+  );
 
   columns.forEach(field => {
     const { type, name, relationshipName } = field;
@@ -152,27 +239,22 @@ async function getColumnNamesFromSearchLayout(api, description) {
 }
 
 export async function getSearchColumns(api, settings, description) {
-  const { hideSystemFields, restrictedFields, staticFilters } = settings;
+  const { hideSystemFields, restrictedFields } = settings;
 
   const columnNames = await getColumnNamesFromSearchLayout(api, description);
   return columnNames
     .map(name => description.fields[name])
     .filter(field => field)
-    .filter(
-      field =>
-        !staticFilters ||
-        !staticFilters.find(filter => filter.field.name === field.name)
-    )
     .filter(field => !hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name))
     .filter(field => !~(restrictedFields || []).indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
 
 export async function executeQuery(api, query) {
-  const { description, columns, orderBy, staticFilters } = query;
+  const { description, columns, orderBy } = query;
   if (!description || !columns || !orderBy) return [];
 
-  const fieldNames = getFieldNames(description, columns, staticFilters);
+  const fieldNames = getFieldNames(description, columns);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${description.name}`];
   soql.push(createWhereClause(query));
   soql.push(createOrderBy(orderBy));
@@ -188,7 +270,7 @@ export function executeScalar(api, query) {
   const soql = [`SELECT COUNT() FROM ${description.name}`];
   soql.push(createWhereClause(query));
 
-  return api.queryScalar(soql.join(' '));
+  return api.queryCount(soql.join(' '));
 }
 
 export function executeLocalSearch(query, items, searchParams) {
