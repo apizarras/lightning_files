@@ -48,10 +48,11 @@ const Header = props => {
       label="Item Picker"
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
-        count > 0 &&
-        `${count} ${
-          count === 1 ? 'item' : 'items'
-        } • sorted by ${query.orderBy && query.orderBy.field.label}`
+        count > 0
+          ? `${count} ${
+              count === 1 ? 'item' : 'items'
+            } • sorted by ${query.orderBy && query.orderBy.field.label}`
+          : ''
       }
       onRenderActions={
         selectedItems.length > 0
