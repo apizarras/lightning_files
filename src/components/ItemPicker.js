@@ -65,7 +65,12 @@ const ItemPicker = props => {
   }, [debouncedSearchParams, dispatch]);
 
   function confirmSelection(items) {
-    setRecentItems([...items, ...recentItems].slice(0, 10));
+    setRecentItems(
+      [
+        ...items,
+        ...recentItems.filter(x => !items.some(item => item.Id === x.Id))
+      ].slice(0, 10)
+    );
 
     if (onSelect) {
       onSelect(isMultiSelect ? items : items[0]);
