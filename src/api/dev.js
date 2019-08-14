@@ -25,28 +25,34 @@ export const dataService = connection => {
     describeLookupFilter: async (objectInfo, fieldName) => {
       const field = objectInfo.fields[fieldName];
 
-      const sourceEntity = await connection.tooling
-        .sobject('EntityDefinition')
-        .find({ QualifiedApiName: objectInfo.apiName });
+      const sourceEntityId = await connection
+        .getJSON(
+          `tooling/query/?q=SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${objectInfo.apiName}'`
+        )
+        .then(res => res.records[0] && res.records[0].DurableId);
 
-      const sourceField = await connection.tooling
-        .sobject('FieldDefinition')
-        .find({
-          EntityDefinitionId: sourceEntity[0].DurableId,
-          QualifiedApiName: field.apiName
-        });
+      const targetEntityId = await connection
+        .getJSON(
+          `tooling/query/?q=SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${field.referenceToInfos[0].apiName}'`
+        )
+        .then(res => res.records[0] && res.records[0].DurableId);
 
-      const targetEntity = await connection.tooling
-        .sobject('EntityDefinition')
-        .find({ QualifiedApiName: field.referenceToInfos[0].apiName });
+      const sourceFieldId = await connection
+        .getJSON(
+          `tooling/query/?q=SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.apiName}'`
+        )
+        .then(res => res.records[0] && res.records[0].DurableId);
 
-      const filters = await connection.tooling.sobject('LookupFilter').find({
-        TargetEntityDefinitionId: targetEntity[0].DurableId
-      });
+      const lookupFilters = await connection
+        .getJSON(
+          `tooling/query/?q=SELECT SourceFieldDefinitionId, Metadata FROM LookupFilter WHERE Active=TRUE AND IsOptional=FALSE AND TargetEntityDefinitionId='${targetEntityId}'`
+        )
+        .then(res => res.records);
 
-      return filters.find(
-        x => x.SourceFieldDefinitionId === sourceField[0].DurableId
+      const filter = lookupFilters.find(
+        x => x.SourceFieldDefinitionId === sourceFieldId
       );
+      return filter && filter.Metadata;
     },
     recordInfo: recordId => connection.getJSON(`ui-api/record-ui/${recordId}`)
   };

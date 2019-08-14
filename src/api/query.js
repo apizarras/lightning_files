@@ -40,13 +40,13 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   const recordInfo = await api.recordInfo(recordId);
   const { records, objectInfos } = recordInfo;
   const record = records[recordId];
-  const { Active, IsOptional, Metadata } = await api.describeLookupFilter(
+  const lookupFilter = await api.describeLookupFilter(
     objectInfos[record.apiName],
     lookupFieldName
   );
-  if (!Active || IsOptional) return;
+  if (!lookupFilter) return;
 
-  const { booleanFilter, filterItems } = Metadata;
+  const { booleanFilter, filterItems } = lookupFilter;
   const parentInfo = objectInfos[record.apiName];
   const lookupInfo = objectInfos[parentInfo.fields[lookupFieldName].apiName];
   const re = new RegExp(`^${lookupInfo.apiName}.`);
