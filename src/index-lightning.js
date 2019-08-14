@@ -66,8 +66,8 @@ export function initialize(component) {
 
   const eventService = {
     triggerLightningEvent: action => {
-      aura
-        .get('e.FX5:ACTION')
+      component
+        .getEvent('FX5:ACTION')
         .setParams(action)
         .fire();
     }

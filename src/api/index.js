@@ -8,9 +8,9 @@ export function createApi(dataService) {
     },
     describePicklist: dataService.describePicklist,
     describeLookupFilter: dataService.describeLookupFilter,
-    searchLayout: sobject => dataService.searchLayout(sobject),
-    query: soql => dataService.query(soql),
-    queryCount: soql => dataService.queryCount(soql),
-    recordInfo: recordId => dataService.recordInfo(recordId)
+    searchLayout: dataService.searchLayout,
+    query: dataService.query,
+    queryCount: dataService.queryCount,
+    recordInfo: dataService.recordInfo
   };
 }
