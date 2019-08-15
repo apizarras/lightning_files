@@ -7,7 +7,11 @@ const SettingsContext = createContext();
 export const useSettings = () => useContext(SettingsContext);
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, dispatch] = useReducer(applyChanges, getDefaultSettings());
+  const [settings, dispatch] = useReducer(
+    applyChanges,
+    getDefaultSettings(),
+    loadSettings
+  );
 
   return (
     <SettingsContext.Provider value={[settings, dispatch]}>
@@ -17,14 +21,13 @@ export const SettingsProvider = ({ children }) => {
 };
 
 export function getDefaultSettings() {
-  const defaults = DESIGN_ATTRIBUTES.reduce(
+  return DESIGN_ATTRIBUTES.reduce(
     (settings, config) => {
       settings[config.name] = config.defaultValue;
       return settings;
     },
     { componentId: 'DEV' }
   );
-  return loadSettings() || defaults;
 }
 
 function applyChanges(state, action) {
@@ -39,9 +42,11 @@ function saveSettings(settings) {
   } catch (e) {}
 }
 
-function loadSettings() {
+function loadSettings(settings) {
   try {
     const saved = localStorage.getItem('dev-fxl-settings');
-    return saved && JSON.parse(saved);
+    if (saved) return JSON.parse(saved);
   } catch (e) {}
+
+  return settings;
 }

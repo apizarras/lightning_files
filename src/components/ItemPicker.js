@@ -65,6 +65,7 @@ const ItemPicker = props => {
   }, [debouncedSearchParams, dispatch]);
 
   function confirmSelection(items) {
+    // TODO: use an 'IN' query instead
     setRecentItems(
       [
         ...items,
