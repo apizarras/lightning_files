@@ -17,15 +17,31 @@ export const SettingsProvider = ({ children }) => {
 };
 
 export function getDefaultSettings() {
-  return DESIGN_ATTRIBUTES.reduce(
+  const defaults = DESIGN_ATTRIBUTES.reduce(
     (settings, config) => {
       settings[config.name] = config.defaultValue;
       return settings;
     },
     { componentId: 'DEV' }
   );
+  return loadSettings() || defaults;
 }
 
 function applyChanges(state, action) {
-  return { ...state, ...action };
+  const settings = { ...state, ...action };
+  saveSettings(settings);
+  return settings;
+}
+
+function saveSettings(settings) {
+  try {
+    localStorage.setItem('dev-fxl-settings', JSON.stringify(settings));
+  } catch (e) {}
+}
+
+function loadSettings() {
+  try {
+    const saved = localStorage.getItem('dev-fxl-settings');
+    return saved && JSON.parse(saved);
+  } catch (e) {}
 }

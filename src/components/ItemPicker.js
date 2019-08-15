@@ -197,7 +197,8 @@ function getInitialQuery({ description, columns, orderBy, staticFilter }) {
     columns,
     orderBy,
     staticFilter,
-    filters: []
+    filters: [],
+    implicitSort: 'Id'
   };
 }
 

@@ -151,16 +151,16 @@ function createGroupedFiltersClause(filters) {
     .join(' AND ');
 }
 
-function createOrderBy(orderBy) {
+function createOrderBy(orderBy, implicitSort = 'Id') {
   const { field, direction } = orderBy;
 
   switch (field.type) {
     case 'location':
       return;
     case 'reference':
-      return `ORDER BY ${field.relationshipName}.Name ${direction}, Id`;
+      return `ORDER BY ${field.relationshipName}.Name ${direction}, ${implicitSort} ${direction}`;
     default:
-      return `ORDER BY ${field.name} ${direction}, Id`;
+      return `ORDER BY ${field.name} ${direction}, ${implicitSort} ${direction}`;
   }
 }
 
@@ -251,13 +251,13 @@ export async function getSearchColumns(api, settings, description) {
 }
 
 export async function executeQuery(api, query) {
-  const { description, columns, orderBy } = query;
+  const { description, columns, orderBy, implicitSort } = query;
   if (!description || !columns || !orderBy) return [];
 
   const fieldNames = getFieldNames(description, columns);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${description.name}`];
   soql.push(createWhereClause(query));
-  soql.push(createOrderBy(orderBy));
+  soql.push(createOrderBy(orderBy, implicitSort));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
 
   return api.query(soql.join(' '));
