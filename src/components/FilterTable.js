@@ -8,6 +8,7 @@ import './FilterTable.scss';
 const FilterTable = props => {
   const {
     compact,
+    multiSelect,
     recentItems,
     selectedItems,
     query,
@@ -95,27 +96,29 @@ const FilterTable = props => {
             />
           </AccordionPanel>
         )}
-        <AccordionPanel
-          id="selected"
-          expanded={showSelected}
-          onTogglePanel={() => setShowSelected(!showSelected)}
-          summary={`${selectedItems.length || 'No'} Selected Item${
-            selectedItems.length === 1 ? '' : 's'
-          }`}
-        >
-          <DataTable
-            compact={compact}
-            style={{ height: 350 }}
-            columns={columns}
-            orderBy={query.orderBy}
-            items={selectedItems}
-            selectedItems={selectedItems}
-            onAddFilter={onAddFilter}
-            onUpdateSort={onUpdateSort}
-            onSelectItem={onSelectItem}
-            onRemoveItem={onRemoveItem}
-          />
-        </AccordionPanel>
+        {multiSelect && (
+          <AccordionPanel
+            id="selected"
+            expanded={showSelected}
+            onTogglePanel={() => setShowSelected(!showSelected)}
+            summary={`${selectedItems.length || 'No'} Selected Item${
+              selectedItems.length === 1 ? '' : 's'
+            }`}
+          >
+            <DataTable
+              compact={compact}
+              style={{ height: 350 }}
+              columns={columns}
+              orderBy={query.orderBy}
+              items={selectedItems}
+              selectedItems={selectedItems}
+              onAddFilter={onAddFilter}
+              onUpdateSort={onUpdateSort}
+              onSelectItem={onSelectItem}
+              onRemoveItem={onRemoveItem}
+            />
+          </AccordionPanel>
+        )}
       </Accordion>
     </div>
   );

@@ -3,6 +3,7 @@ import { useAppContext } from './contexts/AppContext';
 import ItemPicker from './components/ItemPicker';
 import FormattedValue from './components/FormattedValue';
 import { Card, Modal, Button } from '@salesforce/design-system-react';
+import { createLookupFilterClause } from './api/query';
 
 const App = () => {
   const { api, settings } = useAppContext();
@@ -12,16 +13,26 @@ const App = () => {
   const [singleSelected, setSingleSelected] = useState();
   const [multiSelected, setMultiSelected] = useState();
   const [isMultiSelect, setIsMultiSelect] = useState(false);
+  const [lookupFilter, setLookupFilter] = useState();
+  const [parentFilter, setParentFilter] = useState();
 
   useEffect(() => {
     async function fetch() {
       if (!settings) return;
-      const { pickerSobject } = settings;
+      const { pickerSobject, recordId, lookupFieldName } = settings;
       if (!pickerSobject) return;
 
       const description = await api.describe(pickerSobject);
       setDescription(description);
       setDisplayField(description.fields['Name']);
+
+      const lookupFilter = await createLookupFilterClause(
+        api,
+        recordId,
+        lookupFieldName
+      );
+      setLookupFilter(lookupFilter);
+      setParentFilter(`FX5__Ticket__c = '${recordId}'`);
     }
 
     fetch();
@@ -43,10 +54,11 @@ const App = () => {
         size="medium"
       >
         <ItemPicker
-          settings={settings}
+          compact={settings.compact}
+          multiSelect={isMultiSelect}
           description={description}
-          isMultiSelect={isMultiSelect}
           onSelect={onSelect}
+          staticFilter={lookupFilter}
         />
       </Modal>
 
@@ -93,9 +105,10 @@ const App = () => {
       </Card>
 
       <ItemPicker
-        settings={settings}
+        compact={settings.compact}
+        multiSelect={true}
         description={description}
-        isMultiSelect={true}
+        staticFilter={parentFilter}
       />
     </>
   );

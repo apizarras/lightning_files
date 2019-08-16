@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { useDebounce, useSessionStorage } from '../api/hooks';
-import {
-  getSearchColumns,
-  sortItems,
-  createLookupFilterClause
-} from '../api/query';
+import { getSearchColumns, sortItems } from '../api/query';
 import Header from './Header';
 import SearchInput from './SearchInput';
 import QueryFilters from './QueryFilters';
@@ -14,13 +10,7 @@ import { Card } from '@salesforce/design-system-react';
 import './ItemPicker.scss';
 
 const ItemPicker = props => {
-  const {
-    settings,
-    description,
-    isMultiSelect,
-    staticFilter,
-    onSelect
-  } = props;
+  const { compact, multiSelect, description, staticFilter, onSelect } = props;
   const { api, eventService } = useAppContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
@@ -34,7 +24,7 @@ const ItemPicker = props => {
 
   useEffect(() => {
     async function init() {
-      const searchColumns = await getSearchColumns(api, settings, description);
+      const searchColumns = await getSearchColumns(api, description);
       const columns = searchColumns.map(field => ({ field, visible: true }));
       const orderBy = searchColumns && {
         field: searchColumns.find(x => x.type !== 'location'),
@@ -42,11 +32,6 @@ const ItemPicker = props => {
       };
       setColumns(columns);
 
-      const staticFilter = await createLookupFilterClause(
-        api,
-        settings.recordId,
-        settings.fieldName
-      );
       dispatch({
         type: 'INITIALIZE',
         payload: {
@@ -58,7 +43,7 @@ const ItemPicker = props => {
       });
     }
     init();
-  }, [api, dispatch, description, settings, staticFilter]);
+  }, [api, dispatch, description, staticFilter]);
 
   useEffect(() => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
@@ -74,7 +59,7 @@ const ItemPicker = props => {
     );
 
     if (onSelect) {
-      onSelect(isMultiSelect ? items : items[0]);
+      onSelect(multiSelect ? items : items[0]);
     } else if (console) {
       console.log('onSelect', items);
     }
@@ -97,7 +82,7 @@ const ItemPicker = props => {
   function onSelectItem(item) {
     const selected = selectedItems.filter(x => x.Id !== item.Id).concat(item);
     setSelectedItems(sortItems(query, selected));
-    if (!isMultiSelect) confirmSelection(selected);
+    if (!multiSelect) confirmSelection(selected);
   }
 
   function onRemoveItem(item) {
@@ -134,7 +119,8 @@ const ItemPicker = props => {
         }
       />
       <FilterTable
-        compact={settings.compact}
+        compact={compact}
+        multiSelect={multiSelect}
         query={query}
         columns={columns}
         searchParams={searchParams}

@@ -202,14 +202,17 @@ function createWhereClause(query) {
 }
 
 function getFieldNames(description, columns) {
-  const fields = ['Id', 'CurrencyIsoCode'].filter(
+  const fields = ['Id', 'Name', 'CurrencyIsoCode'].filter(
     name => description.fields[name]
   );
 
   columns.forEach(field => {
     const { type, name, relationshipName } = field;
     fields.push(name);
-    if (type === 'reference') fields.push(`${relationshipName}.Name`);
+    if (type === 'reference') {
+      fields.push(`${relationshipName}.Id`);
+      fields.push(`${relationshipName}.Name`);
+    }
   }, []);
 
   return [...new Set(fields)]; // distinct fields
@@ -238,15 +241,12 @@ async function getColumnNamesFromSearchLayout(api, description) {
   }, []);
 }
 
-export async function getSearchColumns(api, settings, description) {
-  const { hideSystemFields, restrictedFields } = settings;
-
+export async function getSearchColumns(api, description) {
   const columnNames = await getColumnNamesFromSearchLayout(api, description);
   return columnNames
     .map(name => description.fields[name])
     .filter(field => field)
-    .filter(field => !hideSystemFields || !~SYSTEM_FIELDS.indexOf(field.name))
-    .filter(field => !~(restrictedFields || []).indexOf(field.name))
+    .filter(field => !~SYSTEM_FIELDS.indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
 
