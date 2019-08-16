@@ -1,4 +1,4 @@
-import { SYSTEM_FIELDS } from '../constants';
+import { SYSTEM_FIELDS } from '../../constants';
 
 const BUFFER_SIZE = 100;
 

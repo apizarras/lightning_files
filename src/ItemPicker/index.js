@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { useAppContext } from '../contexts/AppContext';
-import { useDebounce, useSessionStorage } from '../api/hooks';
-import { getSearchColumns, sortItems } from '../api/query';
-import Header from './Header';
-import SearchInput from './SearchInput';
-import QueryFilters from './QueryFilters';
-import FilterTable from './FilterTable';
+import { useAppContext } from './contexts/AppContext';
+import { useDebounce, useSessionStorage } from './api/hooks';
+import { getSearchColumns, sortItems } from './api/query';
+import Header from './components/Header';
+import SearchInput from './components/SearchInput';
+import QueryFilters from './components/QueryFilters';
+import FilterTable from './components/FilterTable';
 import { Card } from '@salesforce/design-system-react';
-import './ItemPicker.scss';
+import './index.scss';
 
 const ItemPicker = props => {
   const { compact, multiSelect, description, staticFilter, onSelect } = props;

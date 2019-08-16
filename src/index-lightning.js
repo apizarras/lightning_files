@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AppContextProvider } from './contexts/AppContext';
-import { Settings, IconSettings } from '@salesforce/design-system-react';
 import { DESIGN_ATTRIBUTES } from './constants';
-import { handleAppEvent } from './api/events';
+import { AppContextProvider } from './ItemPicker/contexts/AppContext';
+import { handleAppEvent } from './ItemPicker/api/events';
+import { Settings, IconSettings } from '@salesforce/design-system-react';
 import App from './App';
 
 export default function LightningComponent(props) {

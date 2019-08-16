@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from './contexts/AppContext';
-import ItemPicker from './components/ItemPicker';
-import FormattedValue from './components/FormattedValue';
+import { useAppContext } from './ItemPicker/contexts/AppContext';
+import ItemPicker from './ItemPicker';
+import FormattedValue from './ItemPicker/components/FormattedValue';
+import { createLookupFilterClause } from './ItemPicker/api/query';
 import { Card, Modal, Button } from '@salesforce/design-system-react';
-import { createLookupFilterClause } from './api/query';
 
 const App = () => {
   const { api, settings } = useAppContext();
@@ -57,8 +57,8 @@ const App = () => {
           compact={settings.compact}
           multiSelect={isMultiSelect}
           description={description}
-          onSelect={onSelect}
           staticFilter={lookupFilter}
+          onSelect={onSelect}
         />
       </Modal>
 

@@ -6,7 +6,7 @@ import {
   Textarea,
   Button
 } from '@salesforce/design-system-react';
-import { handleAppEvent } from '../../api/events';
+import { handleAppEvent } from '../../ItemPicker/api/events';
 import { ACTION_TYPES } from '../../constants';
 
 function reducer(state, action) {
