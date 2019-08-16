@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     async function fetch() {
       if (!settings) return;
-      const { pickerSobject, recordId, lookupFieldName } = settings;
+      const { recordId, pickerSobject, pickerLookupField } = settings;
       if (!pickerSobject) return;
 
       const description = await api.describe(pickerSobject);
@@ -29,7 +29,7 @@ const App = () => {
       const lookupFilter = await createLookupFilterClause(
         api,
         recordId,
-        lookupFieldName
+        pickerLookupField
       );
       setLookupFilter(lookupFilter);
       setParentFilter(`FX5__Ticket__c = '${recordId}'`);

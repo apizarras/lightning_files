@@ -20,7 +20,7 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'FX5__Ticket_Item__c'
   },
   {
-    name: 'lookupFieldName',
+    name: 'pickerLookupField',
     label: 'Lookup Field API Name',
     type: 'string',
     defaultValue: 'FX5__Ticket__c'
