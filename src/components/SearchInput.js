@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import PicklistCombobox from './PicklistCombobox';
 import ReferenceCombobox from './ReferenceCombobox';
 import {
@@ -15,6 +15,12 @@ const SearchInput = props => {
   const { query, description, onChange, onAddFilter } = props;
   const [field, setField] = useState();
   const [searchText, setSearchText] = useState('');
+  const inputRef = useRef();
+
+  useLayoutEffect(() => {
+    if (!inputRef.current) return;
+    inputRef.current.focus();
+  }, [field, inputRef]);
 
   function onSearchChange(searchText) {
     setSearchText(searchText);
@@ -23,6 +29,7 @@ const SearchInput = props => {
 
   let inputComponent = (
     <Input
+      inputRef={inputRef}
       className="search-input"
       iconRight={
         searchText && (
