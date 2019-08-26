@@ -14,7 +14,7 @@ $stripe-color: #f3f2f2;
 
   .sticky-table-table {
     display: table;
-    min-width: calc(100% + 1px);
+    min-width: 100%;
     box-sizing: border-box;
   }
   .sticky-table-row {
@@ -94,7 +94,7 @@ $stripe-color: #f3f2f2;
     }
   }
 
-  [data-type='address'] span {
+  [data-cell-type='address'] span {
     margin-right: 1em;
 
     &:empty {
@@ -102,24 +102,25 @@ $stripe-color: #f3f2f2;
     }
   }
 
-  [data-type='base64'],
-  [data-type='boolean'] {
+  [data-cell-type='base64'],
+  [data-cell-type='boolean'] {
     text-align: center;
   }
 
-  [data-type='currency'],
-  [data-type='double'],
-  [data-type='date'],
-  [data-type='datetime'],
-  [data-type='int'],
-  [data-type='location'],
-  [data-type='percent'] {
+  [data-autonumber='true'],
+  [data-cell-type='currency'],
+  [data-cell-type='double'],
+  [data-cell-type='date'],
+  [data-cell-type='datetime'],
+  [data-cell-type='int'],
+  [data-cell-type='location'],
+  [data-cell-type='percent'] {
     text-align: right;
   }
 
   [data-size='wide'],
-  [data-type='address'],
-  [data-type='textarea'] {
+  [data-cell-type='address'],
+  [data-cell-type='textarea'] {
     max-width: 50vw;
     white-space: normal;
     overflow: hidden;
@@ -130,19 +131,10 @@ $stripe-color: #f3f2f2;
     }
   }
 
-  [data-type='multipicklist'] ul {
+  [data-cell-type='multipicklist'] ul {
     padding: 0;
     margin: 0;
     list-style-type: none;
-  }
-
-  [data-type='address'],
-  [data-type='textarea'] {
-    line-height: 1.4;
-  }
-
-  [data-autonumber='true'] {
-    text-align: right;
   }
 
   [data-sort]:hover {

@@ -48,7 +48,7 @@ const DataTable = props => {
                 orderBy.field === field &&
                 orderBy.direction
               }
-              data-type={field.type}
+              data-cell-type={field.type}
               data-autonumber={field.autoNumber}
               data-field={field.name}
               onClick={() => onUpdateSort && onUpdateSort(field)}
@@ -74,7 +74,7 @@ const DataTable = props => {
               <Cell
                 key={field.name}
                 className={onAddFilter ? 'filter-cell' : null}
-                data-type={field.type}
+                data-cell-type={field.type}
                 data-autonumber={field.autoNumber}
                 onClick={() => onAddFilter && onAddFilter({ field, item })}
               >

@@ -158,9 +158,9 @@ function createOrderBy(orderBy, implicitSort = 'Id') {
     case 'location':
       return;
     case 'reference':
-      return `ORDER BY ${field.relationshipName}.Name ${direction}, ${implicitSort} ${direction}`;
+      return `ORDER BY ${field.relationshipName}.Name ${direction} NULLS LAST, ${implicitSort} ${direction}`;
     default:
-      return `ORDER BY ${field.name} ${direction}, ${implicitSort} ${direction}`;
+      return `ORDER BY ${field.name} ${direction} NULLS LAST, ${implicitSort} ${direction}`;
   }
 }
 
@@ -319,7 +319,7 @@ export function queryLookupOptions(api, query, field) {
     })
   );
   soql.push(`GROUP BY ${fields}`);
-  soql.push(`ORDER BY ${field.relationshipName}.Name`);
+  soql.push(`ORDER BY ${field.relationshipName}.Name NULLS LAST`);
 
   return api.query(soql.join(' ')).then(results =>
     results.map(x => ({
