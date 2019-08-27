@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { DESIGN_ATTRIBUTES } from './constants';
-import { AppContextProvider } from './ItemPicker/contexts/AppContext';
+import { ComponentContextProvider } from './ItemPicker/context';
 import { handleAppEvent } from './ItemPicker/api/events';
 import { Settings, IconSettings } from '@salesforce/design-system-react';
 import App from './App';
@@ -11,13 +11,13 @@ export default function LightningComponent(props) {
 
   return (
     <IconSettings iconPath="/_slds/icons">
-      <AppContextProvider
+      <ComponentContextProvider
         settings={settings}
         dataService={dataService}
         eventService={eventService}
       >
         <App />
-      </AppContextProvider>
+      </ComponentContextProvider>
     </IconSettings>
   );
 }

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/AppContext';
+import { useComponentContext } from '../context';
 import { queryLookupOptions } from '../api/query';
 import { Combobox } from '@salesforce/design-system-react';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
 
 const ReferenceCombobox = props => {
   const { className, query, field, onSelect } = props;
-  const { api } = useAppContext();
+  const { api } = useComponentContext();
   const [inputValue, setInputValue] = useState();
   const [options, setOptions] = useState();
 

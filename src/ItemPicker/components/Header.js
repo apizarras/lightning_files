@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/AppContext';
+import { useComponentContext } from '../context';
 import { executeScalar } from '../api/query';
 import {
   Icon,
@@ -21,7 +21,7 @@ const Header = props => {
     onClear,
     onColumnsChange
   } = props;
-  const { api } = useAppContext();
+  const { api } = useComponentContext();
   const [count, setCount] = useState(null);
 
   useEffect(() => {

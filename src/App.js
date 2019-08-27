@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from './ItemPicker/contexts/AppContext';
+import { useComponentContext } from './ItemPicker/context';
 import ItemPicker from './ItemPicker';
 import FormattedValue from './ItemPicker/components/FormattedValue';
 import { createLookupFilterClause } from './ItemPicker/api/query';
 import { Card, Modal, Button } from '@salesforce/design-system-react';
 
 const App = () => {
-  const { api, settings } = useAppContext();
+  const { api, settings } = useComponentContext();
   const [description, setDescription] = useState();
+  const [lookupFilter, setLookupFilter] = useState();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [singleSelected, setSingleSelected] = useState();
   const [multiSelected, setMultiSelected] = useState();
-  const [isMultiSelect, setIsMultiSelect] = useState(false);
-  const [lookupFilter, setLookupFilter] = useState();
 
   useEffect(() => {
     async function fetch() {

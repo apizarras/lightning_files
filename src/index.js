@@ -12,7 +12,7 @@ import { Settings } from '@salesforce/design-system-react';
 const appElement = document.getElementById('root');
 Settings.setAppElement(appElement);
 
-// stubs out AppContext params for local dev
+// stubs out context params for local dev
 const Component = props => {
   const connection = useConnection();
   const [settings] = useSettings();

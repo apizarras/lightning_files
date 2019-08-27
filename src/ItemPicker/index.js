@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { useAppContext } from './contexts/AppContext';
+import { useComponentContext } from './context';
 import { useDebounce, useSessionStorage } from './api/hooks';
 import { getSearchColumns, sortItems } from './api/query';
 import Header from './components/Header';
@@ -11,7 +11,7 @@ import './index.scss';
 
 const ItemPicker = props => {
   const { compact, multiSelect, description, staticFilter, onSelect } = props;
-  const { api, eventService } = useAppContext();
+  const { api, eventService } = useComponentContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
   const [searchParams, setSearchParams] = useState();

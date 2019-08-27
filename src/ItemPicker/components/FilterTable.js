@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/AppContext';
+import { useComponentContext } from '../context';
 import { executeQuery, executeLocalSearch } from '../api/query';
 import DataTable from './DataTable';
 import { Accordion, AccordionPanel } from '@salesforce/design-system-react';
@@ -19,7 +19,7 @@ const FilterTable = props => {
     onSelectItem,
     onRemoveItem
   } = props;
-  const { api } = useAppContext();
+  const { api } = useComponentContext();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [showResults, setShowResults] = useState(false);
