@@ -56,23 +56,6 @@ export function useLogger([state, dispatch]) {
   return [state, newDispatchRef.current];
 }
 
-export function useThunk([state, dispatch]) {
-  const stateRef = useRef();
-  stateRef.current = state;
-
-  const getStateRef = useRef(() => stateRef.current);
-
-  const newDispatchRef = useRef(action => {
-    if (typeof action === 'function') {
-      action(newDispatchRef.current, getStateRef.current);
-    } else {
-      dispatch(action);
-    }
-  });
-
-  return [state, newDispatchRef.current];
-}
-
 export function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
