@@ -1,8 +1,0 @@
-<design:component label="FXL Rental">
-    <design:attribute name="TicketRecordTypes" label="TicketRecordTypes" description="TicketRecordTypes" />
-    <design:attribute name="ValidPriceBookItemTypes" label="Valid Price Book Item Types" description="Valid Price Book Item Types" />
-    <design:attribute name="AllowBulkEditHistory" label="AllowBulkEditHistory" description="AllowBulkEditHistory" />
-    <design:attribute name="AllowTicketCreate" label="AllowTicketCreate" description="AllowTicketCreate" />
-    <design:attribute name="AllowAddEquipment" label="AllowAddEquipment" description="AllowAddEquipment" />
-    <design:attribute name="AllowAddNonEquipment" label="AllowAddNonEquipment" description="AllowAddNonEquipment" />
-</design:component>

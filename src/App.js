@@ -8,13 +8,11 @@ import { Card, Modal, Button } from '@salesforce/design-system-react';
 const App = () => {
   const { api, settings } = useAppContext();
   const [description, setDescription] = useState();
-  const [displayField, setDisplayField] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [singleSelected, setSingleSelected] = useState();
   const [multiSelected, setMultiSelected] = useState();
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [lookupFilter, setLookupFilter] = useState();
-  const [parentFilter, setParentFilter] = useState();
 
   useEffect(() => {
     async function fetch() {
@@ -24,7 +22,6 @@ const App = () => {
 
       const description = await api.describe(pickerSobject);
       setDescription(description);
-      setDisplayField(description.fields['Name']);
 
       const lookupFilter = await createLookupFilterClause(
         api,
@@ -32,7 +29,6 @@ const App = () => {
         pickerLookupField
       );
       setLookupFilter(lookupFilter);
-      setParentFilter(`FX5__Ticket__c = '${recordId}'`);
     }
 
     fetch();
@@ -70,7 +66,10 @@ const App = () => {
           }}
         >
           {!singleSelected && 'Select Item'}
-          <FormattedValue field={displayField} item={singleSelected} />
+          <FormattedValue
+            field={description.fields['Name']}
+            item={singleSelected}
+          />
         </Button>
         {singleSelected && (
           <Button
@@ -97,7 +96,10 @@ const App = () => {
           <ul>
             {multiSelected.map(item => (
               <li>
-                <FormattedValue field={displayField} item={item} />
+                <FormattedValue
+                  field={description.fields['Name']}
+                  item={item}
+                />
               </li>
             ))}
           </ul>
@@ -108,7 +110,7 @@ const App = () => {
         compact={settings.compact}
         multiSelect={true}
         description={description}
-        staticFilter={parentFilter}
+        staticFilter={`FX5__Ticket__c = '${settings.recordId}'`}
       />
     </>
   );
