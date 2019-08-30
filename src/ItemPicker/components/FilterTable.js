@@ -9,6 +9,7 @@ const FilterTable = props => {
   const {
     compact,
     multiSelect,
+    showRecentItems,
     recentItems,
     selectedItems,
     query,
@@ -76,7 +77,7 @@ const FilterTable = props => {
             onRemoveItem={onRemoveItem}
           />
         </AccordionPanel>
-        {recentItems.length > 0 && (
+        {showRecentItems && recentItems.length > 0 && (
           <AccordionPanel
             id="recents"
             expanded={showRecents}

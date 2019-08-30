@@ -59,7 +59,7 @@ function queryReducer(state, action) {
 }
 
 const ItemPicker = props => {
-  const { compact, multiSelect, description, staticFilter, onSelect } = props;
+  const { compact, multiSelect, showRecentItems, description, staticFilter, onSelect } = props;
   const { api, eventService } = useComponentContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
@@ -99,10 +99,12 @@ const ItemPicker = props => {
   }, [debouncedSearchParams, dispatch]);
 
   function confirmSelection(items) {
-    // TODO: use an 'IN' query instead
-    setRecentItems(
-      [...items, ...recentItems.filter(x => !items.some(item => item.Id === x.Id))].slice(0, 10)
-    );
+    if (showRecentItems) {
+      // TODO: use an 'IN' query instead
+      setRecentItems(
+        [...items, ...recentItems.filter(x => !items.some(item => item.Id === x.Id))].slice(0, 10)
+      );
+    }
 
     if (onSelect) {
       onSelect(multiSelect ? items : items[0]);
@@ -161,6 +163,7 @@ const ItemPicker = props => {
       <FilterTable
         compact={compact}
         multiSelect={multiSelect}
+        showRecentItems={showRecentItems}
         query={query}
         columns={columns}
         searchParams={searchParams}
