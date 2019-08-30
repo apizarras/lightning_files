@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback
-} from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import useDOMEventListener from './useDOMEventListener';
 
 const SESSION_URL = 'https://login.fieldfx.com/session';
@@ -48,11 +42,7 @@ export default function Connect({ onSessionExpired, children }) {
 
   if (!connection) return null;
 
-  return (
-    <ConnectionContext.Provider value={connection}>
-      {children}
-    </ConnectionContext.Provider>
-  );
+  return <ConnectionContext.Provider value={connection}>{children}</ConnectionContext.Provider>;
 }
 
 /** Retrieve/restore a jsforce connection and possibly redirect to admin portal for re-authentication.
@@ -63,9 +53,7 @@ export function getConnection(onSessionExpired) {
   return fetch(SESSION_URL, { credentials: 'include' })
     .then(response => {
       if (response.ok && !response.redirected) return response.json();
-      window.location.href = `${LOGIN_URL}?returnUrl=${encodeURIComponent(
-        window.location.href
-      )}`;
+      window.location.href = `${LOGIN_URL}?returnUrl=${encodeURIComponent(window.location.href)}`;
     })
     .then(session => {
       const { oauth, identity = {} } = session || {};
@@ -75,14 +63,12 @@ export function getConnection(onSessionExpired) {
         oauth.proxyUrl = PROXY_URL;
       }
 
-      const logLevel =
-        process.env.NODE_ENV !== 'production' ? 'DEBUG' : 'ERROR';
+      const logLevel = process.env.NODE_ENV !== 'production' ? 'DEBUG' : 'ERROR';
       const options = { ...oauth, refreshFn: onSessionExpired, logLevel };
       const connection = new Connection(options);
       connection.identity = identity;
       connection.logout = () => (window.location.href = LOGOUT_URL);
-      connection.getJSON = resource =>
-        getJSON(connection, resource, onSessionExpired);
+      connection.getJSON = resource => getJSON(connection, resource, onSessionExpired);
 
       return connection;
     });

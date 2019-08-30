@@ -32,12 +32,7 @@ const DesignAttributesEditor = props => {
     <Card heading="Design Attributes">
       <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked">
         {DESIGN_ATTRIBUTES.map(config => (
-          <Editor
-            key={config.name}
-            config={config}
-            settings={changes}
-            onChange={onChange}
-          />
+          <Editor key={config.name} config={config} settings={changes} onChange={onChange} />
         ))}
         <div className="slds-m-top_medium">
           <Button variant="base" label="Reset to defaults" onClick={reset} />
@@ -68,10 +63,7 @@ const Editor = ({ config, settings, onChange }) => {
       );
     case 'picklist':
       return (
-        <RadioGroup
-          labels={{ label }}
-          onChange={e => onChange(name, e.target.value)}
-        >
+        <RadioGroup labels={{ label }} onChange={e => onChange(name, e.target.value)}>
           {options.map(option => (
             <Radio
               key={option}

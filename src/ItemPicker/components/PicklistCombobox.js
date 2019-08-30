@@ -14,9 +14,7 @@ const PicklistCombobox = props => {
 
     api
       .describePicklist(query.description.name, field.name)
-      .then(values =>
-        setOptions(values.map(({ value }) => ({ id: value, label: value })))
-      );
+      .then(values => setOptions(values.map(({ value }) => ({ id: value, label: value }))));
   }, [api, query, field]);
 
   if (!query || !field) return null;

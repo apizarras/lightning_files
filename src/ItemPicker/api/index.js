@@ -1,16 +1,14 @@
 export function createApi(dataService) {
   return {
     describe: sobject => {
-      return Promise.all([
-        dataService.describe(sobject),
-        dataService.describeFields(sobject)
-      ]).then(([description, fields]) => ({ ...description, fields }));
+      return Promise.all([dataService.describe(sobject), dataService.describeFields(sobject)]).then(
+        ([description, fields]) => ({ ...description, fields })
+      );
     },
     describePicklist: dataService.describePicklist,
     query: dataService.query,
     queryCount: dataService.queryCount,
-    searchLayout: sobject =>
-      dataService.restAPI(`search/layout/?q=${sobject}`).then(r => r[0]),
+    searchLayout: sobject => dataService.restAPI(`search/layout/?q=${sobject}`).then(r => r[0]),
     recordInfo: recordId => dataService.restAPI(`ui-api/record-ui/${recordId}`),
     describeLookupFilter: async (objectInfo, fieldName) => {
       try {
@@ -44,9 +42,7 @@ export function createApi(dataService) {
           )
           .then(res => res.records);
 
-        const filter = lookupFilters.find(
-          x => x.SourceFieldDefinitionId === sourceFieldId
-        );
+        const filter = lookupFilters.find(x => x.SourceFieldDefinitionId === sourceFieldId);
         return filter && filter.Metadata;
       } catch (e) {
         console.error(e);

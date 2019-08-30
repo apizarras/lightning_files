@@ -1,10 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  ConnectionProvider,
-  useConnection,
-  useSettings
-} from './localhost/context';
+import { ConnectionProvider, useConnection, useSettings } from './localhost/context';
 import { dataService, eventService } from './localhost/api';
 import LightningComponent from './index-lightning';
 import { Settings } from '@salesforce/design-system-react';

@@ -31,17 +31,10 @@ const FilterPill = ({ filter, onRemove }) => {
       className="query-filter"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+      exit={{ opacity: 0 }}>
       <Pill
         labels={{
-          label: (
-            <FormattedValue
-              className="filter-value"
-              field={field}
-              item={item}
-            />
-          ),
+          label: <FormattedValue className="filter-value" field={field} item={item} />,
           title: field.label,
           removeTitle: 'Remove Filter'
         }}

@@ -61,8 +61,7 @@ const FilterTable = props => {
           id="results"
           expanded={showResults}
           onTogglePanel={() => setShowResults(!showResults)}
-          summary="Top Search Results"
-        >
+          summary="Top Search Results">
           <DataTable
             compact={compact}
             style={{ height: 350 }}
@@ -82,8 +81,7 @@ const FilterTable = props => {
             id="recents"
             expanded={showRecents}
             onTogglePanel={() => setShowRecents(!showRecents)}
-            summary="Recent Items"
-          >
+            summary="Recent Items">
             <DataTable
               compact={compact}
               style={{ height: 150 }}
@@ -103,8 +101,7 @@ const FilterTable = props => {
             onTogglePanel={() => setShowSelected(!showSelected)}
             summary={`${selectedItems.length || 'No'} Selected Item${
               selectedItems.length === 1 ? '' : 's'
-            }`}
-          >
+            }`}>
             <DataTable
               compact={compact}
               style={{ height: 350 }}

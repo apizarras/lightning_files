@@ -12,15 +12,7 @@ import {
 import './Header.scss';
 
 const Header = props => {
-  const {
-    description,
-    query,
-    columns,
-    selectedItems,
-    onConfirm,
-    onClear,
-    onColumnsChange
-  } = props;
+  const { description, query, columns, selectedItems, onConfirm, onClear, onColumnsChange } = props;
   const { api } = useComponentContext();
   const [count, setCount] = useState(null);
 
@@ -49,9 +41,8 @@ const Header = props => {
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
         count > 0
-          ? `${count} ${
-              count === 1 ? 'item' : 'items'
-            } • sorted by ${query.orderBy && query.orderBy.field.label}`
+          ? `${count} ${count === 1 ? 'item' : 'items'} • sorted by ${query.orderBy &&
+              query.orderBy.field.label}`
           : ''
       }
       onRenderActions={
@@ -87,15 +78,11 @@ const Header = props => {
             body={columns.map((column, index) => (
               <div className="column-selection" key={column.field.name}>
                 <label>
-                  <Checkbox
-                    checked={column.visible}
-                    onChange={() => onColumnSelect(column)}
-                  />
+                  <Checkbox checked={column.visible} onChange={() => onColumnSelect(column)} />
                   {column.field.label}
                 </label>
               </div>
-            ))}
-          >
+            ))}>
             <Button
               assistiveText={{ icon: 'Edit Columns' }}
               iconCategory="utility"

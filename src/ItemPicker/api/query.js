@@ -54,10 +54,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   const recordInfo = await api.recordInfo(recordId);
   const { records, objectInfos } = recordInfo;
   const record = records[recordId];
-  const lookupFilter = await api.describeLookupFilter(
-    objectInfos[record.apiName],
-    lookupFieldName
-  );
+  const lookupFilter = await api.describeLookupFilter(objectInfos[record.apiName], lookupFieldName);
   if (!lookupFilter) return;
 
   const { booleanFilter, filterItems } = lookupFilter;
@@ -194,11 +191,8 @@ function createGroupedSearchClause(columns, keyword) {
 function createSearchClause(columns, searchParams) {
   const keywords = splitKeywords(searchParams);
   if (!keywords.length) return;
-  const searchColumns =
-    searchParams && searchParams.field ? [searchParams.field] : columns;
-  return keywords
-    .map(keyword => createGroupedSearchClause(searchColumns, keyword))
-    .join(' AND ');
+  const searchColumns = searchParams && searchParams.field ? [searchParams.field] : columns;
+  return keywords.map(keyword => createGroupedSearchClause(searchColumns, keyword)).join(' AND ');
 }
 
 function createWhereClause(query) {
@@ -216,9 +210,7 @@ function createWhereClause(query) {
 }
 
 function getFieldNames(description, columns) {
-  const fields = ['Id', 'Name', 'CurrencyIsoCode'].filter(
-    name => description.fields[name]
-  );
+  const fields = ['Id', 'Name', 'CurrencyIsoCode'].filter(name => description.fields[name]);
 
   columns.forEach(({ type, name, relationshipName }) => {
     if (name) fields.push(name);
@@ -287,9 +279,7 @@ export function executeScalar(api, query) {
 }
 
 export function executeLocalSearch(query, items, searchParams) {
-  const keywords = splitKeywords(searchParams).map(
-    x => new RegExp(x.trim(), 'i')
-  );
+  const keywords = splitKeywords(searchParams).map(x => new RegExp(x.trim(), 'i'));
   if (keywords.length === 0) return items;
 
   const searchColumns = (searchParams && searchParams.field
@@ -302,19 +292,14 @@ export function executeLocalSearch(query, items, searchParams) {
 
     item._keywords = searchColumns
       .map(({ type, name, relationshipName }) =>
-        type === 'reference'
-          ? item[name] && item[relationshipName].Name
-          : item[name]
+        type === 'reference' ? item[name] && item[relationshipName].Name : item[name]
       )
       .join(' ');
   });
 
   return items
     .filter(item =>
-      keywords.reduce(
-        (result, search) => search.test(item._keywords) && result,
-        true
-      )
+      keywords.reduce((result, search) => search.test(item._keywords) && result, true)
     )
     .slice(0, BUFFER_SIZE);
 }
@@ -357,8 +342,7 @@ export function sortItems(query, items) {
       break;
     case 'reference':
       key = field.relationshipName;
-      sorter = (a, b) =>
-        (a[key] ? a[key].Name : '').localeCompare(b[key] ? b[key].Name : '');
+      sorter = (a, b) => (a[key] ? a[key].Name : '').localeCompare(b[key] ? b[key].Name : '');
       break;
     default:
       key = field.name;

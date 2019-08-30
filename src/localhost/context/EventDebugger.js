@@ -1,11 +1,5 @@
 import React, { useReducer } from 'react';
-import {
-  Card,
-  RadioGroup,
-  Radio,
-  Textarea,
-  Button
-} from '@salesforce/design-system-react';
+import { Card, RadioGroup, Radio, Textarea, Button } from '@salesforce/design-system-react';
 import { handleAppEvent } from '../../ItemPicker/api/events';
 import { ACTION_TYPES } from '../../constants';
 
@@ -32,10 +26,7 @@ const EventDebugger = props => {
   return (
     <Card heading="Application Events">
       <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked slds-clearfix">
-        <RadioGroup
-          labels={{ label: 'Type' }}
-          onChange={e => dispatch({ type: e.target.value })}
-        >
+        <RadioGroup labels={{ label: 'Type' }} onChange={e => dispatch({ type: e.target.value })}>
           {ACTION_TYPES.map(option => (
             <Radio
               key={option}

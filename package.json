@@ -18,7 +18,7 @@
     "build": "react-app-rewired build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "format": "pretty-quick",
+    "format": "prettier --write './src/**/*.{js,json,css,scss}'",
     "deploy": "node ./deploy.js"
   },
   "husky": {
@@ -30,7 +30,9 @@
     "extends": "react-app"
   },
   "prettier": {
-    "singleQuote": true
+    "jsxBracketSameLine": true,
+    "singleQuote": true,
+    "printWidth": 100
   },
   "browserslist": [
     "last 2 Chrome versions"

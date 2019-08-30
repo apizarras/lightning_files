@@ -90,8 +90,7 @@ const SearchInput = props => {
           onSelect={option => {
             onSearchChange('');
             setField(description.fields[option.value]);
-          }}
-        >
+          }}>
           <DropdownTrigger>
             <Button
               iconCategory="utility"
@@ -108,17 +107,12 @@ const SearchInput = props => {
 };
 
 function getFilterOptions(query) {
-  const options = [
-    { label: 'Search', leftIcon: { category: 'utility', name: 'search' } }
-  ];
+  const options = [{ label: 'Search', leftIcon: { category: 'utility', name: 'search' } }];
 
   if (query.columns) {
     options.push(
       ...query.columns
-        .filter(
-          ({ type }) =>
-            type === 'string' || type === 'reference' || type === 'picklist'
-        )
+        .filter(({ type }) => type === 'string' || type === 'reference' || type === 'picklist')
         .map(({ label, name }) => ({
           label,
           value: name,

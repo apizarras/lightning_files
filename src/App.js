@@ -23,11 +23,7 @@ const App = () => {
       const description = await api.describe(pickerSobject);
       setDescription(description);
 
-      const lookupFilter = await createLookupFilterClause(
-        api,
-        recordId,
-        pickerLookupField
-      );
+      const lookupFilter = await createLookupFilterClause(api, recordId, pickerLookupField);
       setLookupFilter(lookupFilter);
     }
 
@@ -43,12 +39,7 @@ const App = () => {
 
   return (
     <>
-      <Modal
-        align="top"
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        size="medium"
-      >
+      <Modal align="top" isOpen={isOpen} onRequestClose={() => setIsOpen(false)} size="medium">
         <ItemPicker
           compact={settings.compact}
           multiSelect={isMultiSelect}
@@ -63,13 +54,9 @@ const App = () => {
           onClick={() => {
             setIsMultiSelect(false);
             setIsOpen(true);
-          }}
-        >
+          }}>
           {!singleSelected && 'Select Item'}
-          <FormattedValue
-            field={description.fields['Name']}
-            item={singleSelected}
-          />
+          <FormattedValue field={description.fields['Name']} item={singleSelected} />
         </Button>
         {singleSelected && (
           <Button
@@ -88,18 +75,14 @@ const App = () => {
           onClick={() => {
             setIsMultiSelect(true);
             setIsOpen(true);
-          }}
-        >
+          }}>
           Select Items
         </Button>
         {multiSelected && (
           <ul>
             {multiSelected.map(item => (
               <li>
-                <FormattedValue
-                  field={description.fields['Name']}
-                  item={item}
-                />
+                <FormattedValue field={description.fields['Name']} item={item} />
               </li>
             ))}
           </ul>

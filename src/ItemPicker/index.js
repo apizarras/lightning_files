@@ -40,8 +40,7 @@ function queryReducer(state, action) {
       if (
         state.filters.find(
           ({ field, item }) =>
-            field.name === payload.field.name &&
-            item[field.name] === payload.item[field.name]
+            field.name === payload.field.name && item[field.name] === payload.item[field.name]
         )
       ) {
         return state;
@@ -67,10 +66,7 @@ const ItemPicker = props => {
   const [searchParams, setSearchParams] = useState();
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [recentItems, setRecentItems] = useSessionStorage(
-    `recents-${description.name}`,
-    []
-  );
+  const [recentItems, setRecentItems] = useSessionStorage(`recents-${description.name}`, []);
 
   useEffect(() => {
     async function init() {
@@ -105,10 +101,7 @@ const ItemPicker = props => {
   function confirmSelection(items) {
     // TODO: use an 'IN' query instead
     setRecentItems(
-      [
-        ...items,
-        ...recentItems.filter(x => !items.some(item => item.Id === x.Id))
-      ].slice(0, 10)
+      [...items, ...recentItems.filter(x => !items.some(item => item.Id === x.Id))].slice(0, 10)
     );
 
     if (onSelect) {
@@ -145,11 +138,7 @@ const ItemPicker = props => {
   }
 
   return (
-    <Card
-      className="item-picker"
-      hasNoHeader={true}
-      bodyClassName="item-picker-contents"
-    >
+    <Card className="item-picker" hasNoHeader={true} bodyClassName="item-picker-contents">
       <Header
         query={query}
         columns={columns}
@@ -163,15 +152,11 @@ const ItemPicker = props => {
         query={query}
         description={description}
         onChange={value => setSearchParams(value)}
-        onAddFilter={filter =>
-          dispatch({ type: 'ADD_FILTER', payload: filter })
-        }
+        onAddFilter={filter => dispatch({ type: 'ADD_FILTER', payload: filter })}
       />
       <QueryFilters
         query={query}
-        onRemoveFilter={filter =>
-          dispatch({ type: 'REMOVE_FILTER', payload: filter })
-        }
+        onRemoveFilter={filter => dispatch({ type: 'REMOVE_FILTER', payload: filter })}
       />
       <FilterTable
         compact={compact}
@@ -183,12 +168,8 @@ const ItemPicker = props => {
         selectedItems={selectedItems}
         onSelectItem={onSelectItem}
         onRemoveItem={onRemoveItem}
-        onAddFilter={filter =>
-          dispatch({ type: 'ADD_FILTER', payload: filter })
-        }
-        onUpdateSort={field =>
-          dispatch({ type: 'UPDATE_SORT', payload: field })
-        }
+        onAddFilter={filter => dispatch({ type: 'ADD_FILTER', payload: filter })}
+        onUpdateSort={field => dispatch({ type: 'UPDATE_SORT', payload: field })}
       />
     </Card>
   );

@@ -33,8 +33,7 @@ const DataTable = props => {
       className={`data-table ${compact ? 'compact' : null} ${
         loading && items.length > 0 ? 'transient' : ''
       } ${className || ''}`}
-      style={style}
-    >
+      style={style}>
       {loading && items.length === 0 && <Spinner size="small" variant="base" />}
       <StickyTable stickyColumnCount={1}>
         <Row>
@@ -42,17 +41,11 @@ const DataTable = props => {
           {visibleColumns.map(field => (
             <Cell
               key={field.name}
-              data-sort={
-                onUpdateSort &&
-                orderBy &&
-                orderBy.field === field &&
-                orderBy.direction
-              }
+              data-sort={onUpdateSort && orderBy && orderBy.field === field && orderBy.direction}
               data-cell-type={field.type}
               data-autonumber={field.autoNumber}
               data-field={field.name}
-              onClick={() => onUpdateSort && onUpdateSort(field)}
-            >
+              onClick={() => onUpdateSort && onUpdateSort(field)}>
               {field.label}
             </Cell>
           ))}
@@ -64,9 +57,7 @@ const DataTable = props => {
               <Checkbox
                 checked={selectedIds[item.Id]}
                 onChange={e => {
-                  selectedIds[item.Id]
-                    ? onRemoveItem(item)
-                    : onSelectItem(item);
+                  selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item);
                 }}
               />
             </Cell>
@@ -76,8 +67,7 @@ const DataTable = props => {
                 className={onAddFilter ? 'filter-cell' : null}
                 data-cell-type={field.type}
                 data-autonumber={field.autoNumber}
-                onClick={() => onAddFilter && onAddFilter({ field, item })}
-              >
+                onClick={() => onAddFilter && onAddFilter({ field, item })}>
                 <FormattedValue field={field} item={item} />
               </Cell>
             ))}

@@ -8,9 +8,9 @@ fs.copyFile(
   err => {
     if (err) throw err;
     console.log(
-      `build/${packageJSON.name}.resource.js was copied to ${
-        packageJSON['deploy-path']
-      }/${packageJSON.name}.resource`
+      `build/${packageJSON.name}.resource.js was copied to ${packageJSON['deploy-path']}/${
+        packageJSON.name
+      }.resource`
     );
   }
 );
@@ -21,9 +21,9 @@ fs.copyFile(
   err => {
     if (err) throw err;
     console.log(
-      `build/${packageJSON.name}_style.resource.css was copied to ${
-        packageJSON['deploy-path']
-      }/${packageJSON.name}_style.resource`
+      `build/${packageJSON.name}_style.resource.css was copied to ${packageJSON['deploy-path']}/${
+        packageJSON.name
+      }_style.resource`
     );
   }
 );

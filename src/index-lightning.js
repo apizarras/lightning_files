@@ -14,8 +14,7 @@ export default function LightningComponent(props) {
       <ComponentContextProvider
         settings={settings}
         dataService={dataService}
-        eventService={eventService}
-      >
+        eventService={eventService}>
         <App />
       </ComponentContextProvider>
     </IconSettings>
@@ -56,8 +55,7 @@ export function initialize(component) {
 
   const dataService = {
     describe: sobjectType => wrap('describe', { sobjectType }, true),
-    describeFields: sobjectType =>
-      wrap('describeFields', { sobjectType }, true),
+    describeFields: sobjectType => wrap('describeFields', { sobjectType }, true),
     describePicklist: (sobjectType, fieldName) =>
       wrap('describePicklist', { sobjectType, fieldName }, true),
     query: soql => wrap('query', { soql }),
@@ -76,9 +74,7 @@ export function initialize(component) {
 
   // pass lightning application events to react
   // expecting event param to look like: { type, payload }
-  component.addEventHandler('FX5:ACTION', (component, event) =>
-    handleAppEvent(event.getParams())
-  );
+  component.addEventHandler('FX5:ACTION', (component, event) => handleAppEvent(event.getParams()));
 
   const appElement = component.find('root').getElement();
   Settings.appElement(appElement);

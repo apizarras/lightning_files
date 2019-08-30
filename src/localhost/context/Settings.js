@@ -7,16 +7,10 @@ const SettingsContext = createContext();
 export const useSettings = () => useContext(SettingsContext);
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, dispatch] = useReducer(
-    applyChanges,
-    getDefaultSettings(),
-    loadSettings
-  );
+  const [settings, dispatch] = useReducer(applyChanges, getDefaultSettings(), loadSettings);
 
   return (
-    <SettingsContext.Provider value={[settings, dispatch]}>
-      {children}
-    </SettingsContext.Provider>
+    <SettingsContext.Provider value={[settings, dispatch]}>{children}</SettingsContext.Provider>
   );
 };
 

@@ -27,8 +27,7 @@ export const ConnectionProvider = props => {
             right: 0,
             bottom: 0,
             left: 0
-          }}
-        >
+          }}>
           <Menu />
           <div className="slds-brand-band slds-brand-band_medium">
             <section
@@ -37,8 +36,7 @@ export const ConnectionProvider = props => {
                 top: 50,
                 width: '100%',
                 height: 'calc(100% - 50px)'
-              }}
-            >
+              }}>
               <div className="slds-template_default">
                 <div
                   style={{
@@ -46,8 +44,7 @@ export const ConnectionProvider = props => {
                     flexFlow: 'row wrap',
                     minWidth: 1050,
                     marginBottom: '3rem'
-                  }}
-                >
+                  }}>
                   <div style={{ width: '66.66%' }}>{props.children}</div>
                   <div style={{ width: '33.33%', paddingLeft: '.75rem' }}>
                     <DesignAttributesEditor />

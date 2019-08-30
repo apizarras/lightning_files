@@ -19,9 +19,7 @@ const Menu = props => {
             body={
               <>
                 <div className="slds-clearfix">
-                  <p className="slds-text-title slds-p-bottom_medium">
-                    {organization_name}
-                  </p>
+                  <p className="slds-text-title slds-p-bottom_medium">{organization_name}</p>
                   <Button
                     className="slds-float_right"
                     variant="destructive"

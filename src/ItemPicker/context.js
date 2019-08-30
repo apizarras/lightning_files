@@ -5,12 +5,7 @@ const ComponentContext = createContext();
 
 export const useComponentContext = () => useContext(ComponentContext);
 
-export const ComponentContextProvider = ({
-  children,
-  settings,
-  dataService,
-  eventService
-}) => {
+export const ComponentContextProvider = ({ children, settings, dataService, eventService }) => {
   const api = createApi(dataService);
 
   return (

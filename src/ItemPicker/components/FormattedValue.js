@@ -33,14 +33,7 @@ function FormattedValue(props) {
       formatted = <Icon category="doctype" name="unknown" size="xx-small" />;
       break;
     case 'boolean':
-      formatted = (
-        <Icon
-          title={field.label}
-          category="utility"
-          name="check"
-          size="xx-small"
-        />
-      );
+      formatted = <Icon title={field.label} category="utility" name="check" size="xx-small" />;
       break;
     case 'currency':
       attrs['data-currency'] = item.CurrencyIsoCode || null;
