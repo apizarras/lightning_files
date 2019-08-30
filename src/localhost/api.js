@@ -20,7 +20,7 @@ export const dataService = connection => {
     searchLayout: sobject => connection.getJSON(`search/layout/?q=${sobject}`).then(r => r[0]),
     query: soql => connection.query(soql).then(r => r.records),
     queryCount: soql => connection.query(soql).then(r => r.totalSize),
-    restAPI: connection.getJSON
+    restApi: connection.getJSON
   };
 };
 
