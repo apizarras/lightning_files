@@ -7,7 +7,7 @@
   "dependencies": {
     "@salesforce-ux/design-system": "2.9.4",
     "@salesforce/design-system-react": "0.10.9",
-    "framer-motion": "1.6.5",
+    "framer-motion": "1.6.7",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-scripts": "3.1.1",
@@ -18,9 +18,13 @@
     "build": "react-app-rewired build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "precommit": "pretty-quick --staged",
     "format": "pretty-quick",
     "deploy": "node ./deploy.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
