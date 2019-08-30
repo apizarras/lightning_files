@@ -35,19 +35,3 @@ export const DESIGN_ATTRIBUTES = [
 ];
 
 export const ACTION_TYPES = ['I did something good', 'I did something bad'];
-
-export const SYSTEM_FIELDS = [
-  'Id',
-  'CurrencyIsoCode',
-  'IsDeleted',
-  'CreatedBy',
-  'CreatedById',
-  'CreatedDate',
-  'CurrencyIsoCode',
-  'LastModifiedBy',
-  'LastModifiedById',
-  'LastModifiedDate',
-  'LastReferencedDate',
-  'LastViewedDate',
-  'SystemModstamp'
-];

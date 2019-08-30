@@ -9,6 +9,56 @@ import FilterTable from './components/FilterTable';
 import { Card } from '@salesforce/design-system-react';
 import './index.scss';
 
+function getInitialQuery({ description, columns, orderBy, staticFilter }) {
+  return {
+    description,
+    columns,
+    orderBy,
+    staticFilter,
+    filters: [],
+    implicitSort: 'Id'
+  };
+}
+
+function queryReducer(state, action) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case 'UPDATE_COLUMNS':
+      return { ...state, columns: payload };
+    case 'UPDATE_SORT':
+      const direction = state.orderBy
+        ? state.orderBy.field === payload
+          ? state.orderBy.direction === 'ASC'
+            ? 'DESC'
+            : 'ASC'
+          : 'ASC'
+        : 'ASC';
+
+      return { ...state, orderBy: { field: payload, direction } };
+    case 'ADD_FILTER':
+      if (
+        state.filters.find(
+          ({ field, item }) =>
+            field.name === payload.field.name &&
+            item[field.name] === payload.item[field.name]
+        )
+      ) {
+        return state;
+      }
+      return { ...state, filters: state.filters.concat(payload) };
+    case 'REMOVE_FILTER':
+      return { ...state, filters: state.filters.filter(x => x !== payload) };
+    case 'UPDATE_SEARCH':
+      if (payload && payload.searchText.length === 1) return state;
+      return { ...state, searchParams: payload };
+    case 'INITIALIZE':
+      return { ...state, ...getInitialQuery(payload) };
+    default:
+      return state;
+  }
+}
+
 const ItemPicker = props => {
   const { compact, multiSelect, description, staticFilter, onSelect } = props;
   const { api, eventService } = useComponentContext();
@@ -64,19 +114,21 @@ const ItemPicker = props => {
       console.log('onSelect', items);
     }
 
-    eventService.triggerLightningEvent({
-      type: 'ITEMS_SELECTED',
-      payload: items.map(x => x.Id).join(',')
-    });
+    eventService &&
+      eventService.triggerLightningEvent({
+        type: 'ITEMS_SELECTED',
+        payload: items.map(x => x.Id).join(',')
+      });
   }
 
   function onClear() {
     setSelectedItems([]);
 
-    eventService.triggerLightningEvent({
-      type: 'ITEMS_SELECTED',
-      payload: null
-    });
+    eventService &&
+      eventService.triggerLightningEvent({
+        type: 'ITEMS_SELECTED',
+        payload: null
+      });
   }
 
   function onSelectItem(item) {
@@ -138,55 +190,5 @@ const ItemPicker = props => {
     </Card>
   );
 };
-
-function queryReducer(state, action) {
-  const { type, payload } = action;
-
-  switch (type) {
-    case 'UPDATE_COLUMNS':
-      return { ...state, columns: payload };
-    case 'UPDATE_SORT':
-      const direction = state.orderBy
-        ? state.orderBy.field === payload
-          ? state.orderBy.direction === 'ASC'
-            ? 'DESC'
-            : 'ASC'
-          : 'ASC'
-        : 'ASC';
-
-      return { ...state, orderBy: { field: payload, direction } };
-    case 'ADD_FILTER':
-      if (
-        state.filters.find(
-          ({ field, item }) =>
-            field.name === payload.field.name &&
-            item[field.name] === payload.item[field.name]
-        )
-      ) {
-        return state;
-      }
-      return { ...state, filters: state.filters.concat(payload) };
-    case 'REMOVE_FILTER':
-      return { ...state, filters: state.filters.filter(x => x !== payload) };
-    case 'UPDATE_SEARCH':
-      if (payload && payload.searchText.length === 1) return state;
-      return { ...state, searchParams: payload };
-    case 'INITIALIZE':
-      return { ...state, ...getInitialQuery(payload) };
-    default:
-      return state;
-  }
-}
-
-function getInitialQuery({ description, columns, orderBy, staticFilter }) {
-  return {
-    description,
-    columns,
-    orderBy,
-    staticFilter,
-    filters: [],
-    implicitSort: 'Id'
-  };
-}
 
 export default ItemPicker;

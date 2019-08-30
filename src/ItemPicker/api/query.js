@@ -1,10 +1,28 @@
-import { SYSTEM_FIELDS } from '../../constants';
+const SYSTEM_FIELDS = [
+  'Id',
+  'CurrencyIsoCode',
+  'IsDeleted',
+  'CreatedBy',
+  'CreatedById',
+  'CreatedDate',
+  'CurrencyIsoCode',
+  'LastModifiedBy',
+  'LastModifiedById',
+  'LastModifiedDate',
+  'LastReferencedDate',
+  'LastViewedDate',
+  'SystemModstamp'
+];
 
 const BUFFER_SIZE = 100;
 
 function searchableColumnsFilter(column) {
   // salesforce LIKE operator only supports strings
-  const { type } = column;
+  if (!column || !column.field) return false;
+
+  const {
+    field: { type }
+  } = column;
   return type === 'string' || type === 'reference' || type === 'picklist';
 }
 
@@ -167,7 +185,7 @@ function createOrderBy(orderBy, implicitSort = 'Id') {
 function createGroupedSearchClause(columns, keyword) {
   const clauses = columns
     .filter(searchableColumnsFilter)
-    .map(({ type, name, relationshipName }) =>
+    .map(({ field: { type, name, relationshipName } }) =>
       type === 'reference' ? `${relationshipName}.Name` : name
     )
     .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword)}%'`)
@@ -206,9 +224,8 @@ function getFieldNames(description, columns) {
     name => description.fields[name]
   );
 
-  columns.forEach(field => {
-    const { type, name, relationshipName } = field;
-    fields.push(name);
+  columns.forEach(({ field: { type, name, relationshipName } }) => {
+    if (name) fields.push(name);
     if (type === 'reference') {
       fields.push(`${relationshipName}.Id`);
       fields.push(`${relationshipName}.Name`);
@@ -280,7 +297,7 @@ export function executeLocalSearch(query, items, searchParams) {
   if (keywords.length === 0) return items;
 
   const searchColumns = (searchParams && searchParams.field
-    ? [searchParams.field]
+    ? [searchParams]
     : query.columns
   ).filter(searchableColumnsFilter);
 
@@ -288,7 +305,7 @@ export function executeLocalSearch(query, items, searchParams) {
     if (item._keywords) return;
 
     item._keywords = searchColumns
-      .map(({ type, name, relationshipName }) =>
+      .map(({ field: { type, name, relationshipName } }) =>
         type === 'reference'
           ? item[name] && item[relationshipName].Name
           : item[name]

@@ -116,10 +116,12 @@ function getFilterOptions(query) {
     options.push(
       ...query.columns
         .filter(
-          ({ type }) =>
-            type === 'string' || type === 'reference' || type === 'picklist'
+          ({ field }) =>
+            field.type === 'string' ||
+            field.type === 'reference' ||
+            field.type === 'picklist'
         )
-        .map(({ label, name }) => ({
+        .map(({ field: { label, name } }) => ({
           label,
           value: name,
           leftIcon: {
