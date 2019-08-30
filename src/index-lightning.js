@@ -60,7 +60,7 @@ export function initialize(component) {
       wrap('describePicklist', { sobjectType, fieldName }, true),
     query: soql => wrap('query', { soql }),
     queryCount: soql => wrap('query', { soql }),
-    restApi: endpoint => wrap('callRest', { endpoint }, true)
+    restApi: path => wrap('callRest', { endpoint: `/services/data/v44.0/${path}` }, true)
   };
 
   const eventService = {
