@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useComponentContext } from './context';
 import { useDebounce, useSessionStorage } from './api/hooks';
-import { getSearchColumns, sortItems } from './api/query';
+import { getSearchFields, sortItems } from './api/query';
 import Header from './components/Header';
 import SearchInput from './components/SearchInput';
 import QueryFilters from './components/QueryFilters';
@@ -74,19 +74,22 @@ const ItemPicker = props => {
 
   useEffect(() => {
     async function init() {
-      const searchColumns = await getSearchColumns(api, description);
-      const columns = searchColumns.map(field => ({ field, visible: true }));
-      const orderBy = searchColumns && {
-        field: searchColumns.find(x => x.type !== 'location'),
+      const searchFields = await getSearchFields(api, description);
+      const gridColumns = searchFields.map(field => ({
+        field,
+        visible: true
+      }));
+      const orderBy = searchFields && {
+        field: searchFields.find(x => x.type !== 'location'),
         direction: 'ASC'
       };
-      setColumns(columns);
+      setColumns(gridColumns);
 
       dispatch({
         type: 'INITIALIZE',
         payload: {
           description,
-          columns: searchColumns,
+          columns: searchFields,
           orderBy,
           staticFilter
         }

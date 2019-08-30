@@ -18,11 +18,7 @@ const BUFFER_SIZE = 100;
 
 function searchableColumnsFilter(column) {
   // salesforce LIKE operator only supports strings
-  if (!column || !column.field) return false;
-
-  const {
-    field: { type }
-  } = column;
+  const { type } = column;
   return type === 'string' || type === 'reference' || type === 'picklist';
 }
 
@@ -185,7 +181,7 @@ function createOrderBy(orderBy, implicitSort = 'Id') {
 function createGroupedSearchClause(columns, keyword) {
   const clauses = columns
     .filter(searchableColumnsFilter)
-    .map(({ field: { type, name, relationshipName } }) =>
+    .map(({ type, name, relationshipName }) =>
       type === 'reference' ? `${relationshipName}.Name` : name
     )
     .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword)}%'`)
@@ -224,7 +220,7 @@ function getFieldNames(description, columns) {
     name => description.fields[name]
   );
 
-  columns.forEach(({ field: { type, name, relationshipName } }) => {
+  columns.forEach(({ type, name, relationshipName }) => {
     if (name) fields.push(name);
     if (type === 'reference') {
       fields.push(`${relationshipName}.Id`);
@@ -258,7 +254,7 @@ async function getColumnNamesFromSearchLayout(api, description) {
   }, []);
 }
 
-export async function getSearchColumns(api, description) {
+export async function getSearchFields(api, description) {
   const columnNames = await getColumnNamesFromSearchLayout(api, description);
   return columnNames
     .map(name => description.fields[name])
@@ -305,7 +301,7 @@ export function executeLocalSearch(query, items, searchParams) {
     if (item._keywords) return;
 
     item._keywords = searchColumns
-      .map(({ field: { type, name, relationshipName } }) =>
+      .map(({ type, name, relationshipName }) =>
         type === 'reference'
           ? item[name] && item[relationshipName].Name
           : item[name]

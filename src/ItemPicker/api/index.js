@@ -7,9 +7,10 @@ export function createApi(dataService) {
       ]).then(([description, fields]) => ({ ...description, fields }));
     },
     describePicklist: dataService.describePicklist,
-    searchLayout: dataService.searchLayout,
     query: dataService.query,
     queryCount: dataService.queryCount,
+    searchLayout: sobject =>
+      dataService.restAPI(`search/layout/?q=${sobject}`).then(r => r[0]),
     recordInfo: recordId => dataService.restAPI(`ui-api/record-ui/${recordId}`),
     describeLookupFilter: async (objectInfo, fieldName) => {
       try {
