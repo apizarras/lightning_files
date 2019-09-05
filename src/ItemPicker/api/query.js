@@ -218,7 +218,7 @@ function getFieldNames(description, columns) {
       fields.push(`${relationshipName}.Id`);
       fields.push(`${relationshipName}.Name`);
     }
-  }, []);
+  });
 
   return [...new Set(fields)]; // distinct fields
 }
@@ -299,7 +299,7 @@ export function executeLocalSearch(query, items, searchParams) {
 
   return items
     .filter(item =>
-      keywords.reduce((result, search) => search.test(item._keywords) && result, true)
+      keywords.reduce((result, search) => result && search.test(item._keywords), true)
     )
     .slice(0, BUFFER_SIZE);
 }
