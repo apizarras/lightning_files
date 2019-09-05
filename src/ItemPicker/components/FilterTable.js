@@ -23,8 +23,8 @@ const FilterTable = props => {
   const { api } = useComponentContext();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [showRecents, setShowRecents] = useState(false);
+  const [showResults, setShowResults] = useState(recentItems.length === 0);
+  const [showRecents, setShowRecents] = useState(recentItems.length > 0);
   const [showSelected, setShowSelected] = useState(false);
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const FilterTable = props => {
             onRemoveItem={onRemoveItem}
           />
         </AccordionPanel>
-        {showRecentItems && recentItems.length > 0 && (
+        {showRecentItems && (
           <AccordionPanel
             id="recents"
             expanded={showRecents}
