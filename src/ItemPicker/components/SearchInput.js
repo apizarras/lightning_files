@@ -86,6 +86,7 @@ const SearchInput = props => {
     <div className="slds-page-header item-picker-search">
       <ButtonGroup variant="list" className="search-bar">
         <Dropdown
+          menuPosition="relative"
           options={getFilterOptions(query)}
           onSelect={option => {
             onSearchChange('');

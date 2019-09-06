@@ -71,10 +71,10 @@ const Header = props => {
       onRenderControls={() => (
         <PageHeaderControl>
           <Popover
-            triggerClassName="column-editor"
-            hasNoCloseButton={true}
             position="relative"
             align="bottom right"
+            hasNoCloseButton={true}
+            triggerClassName="column-editor"
             body={columns.map((column, index) => (
               <div className="column-selection" key={column.field.name}>
                 <label>

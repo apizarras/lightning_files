@@ -59,7 +59,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
 
   const { booleanFilter, filterItems } = lookupFilter;
   const parentInfo = objectInfos[record.apiName];
-  const lookupInfo = objectInfos[parentInfo.fields[lookupFieldName].apiName];
+  const lookupInfo = objectInfos[parentInfo.apiName].fields[lookupFieldName].referenceToInfos[0];
   const re = new RegExp(`^${lookupInfo.apiName}.`);
 
   function clean(str) {
@@ -97,7 +97,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
       case 'notContain':
         return `${field} NOT IN ${formatted}`;
       case 'startsWith':
-        return `${field} LIKE ${formatted}`;
+        return `${field} LIKE '${escapeSOQLString(val)}%'`;
       case 'includes':
         return `${field} INCLUDES ${formatted}`;
       case 'excludes':
