@@ -71,8 +71,9 @@ const Header = props => {
       onRenderControls={() => (
         <PageHeaderControl>
           <Popover
-            position="relative"
+            position="absolute"
             align="bottom right"
+            hasNoNubbin={true}
             hasNoCloseButton={true}
             triggerClassName="column-editor"
             body={columns.map((column, index) => (

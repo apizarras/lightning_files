@@ -1,4 +1,8 @@
 export function createApi(dataService) {
+  function toolingQuery(soql) {
+    return dataService.restApi(`tooling/query/?q=${encodeURIComponent(soql)}`);
+  }
+
   return {
     describe: sobject => {
       return Promise.all([dataService.describe(sobject), dataService.describeFields(sobject)]).then(
@@ -16,24 +20,18 @@ export function createApi(dataService) {
         if (!field) return;
 
         const [sourceEntityId, targetEntityId] = await Promise.all([
-          dataService
-            .restApi(
-              `tooling/query/?q=SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${objectInfo.apiName}'`
-            )
-            .then(res => res.records[0] && res.records[0].DurableId),
-          dataService
-            .restApi(
-              `tooling/query/?q=SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${field.referenceToInfos[0].apiName}'`
-            )
-            .then(res => res.records[0] && res.records[0].DurableId)
+          toolingQuery(
+            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${objectInfo.apiName}'`
+          ).then(res => res.records[0] && res.records[0].DurableId),
+          toolingQuery(
+            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${field.referenceToInfos[0].apiName}'`
+          ).then(res => res.records[0] && res.records[0].DurableId)
         ]);
         if (!sourceEntityId || !targetEntityId) return;
 
-        const sourceFieldId = await dataService
-          .restApi(
-            `tooling/query/?q=SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.apiName}'`
-          )
-          .then(res => res.records[0] && res.records[0].DurableId);
+        const sourceFieldId = await toolingQuery(
+          `SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.apiName}'`
+        ).then(res => res.records[0] && res.records[0].DurableId);
         if (!sourceFieldId) return;
 
         const developerName =
@@ -43,11 +41,9 @@ export function createApi(dataService) {
             .map(sf15to18)
             .join('_');
 
-        const filter = await dataService
-          .restApi(
-            `tooling/query/?q=SELECT Metadata FROM LookupFilter WHERE Active=TRUE AND IsOptional=FALSE AND DeveloperName='${developerName}'`
-          )
-          .then(res => res.records && res.records[0]);
+        const filter = await toolingQuery(
+          `SELECT Metadata FROM LookupFilter WHERE Active=TRUE AND IsOptional=FALSE AND DeveloperName='${developerName}'`
+        ).then(res => res.records && res.records[0]);
 
         return filter && filter.Metadata;
       } catch (e) {
