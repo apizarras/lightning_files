@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import useDOMEventListener from './useDOMEventListener';
+import { Connection } from 'jsforce';
 
 const SESSION_URL = 'https://login.fieldfx.com/session';
 const LOGIN_URL = 'https://login.fieldfx.com/login';
 const LOGOUT_URL = 'https://login.fieldfx.com/oauth/logout';
 const PROXY_URL = 'https://login.fieldfx.com/salesforce';
 
-// expect jsforce to be available globally via CDN on index.html
-const { Connection } = global.jsforce;
 const ConnectionContext = createContext();
 
 /** React hook to access jsforce connection in function components */
