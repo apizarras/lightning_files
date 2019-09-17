@@ -2,23 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ConnectionProvider, useConnection, useSettings } from './localhost/context';
 import { dataService, eventService } from './localhost/api';
-import LightningComponent from './index-lightning';
 import { Settings } from '@salesforce/design-system-react';
+import App from './App';
 
 const appElement = document.getElementById('root');
 Settings.setAppElement(appElement);
 
 // stubs out context params for local dev
 const Component = props => {
-  const connection = useConnection();
   const [settings] = useSettings();
+  const connection = useConnection();
 
   return (
-    <LightningComponent
-      settings={settings}
-      dataService={dataService(connection)}
-      eventService={eventService()}
-    />
+    <App settings={settings} dataService={dataService(connection)} eventService={eventService()} />
   );
 };
 

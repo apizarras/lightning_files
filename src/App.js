@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useComponentContext } from './ItemPicker/context';
+import { ComponentContextProvider, useComponentContext } from './ItemPicker/context';
 import ItemPicker from './ItemPicker';
 import FormattedValue from './ItemPicker/components/FormattedValue';
 import { createLookupFilterClause } from './ItemPicker/api/query';
-import { Card, Modal, Button } from '@salesforce/design-system-react';
+import { IconSettings, Card, Modal, Button } from '@salesforce/design-system-react';
+
+export default function LightningComponent(props) {
+  const { settings, dataService, eventService } = props;
+
+  return (
+    <IconSettings iconPath="/_slds/icons">
+      <ComponentContextProvider
+        settings={settings}
+        dataService={dataService}
+        eventService={eventService}>
+        <App />
+      </ComponentContextProvider>
+    </IconSettings>
+  );
+}
 
 const App = () => {
   const { api, settings } = useComponentContext();
@@ -98,5 +113,3 @@ const App = () => {
     </>
   );
 };
-
-export default App;

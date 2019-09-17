@@ -1,25 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { DESIGN_ATTRIBUTES } from './constants';
-import { ComponentContextProvider } from './ItemPicker/context';
 import { handleAppEvent } from './ItemPicker/api/events';
-import { Settings, IconSettings } from '@salesforce/design-system-react';
+import { Settings } from '@salesforce/design-system-react';
 import App from './App';
-
-export default function LightningComponent(props) {
-  const { settings, dataService, eventService } = props;
-
-  return (
-    <IconSettings iconPath="/_slds/icons">
-      <ComponentContextProvider
-        settings={settings}
-        dataService={dataService}
-        eventService={eventService}>
-        <App />
-      </ComponentContextProvider>
-    </IconSettings>
-  );
-}
 
 export function initialize(component) {
   const aura = window.$A;
@@ -80,11 +64,7 @@ export function initialize(component) {
   Settings.appElement(appElement);
 
   ReactDOM.render(
-    <LightningComponent
-      settings={settings}
-      dataService={dataService}
-      eventService={eventService}
-    />,
+    <App settings={settings} dataService={dataService} eventService={eventService} />,
     appElement
   );
 }
