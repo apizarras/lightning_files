@@ -1,4 +1,5 @@
 // dev-only stubs for LightningContext params
+import { createEventService } from '../ItemPicker/api/events';
 
 export const dataService = connection => {
   return {
@@ -25,10 +26,8 @@ export const dataService = connection => {
 };
 
 export const eventService = () => {
-  return {
-    triggerLightningEvent: action => {
-      // no other lightning components here...just log to console
-      console.info('EVENT TRIGGERED', action);
-    }
-  };
+  return createEventService({
+    sendMessage: message => console.log('SEND LIGHTNING MESSAGE', message),
+    addMessageHandler: () => {}
+  });
 };

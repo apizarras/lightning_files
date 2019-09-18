@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react';
 import { Card, RadioGroup, Radio, Textarea, Button } from '@salesforce/design-system-react';
-import { handleAppEvent } from '../../ItemPicker/api/events';
-import { ACTION_TYPES } from '../../constants';
+import { triggerMessageHandler } from '../../ItemPicker/api/events';
+import { MESSAGE_TYPES } from '../../constants';
 
 function reducer(state, action) {
   return { ...state, ...action };
@@ -11,13 +11,13 @@ const EventDebugger = props => {
   const [params, dispatch] = useReducer(reducer, {});
 
   function triggerEvent() {
-    const { type, payload } = params;
-    if (!type) return;
+    const { name, value } = params;
+    if (!name) return;
 
     try {
-      const action = { type, payload: payload && JSON.parse(payload) };
-      console.info('SIMULATED INCOMING EVENT', action);
-      handleAppEvent(action);
+      const message = { name, value: value && JSON.parse(value) };
+      console.info('SIMULATED INCOMING MESSAGE', message);
+      triggerMessageHandler(message);
     } catch (e) {
       console.error(e);
     }
@@ -26,21 +26,21 @@ const EventDebugger = props => {
   return (
     <Card heading="Application Events">
       <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked slds-clearfix">
-        <RadioGroup labels={{ label: 'Type' }} onChange={e => dispatch({ type: e.target.value })}>
-          {ACTION_TYPES.map(option => (
+        <RadioGroup labels={{ label: 'Name' }} onChange={e => dispatch({ name: e.target.value })}>
+          {MESSAGE_TYPES.map(name => (
             <Radio
-              key={option}
-              value={option}
-              labels={{ label: option }}
-              checked={params.type === option}
+              key={name}
+              value={name}
+              labels={{ label: name }}
+              checked={params.name === name}
               variant="base"
             />
           ))}
         </RadioGroup>
         <Textarea
-          label="Payload"
-          value={params.payload}
-          onChange={e => dispatch({ payload: e.target.value })}
+          label="Value"
+          value={params.value}
+          onChange={e => dispatch({ value: e.target.value })}
         />
 
         <div className="slds-m-top_medium">

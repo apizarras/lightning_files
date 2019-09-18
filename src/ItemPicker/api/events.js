@@ -2,27 +2,44 @@ import { useEffect, useRef } from 'react';
 
 const listeners = {};
 
-function addEventListener(name, handler) {
+function addMessageListener(name, handler) {
   listeners[name] = listeners[name] || [];
   listeners[name].push(handler);
 }
 
-function removeEventListener(name, handler) {
+function removeMessageListener(name, handler) {
   listeners[name] = (listeners[name] || []).filter(x => x !== handler);
 }
 
-export function handleAppEvent({ type, payload }) {
-  (listeners[type] || []).forEach(handler => handler(payload));
+export function triggerMessageHandler(message) {
+  const { name, value } = message;
+  if (!name) return;
+  (listeners[name] || []).forEach(handler => handler(value));
 }
 
-export function useAppEventListener(name, handler) {
+export function useMessageListener(name, handler) {
   const listener = useRef();
 
   useEffect(() => (listener.current = handler), [handler]);
 
   useEffect(() => {
     const eventListener = event => listener.current(event);
-    addEventListener(name, eventListener);
-    return () => removeEventListener(name, eventListener);
+    addMessageListener(name, eventListener);
+    return () => removeMessageListener(name, eventListener);
   }, [name]);
+}
+
+export function createEventService(eventHost) {
+  eventHost.addMessageHandler(message => {
+    console.log('message received by react', message);
+    triggerMessageHandler(message);
+  });
+
+  return {
+    sendMessage: eventHost.sendMessage,
+    addMessageHandler: (name, handler) => {
+      listeners[name] = listeners[name] || [];
+      listeners[name].push(handler);
+    }
+  };
 }

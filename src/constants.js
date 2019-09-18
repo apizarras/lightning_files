@@ -34,4 +34,4 @@ export const DESIGN_ATTRIBUTES = [
   }
 ];
 
-export const ACTION_TYPES = ['I did something good', 'I did something bad'];
+export const MESSAGE_TYPES = ['I did something good', 'I did something bad'];

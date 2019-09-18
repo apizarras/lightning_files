@@ -113,9 +113,9 @@ const ItemPicker = props => {
     }
 
     eventService &&
-      eventService.triggerLightningEvent({
-        type: 'ITEMS_SELECTED',
-        payload: items.map(x => x.Id).join(',')
+      eventService.sendMessage({
+        name: 'ITEMS_SELECTED',
+        value: items.map(x => x.Id)
       });
   }
 
@@ -123,9 +123,9 @@ const ItemPicker = props => {
     setSelectedItems([]);
 
     eventService &&
-      eventService.triggerLightningEvent({
-        type: 'ITEMS_SELECTED',
-        payload: null
+      eventService.sendMessage({
+        name: 'ITEMS_SELECTED',
+        value: null
       });
   }
 
