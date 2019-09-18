@@ -71,7 +71,7 @@ const Header = props => {
       onRenderControls={() => (
         <PageHeaderControl>
           <Popover
-            position="absolute"
+            position="relative"
             align="bottom right"
             hasNoNubbin={true}
             hasNoCloseButton={true}

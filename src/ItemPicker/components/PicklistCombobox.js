@@ -30,6 +30,7 @@ const PicklistCombobox = props => {
 
   return (
     <Combobox
+      menuPosition="relative"
       className={className}
       events={{
         onChange: (event, { value }) => {
