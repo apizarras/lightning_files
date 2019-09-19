@@ -79,7 +79,10 @@ const Header = props => {
             body={columns.map((column, index) => (
               <div className="column-selection" key={column.field.name}>
                 <label>
-                  <Checkbox checked={column.visible} onChange={() => onColumnSelect(column)} />
+                  <Checkbox
+                    checked={Boolean(column.visible)}
+                    onChange={() => onColumnSelect(column)}
+                  />
                   {column.field.label}
                 </label>
               </div>

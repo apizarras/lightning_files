@@ -55,7 +55,7 @@ const DataTable = props => {
           <Row key={item.Id}>
             <Cell className="checkbox-cell">
               <Checkbox
-                checked={selectedIds[item.Id]}
+                checked={Boolean(selectedIds[item.Id])}
                 onChange={e => {
                   selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item);
                 }}
