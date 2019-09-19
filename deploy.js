@@ -1,29 +1,17 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const packageJSON = require('./package.json');
+const destination = packageJSON['deploy-path'];
+const bundleName = packageJSON.name;
 
-// destination.txt will be created or overwritten by default.
-fs.copyFile(
-  `build/${packageJSON.name}.resource.js`,
-  `${packageJSON['deploy-path']}/${packageJSON.name}.resource`,
-  err => {
-    if (err) throw err;
-    console.log(
-      `build/${packageJSON.name}.resource.js was copied to ${packageJSON['deploy-path']}/${
-        packageJSON.name
-      }.resource`
-    );
-  }
-);
+console.log('Copying resources to ' + destination);
 
-fs.copyFile(
-  `build/${packageJSON.name}_style.resource.css`,
-  `${packageJSON['deploy-path']}/${packageJSON.name}_style.resource`,
-  err => {
-    if (err) throw err;
-    console.log(
-      `build/${packageJSON.name}_style.resource.css was copied to ${packageJSON['deploy-path']}/${
-        packageJSON.name
-      }_style.resource`
-    );
+fs.copySync('build', destination, {
+  filter: file => {
+    if (file === 'build' || !!~file.indexOf(bundleName)) {
+      console.log('copying ' + file);
+      return true;
+    }
   }
-);
+});
+
+console.log('Done');

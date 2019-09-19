@@ -30,6 +30,8 @@ export function useMessageListener(name, handler) {
 }
 
 export function createEventService(eventHost) {
+  if (!eventHost) return;
+
   eventHost.addMessageHandler(message => {
     console.log('message received by react', message);
     triggerMessageHandler(message);

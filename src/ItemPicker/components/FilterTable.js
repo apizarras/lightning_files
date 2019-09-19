@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useComponentContext } from '../context';
 import { executeQuery, executeLocalSearch } from '../api/query';
 import DataTable from './DataTable';
-import { Accordion, AccordionPanel } from '@salesforce/design-system-react';
+import { Tabs, TabsPanel } from '@salesforce/design-system-react';
 import './FilterTable.scss';
 
 const FilterTable = props => {
@@ -23,9 +23,7 @@ const FilterTable = props => {
   const { api } = useComponentContext();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
-  const [showResults, setShowResults] = useState(recentItems.length === 0);
-  const [showRecents, setShowRecents] = useState(recentItems.length > 0);
-  const [showSelected, setShowSelected] = useState(false);
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     if (!query.columns) return;
@@ -33,7 +31,6 @@ const FilterTable = props => {
 
     async function fetchRows() {
       setLoading(true);
-      if (query.searchParams) setShowResults(true);
       const items = await executeQuery(api, query);
       if (cancelled) return;
       setItems(items);
@@ -52,17 +49,16 @@ const FilterTable = props => {
 
     setItems(filteredItems);
     setLoading(true);
-    setShowResults(true);
   }, [query, items, searchParams]);
+
+  useEffect(() => {
+    if (selectedItems.length === 0) setTabIndex(0);
+  }, [selectedItems]);
 
   return (
     <div className="filter-table">
-      <Accordion>
-        <AccordionPanel
-          id="results"
-          expanded={showResults}
-          onTogglePanel={() => setShowResults(!showResults)}
-          summary="Top Search Results">
+      <Tabs id="tabs-tables" selectedIndex={tabIndex} onSelect={setTabIndex}>
+        <TabsPanel label="Top Search Results">
           <DataTable
             compact={compact}
             style={{ height: 350 }}
@@ -76,13 +72,9 @@ const FilterTable = props => {
             onSelectItem={onSelectItem}
             onRemoveItem={onRemoveItem}
           />
-        </AccordionPanel>
+        </TabsPanel>
         {showRecentItems && (
-          <AccordionPanel
-            id="recents"
-            expanded={showRecents}
-            onTogglePanel={() => setShowRecents(!showRecents)}
-            summary="Recent Items">
+          <TabsPanel label="Recent Items">
             <DataTable
               compact={compact}
               style={{ height: 150 }}
@@ -93,16 +85,11 @@ const FilterTable = props => {
               onSelectItem={onSelectItem}
               onRemoveItem={onRemoveItem}
             />
-          </AccordionPanel>
+          </TabsPanel>
         )}
-        {multiSelect && (
-          <AccordionPanel
-            id="selected"
-            expanded={showSelected}
-            onTogglePanel={() => setShowSelected(!showSelected)}
-            summary={`${selectedItems.length || 'No'} Selected Item${
-              selectedItems.length === 1 ? '' : 's'
-            }`}>
+        {multiSelect && selectedItems.length > 0 && (
+          <TabsPanel
+            label={`${selectedItems.length} Selected Item${selectedItems.length === 1 ? '' : 's'}`}>
             <DataTable
               compact={compact}
               style={{ height: 350 }}
@@ -115,9 +102,9 @@ const FilterTable = props => {
               onSelectItem={onSelectItem}
               onRemoveItem={onRemoveItem}
             />
-          </AccordionPanel>
+          </TabsPanel>
         )}
-      </Accordion>
+      </Tabs>
     </div>
   );
 };

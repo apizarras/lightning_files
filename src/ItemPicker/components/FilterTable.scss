@@ -1,3 +1,12 @@
+.filter-table {
+  .slds-tabs_default__content {
+    padding: 0;
+
+    .data-table {
+      border: none;
+    }
+  }
+}
 .filter-cell:not(:empty) {
   position: relative;
 

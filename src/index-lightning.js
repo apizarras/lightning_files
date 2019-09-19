@@ -1,39 +1,35 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { DESIGN_ATTRIBUTES } from './constants';
-import { handleAppEvent } from './ItemPicker/api/events';
-import { Settings } from '@salesforce/design-system-react';
 import App from './App';
+import { DESIGN_ATTRIBUTES } from './constants';
 
-export function initialize(component) {
+export function init(component, sessionId, eventService) {
+  const containerElement = component.find('root').getElement();
   const aura = window.$A;
 
-  const settings = DESIGN_ATTRIBUTES.reduce(
-    (settings, { name }) => {
-      settings[name] = component.get(`v.${name}`);
-      return settings;
-    },
-    { componentId: component.getGlobalId() }
-  );
-
-  function wrap(method, params, jsonparse) {
+  function wrap(method, params, needsParse) {
     return new Promise((resolve, reject) => {
       const action = component.get(`c.${method}`);
-      if (action) {
-        action.setParams(params);
-        action.setCallback(this, response => {
-          if (response.getState() === 'SUCCESS') {
-            var result = response.getReturnValue();
-            resolve(jsonparse ? JSON.parse(result) : result);
+
+      if (params) action.setParams(params);
+
+      action.setCallback(this, response => {
+        if (response.getState() === 'SUCCESS') {
+          const returnValue = response.getReturnValue();
+
+          try {
+            // we have to conditionally parse because metadata types are unsupported by AuraEnabled endpoints
+            resolve(needsParse ? JSON.parse(returnValue) : returnValue);
+          } catch (e) {
+            reject(e);
           }
-          if (response.getState() === 'ERROR') {
-            reject(response.getError()[0]);
-          }
-        });
-        aura.getCallback(function() {
-          aura.enqueueAction(action);
-        })();
-      }
+        }
+        if (response.getState() === 'ERROR') {
+          reject(response.getError()[0]);
+        }
+      });
+
+      aura.getCallback(() => aura.enqueueAction(action))();
     });
   }
 
@@ -43,28 +39,20 @@ export function initialize(component) {
     describePicklist: (sobjectType, fieldName) =>
       wrap('describePicklist', { sobjectType, fieldName }, true),
     query: soql => wrap('query', { soql }),
-    queryCount: soql => wrap('query', { soql }),
-    restApi: path => wrap('callRest', { endpoint: `/services/data/v44.0/${path}` }, true)
+    queryCount: soql => wrap('countQuery', { soql }),
+    restApi: path => wrap('callRest', { sessionId, endpoint: `/services/data/v44.0/${path}` }, true)
   };
 
-  const eventService = {
-    triggerLightningEvent: action => {
-      component
-        .getEvent('FX5:ACTION')
-        .setParams(action)
-        .fire();
-    }
-  };
-
-  // pass lightning application events to react
-  // expecting event param to look like: { type, payload }
-  component.addEventHandler('FX5:ACTION', (component, event) => handleAppEvent(event.getParams()));
-
-  const appElement = component.find('root').getElement();
-  Settings.appElement(appElement);
+  const settings = DESIGN_ATTRIBUTES.reduce(
+    (settings, { name }) => {
+      settings[name] = component.get(`v.${name}`);
+      return settings;
+    },
+    { componentId: component.getGlobalId() }
+  );
 
   ReactDOM.render(
     <App settings={settings} dataService={dataService} eventService={eventService} />,
-    appElement
+    containerElement
   );
 }

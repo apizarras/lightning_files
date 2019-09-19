@@ -18,7 +18,6 @@ export const dataService = connection => {
       connection.describe(sobject).then(description => {
         return description.fields.find(f => f.name === fieldName).picklistValues;
       }),
-    searchLayout: sobject => connection.getJSON(`search/layout/?q=${sobject}`).then(r => r[0]),
     query: soql => connection.query(soql).then(r => r.records),
     queryCount: soql => connection.query(soql).then(r => r.totalSize),
     restApi: connection.getJSON

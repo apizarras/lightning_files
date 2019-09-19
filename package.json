@@ -1,12 +1,13 @@
 {
   "homepage": ".",
-  "name": "fx_item_picker",
+  "name": "item_picker",
   "version": "0.1.0",
   "private": true,
   "deploy-path": "../lightning/FX_React_Wrapper/force-app/main/default/staticresources/",
   "dependencies": {
     "@salesforce-ux/design-system": "2.9.4",
-    "@salesforce/design-system-react": "0.10.9",
+    "@salesforce/design-system-react": "0.10.11",
+    "lightning-container": "^1.0.0",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-scripts": "3.1.1",
@@ -15,6 +16,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-app-rewired build",
+    "build:lightning": "npm run build && npm run deploy",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "format": "prettier --write './src/**/*.{js,json,css,scss}'",
@@ -37,6 +39,7 @@
     "last 2 Chrome versions"
   ],
   "devDependencies": {
+    "fs-extra": "8.1.0",
     "husky": "3.0.5",
     "jsforce": "1.9.2",
     "node-sass": "4.12.0",
