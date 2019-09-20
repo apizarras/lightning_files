@@ -42,7 +42,7 @@ export function createApi(dataService) {
             .join('_');
 
         const filter = await toolingQuery(
-          `SELECT Metadata FROM LookupFilter WHERE Active=TRUE AND IsOptional=FALSE AND DeveloperName='${developerName}'`
+          `SELECT Metadata FROM LookupFilter WHERE Active=TRUE AND DeveloperName='${developerName}'`
         ).then(res => res.records && res.records[0]);
 
         return filter && filter.Metadata;

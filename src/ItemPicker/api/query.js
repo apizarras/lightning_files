@@ -40,10 +40,13 @@ function createFilterClause(filter) {
     case 'reference':
       formatted = `'${value}'`;
       break;
+    case 'currency':
+    case 'email':
     case 'phone':
     case 'picklist':
     case 'string':
     case 'textarea':
+    case 'url':
       formatted = `'${escapeSOQLString(value)}'`;
       break;
     default:
