@@ -1,6 +1,9 @@
 .item-picker-search {
+  display: flex;
+
   .search-bar {
-    width: 100%;
+    flex: 1;
+    margin-right: 0.5rem;
 
     li:last-child {
       flex: 1;

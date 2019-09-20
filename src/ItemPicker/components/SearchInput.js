@@ -7,12 +7,14 @@ import {
   Button,
   ButtonGroup,
   Input,
-  InputIcon
+  InputIcon,
+  Popover,
+  Checkbox
 } from '@salesforce/design-system-react';
 import './SearchInput.scss';
 
 const SearchInput = props => {
-  const { query, description, onChange, onAddFilter } = props;
+  const { query, description, columns, onColumnsChange, onChange, onAddFilter } = props;
   const [field, setField] = useState();
   const [searchText, setSearchText] = useState('');
   const inputRef = useRef();
@@ -103,7 +105,43 @@ const SearchInput = props => {
         </Dropdown>
         {inputComponent}
       </ButtonGroup>
+      <SettingsButton columns={columns} onColumnsChange={onColumnsChange} />
     </div>
+  );
+};
+
+const SettingsButton = props => {
+  const { columns, onColumnsChange } = props;
+
+  function onColumnSelect(column) {
+    const found = columns.find(x => x === column);
+    found.visible = !found.visible;
+    onColumnsChange([...columns]);
+  }
+
+  return (
+    <Popover
+      position="relative"
+      align="bottom right"
+      hasNoNubbin={true}
+      hasNoCloseButton={true}
+      triggerClassName="column-editor"
+      body={columns.map((column, index) => (
+        <div className="column-selection" key={column.field.name}>
+          <label>
+            <Checkbox checked={Boolean(column.visible)} onChange={() => onColumnSelect(column)} />
+            {column.field.label}
+          </label>
+        </div>
+      ))}>
+      <Button
+        assistiveText={{ icon: 'Edit Columns' }}
+        iconCategory="utility"
+        iconName="settings"
+        iconVariant="more"
+        variant="icon"
+      />
+    </Popover>
   );
 };
 

@@ -132,17 +132,17 @@ const ItemPicker = props => {
     <Card className="item-picker" hasNoHeader={true} bodyClassName="item-picker-contents">
       <Header
         query={query}
-        columns={columns}
         description={description}
         selectedItems={selectedItems}
         onConfirm={() => confirmSelection(selectedItems)}
         onClear={onClear}
-        onColumnsChange={setColumns}
       />
       <SearchInput
         query={query}
+        columns={columns}
         description={description}
         onChange={value => setSearchParams(value)}
+        onColumnsChange={setColumns}
         onAddFilter={filter => dispatch({ type: 'ADD_FILTER', payload: filter })}
       />
       <QueryFilters

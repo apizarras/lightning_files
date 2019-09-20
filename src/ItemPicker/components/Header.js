@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useComponentContext } from '../context';
 import { executeScalar } from '../api/query';
-import {
-  Icon,
-  PageHeader,
-  PageHeaderControl,
-  Button,
-  Checkbox,
-  Popover
-} from '@salesforce/design-system-react';
+import { Icon, PageHeader, PageHeaderControl, Button } from '@salesforce/design-system-react';
 import './Header.scss';
 
 const Header = props => {
-  const { description, query, columns, selectedItems, onConfirm, onClear, onColumnsChange } = props;
+  const { description, query, selectedItems, onConfirm, onClear } = props;
   const { api } = useComponentContext();
   const [count, setCount] = useState(null);
 
@@ -25,12 +18,6 @@ const Header = props => {
     fetchRows();
   }, [api, query]);
 
-  function onColumnSelect(column) {
-    const found = columns.find(x => x === column);
-    found.visible = !found.visible;
-    onColumnsChange([...columns]);
-  }
-
   return (
     <PageHeader
       joined
@@ -40,10 +27,14 @@ const Header = props => {
       label="Item Picker"
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
-        count > 0
-          ? `${count} ${count === 1 ? 'result' : 'results'} • sorted by ${query.orderBy &&
-              query.orderBy.field.label}`
-          : ''
+        count > 0 ? (
+          <span className="slds-text-body--small">
+            {count} {count === 1 ? 'items' : 'items'} • sorted by{' '}
+            {query.orderBy && query.orderBy.field.label}
+          </span>
+        ) : (
+          ''
+        )
       }
       onRenderActions={
         selectedItems.length > 0
@@ -68,35 +59,6 @@ const Header = props => {
             )
           : undefined
       }
-      onRenderControls={() => (
-        <PageHeaderControl>
-          <Popover
-            position="relative"
-            align="bottom right"
-            hasNoNubbin={true}
-            hasNoCloseButton={true}
-            triggerClassName="column-editor"
-            body={columns.map((column, index) => (
-              <div className="column-selection" key={column.field.name}>
-                <label>
-                  <Checkbox
-                    checked={Boolean(column.visible)}
-                    onChange={() => onColumnSelect(column)}
-                  />
-                  {column.field.label}
-                </label>
-              </div>
-            ))}>
-            <Button
-              assistiveText={{ icon: 'Edit Columns' }}
-              iconCategory="utility"
-              iconName="table"
-              iconVariant="more"
-              variant="icon"
-            />
-          </Popover>
-        </PageHeaderControl>
-      )}
     />
   );
 };

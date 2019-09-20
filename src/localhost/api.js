@@ -1,6 +1,4 @@
 // dev-only stubs for LightningContext params
-import { createEventService } from '../ItemPicker/api/events';
-
 export const dataService = connection => {
   return {
     describe: sobject =>
@@ -25,8 +23,7 @@ export const dataService = connection => {
 };
 
 export const eventService = () => {
-  return createEventService({
-    sendMessage: message => console.log('SEND LIGHTNING MESSAGE', message),
-    addMessageHandler: () => {}
-  });
+  return {
+    refreshView: () => console.log('Triggered force:refreshView')
+  };
 };

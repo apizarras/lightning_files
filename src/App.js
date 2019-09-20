@@ -37,5 +37,12 @@ const App = () => {
 
   if (!description) return null;
 
-  return <ItemPicker compact={settings.compact} multiSelect={true} description={description} />;
+  return (
+    <ItemPicker
+      compact={settings.compact}
+      multiSelect={true}
+      description={description}
+      staticFilter={settings.filter}
+    />
+  );
 };

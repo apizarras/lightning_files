@@ -20,10 +20,10 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'FX5__Ticket_Item__c'
   },
   {
-    name: 'pickerLookupField',
-    label: 'Lookup Field API Name',
+    name: 'targetSobject',
+    label: 'Target Object',
     type: 'string',
-    defaultValue: 'FX5__Ticket__c'
+    options: ['Ticket Item', 'Quote Item', 'Pricebook Item']
   },
   {
     name: 'compact',
@@ -31,6 +31,18 @@ export const DESIGN_ATTRIBUTES = [
     description: 'Display condensed rows in data table',
     type: 'boolean',
     defaultValue: true
+  },
+  {
+    name: 'filter',
+    label: 'SOQL Filter',
+    description: 'Static SOQL Predicate',
+    type: 'string'
+  },
+  {
+    name: 'pickerLookupField',
+    label: '(Local testing for lookup picker in grid) Lookup Field API Name',
+    type: 'string',
+    defaultValue: 'FX5__Ticket__c'
   }
 ];
 
