@@ -61,7 +61,7 @@ function queryReducer(state, action) {
 
 const ItemPicker = props => {
   const { compact, multiSelect, showRecentItems, description, staticFilter, onSelect } = props;
-  const { api, eventService } = useComponentContext();
+  const { api } = useComponentContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
   const [searchParams, setSearchParams] = useState();
@@ -112,22 +112,10 @@ const ItemPicker = props => {
     } else if (console) {
       console.log('onSelect', items);
     }
-
-    eventService &&
-      eventService.sendMessage({
-        name: 'ITEMS_SELECTED',
-        value: items.map(x => x.Id)
-      });
   }
 
   function onClear() {
     setSelectedItems([]);
-
-    eventService &&
-      eventService.sendMessage({
-        name: 'ITEMS_SELECTED',
-        value: null
-      });
   }
 
   function onSelectItem(item) {

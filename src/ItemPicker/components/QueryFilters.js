@@ -23,11 +23,17 @@ const QueryFilters = props => {
 const FilterPill = ({ filter, onRemove }) => {
   const { field, item } = filter;
 
+  const label =
+    field.type === 'boolean' ? (
+      field.label
+    ) : (
+      <FormattedValue className="filter-value" field={field} item={item} />
+    );
   return (
     <span className="query-filter">
       <Pill
         labels={{
-          label: <FormattedValue className="filter-value" field={field} item={item} />,
+          label,
           title: field.label,
           removeTitle: 'Remove Filter'
         }}
