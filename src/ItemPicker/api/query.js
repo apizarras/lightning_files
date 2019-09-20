@@ -34,12 +34,16 @@ function createFilterClause(filter) {
   let formatted;
 
   switch (field.type) {
+    case 'boolean':
+      formatted = Boolean(value).toString();
+      break;
     case 'reference':
       formatted = `'${value}'`;
       break;
     case 'phone':
     case 'picklist':
     case 'string':
+    case 'textarea':
       formatted = `'${escapeSOQLString(value)}'`;
       break;
     default:
