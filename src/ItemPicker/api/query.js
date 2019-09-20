@@ -37,6 +37,7 @@ function createFilterClause(filter) {
     case 'reference':
       formatted = `'${value}'`;
       break;
+    case 'phone':
     case 'picklist':
     case 'string':
       formatted = `'${escapeSOQLString(value)}'`;
