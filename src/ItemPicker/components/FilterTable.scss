@@ -1,6 +1,11 @@
 .filter-table {
-  .slds-tabs_default__content {
-    padding: 0;
+  .slds-tabs_scoped__nav {
+    border-radius: 0;
+    border-width: 1px 0;
+  }
+  .slds-tabs_scoped__content {
+    padding: 1em 0 0;
+    border: none;
 
     .data-table {
       border: none;

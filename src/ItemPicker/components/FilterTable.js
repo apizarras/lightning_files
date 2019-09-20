@@ -57,7 +57,7 @@ const FilterTable = props => {
 
   return (
     <div className="filter-table">
-      <Tabs id="tabs-tables" selectedIndex={tabIndex} onSelect={setTabIndex}>
+      <Tabs id="tabs-tables" variant="scoped" selectedIndex={tabIndex} onSelect={setTabIndex}>
         <TabsPanel label="Top Search Results">
           <DataTable
             compact={compact}

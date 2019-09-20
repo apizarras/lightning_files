@@ -41,7 +41,7 @@ const Header = props => {
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
         count > 0
-          ? `${count} ${count === 1 ? 'item' : 'items'} • sorted by ${query.orderBy &&
+          ? `${count} ${count === 1 ? 'result' : 'results'} • sorted by ${query.orderBy &&
               query.orderBy.field.label}`
           : ''
       }
