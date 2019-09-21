@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useComponentContext } from '../context';
 import { executeScalar } from '../api/query';
-import { Icon, PageHeader, PageHeaderControl, Button } from '@salesforce/design-system-react';
+import { Icon, PageHeader, PageHeaderControl } from '@salesforce/design-system-react';
 import './Header.scss';
 
 const Header = props => {
-  const { description, query, selectedItems, onConfirm, onClear } = props;
+  const { children, description, query } = props;
   const { api } = useComponentContext();
   const [count, setCount] = useState(null);
 
@@ -36,29 +36,7 @@ const Header = props => {
           ''
         )
       }
-      onRenderActions={
-        selectedItems.length > 0
-          ? () => (
-              <PageHeaderControl>
-                <Button
-                  className="slds-float_right"
-                  onClick={onConfirm}
-                  disabled={selectedItems.length === 0}
-                  variant="brand"
-                  label={`Confirm ${selectedItems.length || 'No'} ${
-                    selectedItems.length === 1 ? 'Item' : 'Items'
-                  }`}
-                />
-                <Button
-                  className="slds-m-right_medium slds-float_right"
-                  variant="base"
-                  label="Clear Selection"
-                  onClick={onClear}
-                />
-              </PageHeaderControl>
-            )
-          : undefined
-      }
+      onRenderActions={() => <PageHeaderControl>{children}</PageHeaderControl>}
     />
   );
 };

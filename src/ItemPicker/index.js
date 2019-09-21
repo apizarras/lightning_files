@@ -6,7 +6,7 @@ import Header from './components/Header';
 import SearchInput from './components/SearchInput';
 import QueryFilters from './components/QueryFilters';
 import FilterTable from './components/FilterTable';
-import { Card } from '@salesforce/design-system-react';
+import { Card, Button } from '@salesforce/design-system-react';
 import './index.scss';
 
 function getInitialQuery({ description, columns, orderBy, staticFilter }) {
@@ -130,13 +130,27 @@ const ItemPicker = props => {
 
   return (
     <Card className="item-picker" hasNoHeader={true} bodyClassName="item-picker-contents">
-      <Header
-        query={query}
-        description={description}
-        selectedItems={selectedItems}
-        onConfirm={() => confirmSelection(selectedItems)}
-        onClear={onClear}
-      />
+      <Header query={query} description={description}>
+        {selectedItems.length > 0 && (
+          <>
+            <Button
+              className="slds-float_right"
+              onClick={() => confirmSelection(selectedItems)}
+              disabled={selectedItems.length === 0}
+              variant="brand"
+              label={`Confirm ${selectedItems.length || 'No'} ${
+                selectedItems.length === 1 ? 'Item' : 'Items'
+              }`}
+            />
+            <Button
+              className="slds-m-right_medium slds-float_right"
+              variant="base"
+              label="Clear Selection"
+              onClick={onClear}
+            />
+          </>
+        )}
+      </Header>
       <SearchInput
         query={query}
         columns={columns}
