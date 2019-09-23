@@ -56,6 +56,30 @@ function createFilterClause(filter) {
   return `${field.name} = ${formatted}`;
 }
 
+export async function createParentFilterClause(api, settings) {
+  const { sObjectName, recordId, pickerLookupField, pickerLookupValue } = settings;
+  if (!sObjectName || !recordId || !pickerLookupField || !pickerLookupValue) return;
+
+  try {
+    const soql = `SELECT ${pickerLookupValue} FROM ${sObjectName} WHERE Id='${recordId}'`;
+    const lookupValue = await api.query(soql).then(results => {
+      console.log(results);
+      const value = results && results[0];
+      if (!value) return;
+      const expression =
+        'value' +
+        pickerLookupValue
+          .split('.')
+          .map(x => `['${x}']`)
+          .join('');
+
+      // eslint-disable-next-line no-eval
+      return eval(expression);
+    });
+    return lookupValue && `${pickerLookupField}='${lookupValue}'`;
+  } catch (e) {}
+}
+
 export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   if (!recordId || !lookupFieldName) return;
 

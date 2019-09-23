@@ -4,6 +4,7 @@ export const DESIGN_ATTRIBUTES = [
   {
     name: 'compact',
     label: 'Compact',
+    description: 'Use condensed display mode',
     type: 'boolean',
     defaultValue: true
   },
@@ -20,41 +21,53 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'a0p1N00000CHOabQAH'
   },
   {
+    required: 'true',
     name: 'pickerSobject',
-    label: 'Picker Object API Name',
+    label: 'Picker Object',
+    description: 'Objects to list in the picker',
     type: 'string',
-    defaultValue: 'FX5__Ticket_Item__c'
+    defaultValue: 'Contact'
   },
   {
     name: 'pickerLookupField',
-    label: 'Lookup Filter Field',
-    type: 'string',
-    defaultValue: 'FX5__Ticket__c'
+    label: 'Picker Lookup Field',
+    description: 'Lookup field on picker objects to filter by',
+    type: 'string'
   },
   {
     name: 'pickerLookupValue',
-    label: 'Lookup Filter Value (path from current page object)',
+    label: 'Picker Lookup Value',
+    description: 'SOQL path from current page object',
     type: 'string'
   },
   {
     name: 'filter',
-    label: 'Static SOQL filter',
+    label: 'Picker Filter',
+    description: 'SOQL filter clause applied to picker objects',
     type: 'string'
   },
-  { name: 'actionButtonLabel', label: 'Action Button Label', type: 'string' },
+  {
+    name: 'actionButtonLabel',
+    label: 'Action Button Label',
+    description: 'Label for Target Object create button',
+    type: 'string'
+  },
   {
     name: 'targetSobject',
     label: 'Target Object',
+    description: 'Object ,to create using selected picker items',
     type: 'string'
   },
   {
     name: 'targetParentField',
-    label: 'Target Parent Field',
+    label: 'Target Object Parent Lookup Field',
+    description: 'Parent field on object to create using selected picker items',
     type: 'string'
   },
   {
     name: 'targetItemField',
-    label: 'Target Item Field',
+    label: 'Target Object Item Field',
+    description: 'Item field on object to create using selected picker items',
     type: 'string'
   }
 ];
