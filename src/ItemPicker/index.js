@@ -70,7 +70,7 @@ const ItemPicker = props => {
     staticFilter,
     onSelect
   } = props;
-  const { api } = useComponentContext();
+  const { api, eventService } = useComponentContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
   const [searchParams, setSearchParams] = useState();
@@ -126,6 +126,7 @@ const ItemPicker = props => {
     Promise.resolve(onSelect(multiSelect ? items : items[0]))
       .then(() => {
         onClear();
+        eventService && eventService.refresh();
         setConfirmationMessage(
           `Successfully created ${items.length} item${items.length === 1 ? '' : 's'}`
         );
