@@ -40,7 +40,6 @@ function createFilterClause(filter) {
     case 'reference':
       formatted = `'${value}'`;
       break;
-    case 'currency':
     case 'email':
     case 'phone':
     case 'picklist':
