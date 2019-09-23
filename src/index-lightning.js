@@ -43,7 +43,7 @@ export function init(component, sessionId, eventService) {
     restApi: path =>
       wrap('callRest', { sessionId, endpoint: `/services/data/v44.0/${path}` }, true),
     insertItems: (sobjectType, items) =>
-      wrap('updateItems', { sobjectType, items: items.map(x => JSON.stringify(x)) })
+      wrap('insertItems', { sobjectType, items: items.map(x => JSON.stringify(x)) })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(

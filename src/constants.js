@@ -2,6 +2,12 @@
 
 export const DESIGN_ATTRIBUTES = [
   {
+    name: 'compact',
+    label: 'Compact',
+    type: 'boolean',
+    defaultValue: true
+  },
+  {
     name: 'sObjectName',
     label: 'Page Object API Name (from Salesforce)',
     type: 'string',
@@ -21,9 +27,19 @@ export const DESIGN_ATTRIBUTES = [
   },
   {
     name: 'pickerLookupField',
-    label: '(Local testing for lookup picker in grid) Lookup Field API Name',
+    label: 'Lookup Filter Field',
     type: 'string',
     defaultValue: 'FX5__Ticket__c'
+  },
+  {
+    name: 'pickerLookupValue',
+    label: 'Lookup Filter Value (path from current page object)',
+    type: 'string'
+  },
+  {
+    name: 'filter',
+    label: 'Static SOQL filter',
+    type: 'string'
   },
   { name: 'actionButtonLabel', label: 'Action Button Label', type: 'string' },
   {
@@ -40,19 +56,6 @@ export const DESIGN_ATTRIBUTES = [
     name: 'targetItemField',
     label: 'Target Item Field',
     type: 'string'
-  },
-  {
-    name: 'filter',
-    label: 'SOQL Filter',
-    description: 'Static SOQL Predicate',
-    type: 'string'
-  },
-  {
-    name: 'compact',
-    label: 'Compact',
-    description: 'Display condensed rows in data table',
-    type: 'boolean',
-    defaultValue: true
   }
 ];
 

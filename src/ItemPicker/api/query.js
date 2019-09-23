@@ -78,6 +78,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   function getValue(obj, [name, ...rest]) {
     if (name === '$Source') return getValue(obj, rest);
     const value = obj.fields[name];
+    if (!value) return;
     if (rest.length === 0) return value.value;
     return getValue(value, rest);
   }
