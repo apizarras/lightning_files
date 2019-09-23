@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { useComponentContext } from './context';
 import { useDebounce, useSessionStorage } from './api/hooks';
-import { getSearchFields, sortItems } from './api/query';
+import { getSearchFields } from './api/query';
 import Header from './components/Header';
 import SearchInput from './components/SearchInput';
 import QueryFilters from './components/QueryFilters';
 import FilterTable from './components/FilterTable';
-import { Card, Button } from '@salesforce/design-system-react';
+import { Card, Spinner, ToastContainer, Toast } from '@salesforce/design-system-react';
 import './index.scss';
 
 function getInitialQuery({ description, columns, orderBy, staticFilter }) {
@@ -60,7 +60,16 @@ function queryReducer(state, action) {
 }
 
 const ItemPicker = props => {
-  const { compact, multiSelect, showRecentItems, description, staticFilter, onSelect } = props;
+  const {
+    title = 'Item Picker',
+    actionButtonLabel = 'Confirm Selection',
+    compact,
+    multiSelect,
+    showRecentItems,
+    description,
+    staticFilter,
+    onSelect
+  } = props;
   const { api } = useComponentContext();
   const [query, dispatch] = useReducer(queryReducer, {});
   const [columns, setColumns] = useState([]);
@@ -68,6 +77,9 @@ const ItemPicker = props => {
   const debouncedSearchParams = useDebounce(searchParams, 150);
   const [selectedItems, setSelectedItems] = useState([]);
   const [recentItems, setRecentItems] = useSessionStorage(`recents-${description.name}`, []);
+  const [actionPending, setActionPending] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
   useEffect(() => {
     async function init() {
@@ -100,6 +112,8 @@ const ItemPicker = props => {
   }, [debouncedSearchParams, dispatch]);
 
   function confirmSelection(items) {
+    if (!onSelect) return onClear();
+
     if (showRecentItems) {
       // TODO: use an 'IN' query instead
       setRecentItems(
@@ -107,11 +121,19 @@ const ItemPicker = props => {
       );
     }
 
-    if (onSelect) {
-      onSelect(multiSelect ? items : items[0]);
-    } else if (console) {
-      console.log('onSelect', items);
-    }
+    setActionPending(true);
+
+    Promise.resolve(onSelect(multiSelect ? items : items[0]))
+      .then(() => {
+        onClear();
+        setConfirmationMessage(
+          `Successfully created ${items.length} item${items.length === 1 ? '' : 's'}`
+        );
+      })
+      .catch(error => {
+        setErrorMessage(error && error.message);
+      })
+      .finally(() => setActionPending(false));
   }
 
   function onClear() {
@@ -120,7 +142,7 @@ const ItemPicker = props => {
 
   function onSelectItem(item) {
     const selected = selectedItems.filter(x => x.Id !== item.Id).concat(item);
-    setSelectedItems(sortItems(query, selected));
+    setSelectedItems(selected);
     if (!multiSelect) confirmSelection(selected);
   }
 
@@ -130,27 +152,36 @@ const ItemPicker = props => {
 
   return (
     <Card className="item-picker" hasNoHeader={true} bodyClassName="item-picker-contents">
-      <Header query={query} description={description}>
-        {selectedItems.length > 0 && (
-          <>
-            <Button
-              className="slds-float_right"
-              onClick={() => confirmSelection(selectedItems)}
-              disabled={selectedItems.length === 0}
-              variant="brand"
-              label={`Confirm ${selectedItems.length || 'No'} ${
-                selectedItems.length === 1 ? 'Item' : 'Items'
-              }`}
-            />
-            <Button
-              className="slds-m-right_medium slds-float_right"
-              variant="base"
-              label="Clear Selection"
-              onClick={onClear}
-            />
-          </>
+      <ToastContainer>
+        {confirmationMessage && (
+          <Toast
+            labels={{
+              heading: confirmationMessage
+            }}
+            variant="success"
+            onRequestClose={() => setConfirmationMessage(null)}
+          />
         )}
-      </Header>
+        {errorMessage && (
+          <Toast
+            variant="error"
+            labels={{
+              heading: 'Items could not be created',
+              details: errorMessage
+            }}
+            onRequestClose={() => setErrorMessage(null)}
+          />
+        )}
+      </ToastContainer>
+      <Header
+        title={title}
+        actionButtonLabel={actionButtonLabel}
+        query={query}
+        description={description}
+        selectedItems={selectedItems}
+        onConfirm={() => confirmSelection(selectedItems)}
+        onClear={onClear}
+      />
       <SearchInput
         query={query}
         columns={columns}
@@ -172,11 +203,12 @@ const ItemPicker = props => {
         searchParams={searchParams}
         recentItems={recentItems}
         selectedItems={selectedItems}
-        onSelectItem={onSelectItem}
+        onSelectItem={onSelect && onSelectItem}
         onRemoveItem={onRemoveItem}
         onAddFilter={filter => dispatch({ type: 'ADD_FILTER', payload: filter })}
         onUpdateSort={field => dispatch({ type: 'UPDATE_SORT', payload: field })}
       />
+      {actionPending && <Spinner size="medium" variant="base" />}
     </Card>
   );
 };

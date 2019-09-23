@@ -40,7 +40,10 @@ export function init(component, sessionId, eventService) {
       wrap('describePicklist', { sobjectType, fieldName }, true),
     query: soql => wrap('query', { soql }),
     queryCount: soql => wrap('countQuery', { soql }),
-    restApi: path => wrap('callRest', { sessionId, endpoint: `/services/data/v44.0/${path}` }, true)
+    restApi: path =>
+      wrap('callRest', { sessionId, endpoint: `/services/data/v44.0/${path}` }, true),
+    insertItems: (sobjectType, items) =>
+      wrap('updateItems', { sobjectType, items: items.map(x => JSON.stringify(x)) })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(

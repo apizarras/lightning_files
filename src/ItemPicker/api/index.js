@@ -49,7 +49,8 @@ export function createApi(dataService) {
       } catch (e) {
         console.error(e);
       }
-    }
+    },
+    insertItems: dataService.insertItems
   };
 }
 

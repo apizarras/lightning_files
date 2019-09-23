@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useComponentContext } from '../context';
 import { executeScalar } from '../api/query';
-import { Icon, PageHeader, PageHeaderControl } from '@salesforce/design-system-react';
+import { Icon, PageHeader, PageHeaderControl, Button } from '@salesforce/design-system-react';
 import './Header.scss';
 
 const Header = props => {
-  const { children, description, query } = props;
+  const { title, actionButtonLabel, description, query, selectedItems, onClear, onConfirm } = props;
   const { api } = useComponentContext();
   const [count, setCount] = useState(null);
 
@@ -24,7 +24,7 @@ const Header = props => {
       truncate
       variant="object-home"
       title={description.labelPlural}
-      label="Item Picker"
+      label={title}
       icon={<Icon category="standard" name="multi_select_checkbox" />}
       info={
         count > 0 ? (
@@ -36,7 +36,24 @@ const Header = props => {
           ''
         )
       }
-      onRenderActions={() => <PageHeaderControl>{children}</PageHeaderControl>}
+      onRenderActions={() =>
+        selectedItems.length > 0 && (
+          <PageHeaderControl>
+            <Button
+              className="slds-float_right"
+              onClick={onConfirm}
+              variant="brand"
+              label={actionButtonLabel}
+            />
+            <Button
+              className="slds-m-right_medium slds-float_right"
+              variant="base"
+              label="Clear Selection"
+              onClick={onClear}
+            />
+          </PageHeaderControl>
+        )
+      }
     />
   );
 };

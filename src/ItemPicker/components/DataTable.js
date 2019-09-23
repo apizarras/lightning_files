@@ -35,9 +35,9 @@ const DataTable = props => {
       } ${className || ''}`}
       style={style}>
       {loading && items.length === 0 && <Spinner size="small" variant="base" />}
-      <StickyTable stickyColumnCount={1}>
+      <StickyTable stickyColumnCount={onSelectItem ? 1 : 0}>
         <Row>
-          <Cell className="checkbox-cell"></Cell>
+          {onSelectItem && <Cell className="checkbox-cell"></Cell>}
           {visibleColumns.map(field => (
             <Cell
               key={field.name}
@@ -53,14 +53,16 @@ const DataTable = props => {
 
         {items.map(item => (
           <Row key={item.Id}>
-            <Cell className="checkbox-cell">
-              <Checkbox
-                checked={Boolean(selectedIds[item.Id])}
-                onChange={e => {
-                  selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item);
-                }}
-              />
-            </Cell>
+            {onSelectItem && (
+              <Cell className="checkbox-cell">
+                <Checkbox
+                  checked={Boolean(selectedIds[item.Id])}
+                  onChange={e => {
+                    selectedIds[item.Id] ? onRemoveItem(item) : onSelectItem(item);
+                  }}
+                />
+              </Cell>
+            )}
             {visibleColumns.map(field => (
               <Cell
                 key={field.name}

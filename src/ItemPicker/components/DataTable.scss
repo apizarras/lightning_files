@@ -5,7 +5,7 @@ $cell-bg: #fff;
 $stripe-color: #f3f2f2;
 
 .sticky-table {
-  background: $stripe-color;
+  background: $cell-bg;
   position: relative;
   width: 100%;
   height: 100%;
@@ -39,7 +39,7 @@ $stripe-color: #f3f2f2;
   background: $cell-bg;
 
   // fixed checkbox column
-  .sticky-table-cell:first-child {
+  .sticky-table-cell.checkbox-cell {
     background: darken($cell-bg, 5%);
     border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
@@ -49,14 +49,14 @@ $stripe-color: #f3f2f2;
     background: $stripe-color;
 
     // fixed checkbox column
-    .sticky-table-cell:first-child {
+    .sticky-table-cell.checkbox-cell {
       background: darken($stripe-color, 2.5%);
     }
   }
 
   &:hover {
     // fixed checkbox column
-    .sticky-table-cell:first-child {
+    .sticky-table-cell.checkbox-cell {
       background: inherit;
     }
   }

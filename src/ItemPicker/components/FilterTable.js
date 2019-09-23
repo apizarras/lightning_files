@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useComponentContext } from '../context';
-import { executeQuery, executeLocalSearch } from '../api/query';
+import { executeQuery, executeLocalSearch, sortItems } from '../api/query';
 import DataTable from './DataTable';
 import { Tabs, TabsPanel } from '@salesforce/design-system-react';
 import './FilterTable.scss';
@@ -95,7 +95,7 @@ const FilterTable = props => {
               style={{ height: 350 }}
               columns={columns}
               orderBy={query.orderBy}
-              items={selectedItems}
+              items={sortItems(query, selectedItems)}
               selectedItems={selectedItems}
               onAddFilter={onAddFilter}
               onUpdateSort={onUpdateSort}

@@ -18,7 +18,18 @@ export const dataService = connection => {
       }),
     query: soql => connection.query(soql).then(r => r.records),
     queryCount: soql => connection.query(soql).then(r => r.totalSize),
-    restApi: connection.getJSON
+    restApi: connection.getJSON,
+    insertItems: (sobject, items) =>
+      new Promise((resolve, reject) =>
+        connection.sobject(sobject).create(items, { allOrNone: true }, (err, results) => {
+          if (err) return reject(err);
+          results.forEach(({ id, success, errors }, index) => {
+            if (success) console.log('Created record id:', id, items[index]);
+            if (errors) reject(errors[0]);
+          });
+          resolve(results);
+        })
+      )
   };
 };
 

@@ -20,17 +20,26 @@ export const DESIGN_ATTRIBUTES = [
     defaultValue: 'FX5__Ticket_Item__c'
   },
   {
+    name: 'pickerLookupField',
+    label: '(Local testing for lookup picker in grid) Lookup Field API Name',
+    type: 'string',
+    defaultValue: 'FX5__Ticket__c'
+  },
+  { name: 'actionButtonLabel', label: 'Action Button Label', type: 'string' },
+  {
     name: 'targetSobject',
     label: 'Target Object',
-    type: 'string',
-    options: ['Ticket Item', 'Quote Item', 'Pricebook Item']
+    type: 'string'
   },
   {
-    name: 'compact',
-    label: 'Compact',
-    description: 'Display condensed rows in data table',
-    type: 'boolean',
-    defaultValue: true
+    name: 'targetParentField',
+    label: 'Target Parent Field',
+    type: 'string'
+  },
+  {
+    name: 'targetItemField',
+    label: 'Target Item Field',
+    type: 'string'
   },
   {
     name: 'filter',
@@ -39,10 +48,11 @@ export const DESIGN_ATTRIBUTES = [
     type: 'string'
   },
   {
-    name: 'pickerLookupField',
-    label: '(Local testing for lookup picker in grid) Lookup Field API Name',
-    type: 'string',
-    defaultValue: 'FX5__Ticket__c'
+    name: 'compact',
+    label: 'Compact',
+    description: 'Display condensed rows in data table',
+    type: 'boolean',
+    defaultValue: true
   }
 ];
 
