@@ -62,7 +62,6 @@ export async function createParentFilterClause(api, settings) {
   try {
     const soql = `SELECT ${pickerLookupValue} FROM ${sObjectName} WHERE Id='${recordId}'`;
     const lookupValue = await api.query(soql).then(results => {
-      console.log(results);
       const value = results && results[0];
       if (!value) return;
       const expression =

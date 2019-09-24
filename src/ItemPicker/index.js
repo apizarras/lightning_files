@@ -126,7 +126,7 @@ const ItemPicker = props => {
     Promise.resolve(onSelect(multiSelect ? items : items[0]))
       .then(() => {
         onClear();
-        eventService && eventService.refresh();
+        eventService && eventService.refreshView && eventService.refreshView();
         setConfirmationMessage(
           `Successfully created ${items.length} item${items.length === 1 ? '' : 's'}`
         );
