@@ -26,32 +26,29 @@ function escapeSOQLString(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-function createFilterClause(filter) {
-  const { field, item } = filter;
-  const value = item[field.name];
-  if (value === undefined || value === null) return `${field.name} = NULL`;
+function formatExpressionValue(type, value) {
+  if (value === undefined || value === null) return 'NULL';
 
-  let formatted;
-
-  switch (field.type) {
+  switch (type.toLowerCase()) {
     case 'boolean':
-      formatted = Boolean(value).toString();
-      break;
+      return Boolean(value) ? 'True' : 'False';
     case 'reference':
-      formatted = `'${value}'`;
-      break;
+      return `'${value}'`;
     case 'email':
     case 'phone':
     case 'picklist':
     case 'string':
     case 'textarea':
     case 'url':
-      formatted = `'${escapeSOQLString(value)}'`;
-      break;
+      return `'${escapeSOQLString(value)}'`;
     default:
-      formatted = value.toString();
+      return value.toString();
   }
+}
 
+function createExpression(filter) {
+  const { field, item } = filter;
+  const formatted = formatExpressionValue(field.type, item[field.name]);
   return `${field.name} = ${formatted}`;
 }
 
@@ -99,16 +96,28 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
 
   function getValue(obj, [name, ...rest]) {
     if (name === '$Source') return getValue(obj, rest);
+
     const value = obj.fields[name];
-    if (!value) return;
-    if (rest.length === 0) return value.value;
-    return getValue(value, rest);
+    if (rest.length > 0) return getValue(value, rest);
+
+    return formatExpressionValue(
+      objectInfos[obj.apiName].fields[name].dataType,
+      value && value.value
+    );
   }
 
-  function toSOQL($Source, filter) {
+  function createExpression($Source, filter) {
     const { field, operation, value, valueField } = filter;
-    const val = valueField ? getValue($Source, valueField.split('.')) : value;
-    const formatted = val ? `'${escapeSOQLString(val)}'` : 'NULL';
+    const formatted = valueField ? getValue($Source, valueField.split('.')) : value;
+
+    // special case for boolean lookup filter clauses that are checking against $Source
+    // SOQL won't accespt expressions like True=True, True=False
+    if (field === 'True' || field === 'False') {
+      // condition isn't met, return expression that will always fail
+      if (field !== formatted) return `Id=NULL`;
+      // conditions are met, no expression needed
+      return;
+    }
 
     switch (operation) {
       case 'equals':
@@ -128,7 +137,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
       case 'notContain':
         return `${field} NOT IN ${formatted}`;
       case 'startsWith':
-        return `${field} LIKE '${escapeSOQLString(val)}%'`;
+        return `${field} LIKE '${escapeSOQLString(value)}%'`;
       case 'includes':
         return `${field} INCLUDES ${formatted}`;
       case 'excludes':
@@ -151,10 +160,11 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   function organizeFilters(filterItems) {
     return filterItems.map(({ field, operation, value, valueField }) => {
       if (!!~field.indexOf('$Source')) {
+        // filter against $Source requires a static value
+        // swap field/valueField so we can evaluate the $Source value using same logic
         return {
-          field: clean(valueField),
+          field: value,
           operation,
-          value,
           valueField: field
         };
       } else {
@@ -169,9 +179,9 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   }
 
   const filters = organizeFilters(filterItems);
-  const clauses = filters.map(filter => toSOQL(record, filter));
+  const clauses = filters.map(filter => createExpression(record, filter)).filter(Boolean);
 
-  return `(${interpolate(booleanFilter, clauses)})`;
+  return clauses.length > 0 && `(${interpolate(booleanFilter, clauses)})`;
 }
 
 function createGroupedFiltersClause(filters) {
@@ -186,10 +196,10 @@ function createGroupedFiltersClause(filters) {
 
   return Object.values(grouped)
     .map(filters => {
-      const groupClause = filters.map(createFilterClause).join(' OR ');
+      const groupClause = filters.map(createExpression).join(' OR ');
       return groupClause && `(${groupClause})`;
     })
-    .filter(clause => clause)
+    .filter(Boolean)
     .join(' AND ');
 }
 
@@ -213,7 +223,7 @@ function createGroupedSearchClause(columns, keyword) {
       type === 'reference' ? `${relationshipName}.Name` : name
     )
     .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword)}%'`)
-    .filter(clause => clause)
+    .filter(Boolean)
     .join(' OR ');
 
   return clauses && `(${clauses})`;
@@ -234,7 +244,7 @@ function createWhereClause(query) {
   if (filters) conditions.push(createGroupedFiltersClause(filters));
   if (searchParams) conditions.push(createSearchClause(columns, searchParams));
 
-  const filtered = conditions.filter(x => x);
+  const filtered = conditions.filter(Boolean);
   if (!filtered.length) return;
 
   return `WHERE ${filtered.join(' AND ')}`;
@@ -281,7 +291,7 @@ export async function getSearchFields(api, description) {
   const columnNames = await getColumnNamesFromSearchLayout(api, description);
   return columnNames
     .map(name => description.fields[name])
-    .filter(field => field)
+    .filter(Boolean)
     .filter(field => !~SYSTEM_FIELDS.indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
