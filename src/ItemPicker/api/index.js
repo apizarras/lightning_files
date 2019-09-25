@@ -13,24 +13,25 @@ export function createApi(dataService) {
     query: dataService.query,
     queryCount: dataService.queryCount,
     searchLayout: sobject => dataService.restApi(`search/layout/?q=${sobject}`).then(r => r[0]),
-    recordInfo: recordId => dataService.restApi(`ui-api/record-ui/${recordId}`),
-    describeLookupFilter: async (objectInfo, fieldName) => {
+    describeLookupFilter: async (description, fieldName) => {
       try {
-        const field = objectInfo.fields[fieldName];
+        const field = description.fields[fieldName];
         if (!field) return;
 
         const [sourceEntityId, targetEntityId] = await Promise.all([
           toolingQuery(
-            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${objectInfo.apiName}'`
+            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${description.name}'`
           ).then(res => res.records[0] && res.records[0].DurableId),
           toolingQuery(
-            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${field.referenceToInfos[0].apiName}'`
+            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${
+              field.referenceTo[0]
+            }'`
           ).then(res => res.records[0] && res.records[0].DurableId)
         ]);
         if (!sourceEntityId || !targetEntityId) return;
 
         const sourceFieldId = await toolingQuery(
-          `SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.apiName}'`
+          `SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.name}'`
         ).then(res => res.records[0] && res.records[0].DurableId);
         if (!sourceFieldId) return;
 

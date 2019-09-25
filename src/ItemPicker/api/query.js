@@ -67,19 +67,24 @@ export async function createParentFilterClause(api, settings) {
   } catch (e) {}
 }
 
-export async function createLookupFilterClause(api, recordId, lookupFieldName) {
+export async function createLookupFilterClause(api, sobject, recordId, lookupFieldName) {
   if (!recordId || !lookupFieldName) return;
 
-  const recordInfo = await api.recordInfo(recordId);
-  const { records, objectInfos } = recordInfo;
-  const record = records[recordId];
-  const lookupFilter = await api.describeLookupFilter(objectInfos[record.apiName], lookupFieldName);
+  const description = await api.describe(sobject);
+  const lookupFilter = await api.describeLookupFilter(description, lookupFieldName);
   if (!lookupFilter) return;
 
+  const record = await api
+    .query(
+      `SELECT ${Object.values(description.fields)
+        .filter(x => x.type === 'reference')
+        .map(x => x.name)
+        .join(',')} FROM ${description.name} WHERE Id='${recordId}'`
+    )
+    .then(results => results && results[0]);
   const { booleanFilter, filterItems } = lookupFilter;
-  const parentInfo = objectInfos[record.apiName];
-  const lookupInfo = objectInfos[parentInfo.apiName].fields[lookupFieldName].referenceToInfos[0];
-  const re = new RegExp(`^${lookupInfo.apiName}.`);
+  const lookupSobject = description.fields[lookupFieldName].referenceTo[0];
+  const re = new RegExp(`^${lookupSobject}.`);
 
   function clean(str) {
     if (!str) return str;
@@ -89,13 +94,10 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   function getValue(obj, [name, ...rest]) {
     if (name === '$Source') return getValue(obj, rest);
 
-    const value = obj.fields[name];
+    const value = obj[name];
     if (rest.length > 0) return getValue(value, rest);
 
-    return formatExpressionValue(
-      objectInfos[obj.apiName].fields[name].dataType,
-      value && value.value
-    );
+    return formatExpressionValue(description.fields[name].type, value);
   }
 
   function createExpression($Source, filter) {
@@ -166,7 +168,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
         // filter against $Source requires a static value
         // swap field/valueField so we can evaluate the $Source value using same logic
         return {
-          field: value,
+          field: clean(valueField),
           operation,
           valueField: field
         };
@@ -182,6 +184,7 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
   }
 
   const filters = organizeFilters(filterItems);
+  console.log({ filters });
   const clauses = filters.map(filter => createExpression(record, filter)).filter(Boolean);
 
   return clauses.length > 0 && `(${interpolate(booleanFilter, clauses)})`;
