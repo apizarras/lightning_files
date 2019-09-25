@@ -59,17 +59,9 @@ export async function createParentFilterClause(api, settings) {
   try {
     const soql = `SELECT ${pickerLookupValue} FROM ${sObjectName} WHERE Id='${recordId}'`;
     const lookupValue = await api.query(soql).then(results => {
-      const value = results && results[0];
-      if (!value) return;
-      const expression =
-        'value' +
-        pickerLookupValue
-          .split('.')
-          .map(x => `['${x}']`)
-          .join('');
-
-      // eslint-disable-next-line no-eval
-      return eval(expression);
+      return pickerLookupValue
+        .split('.')
+        .reduce((value, key) => value && value[key], results && results[0]);
     });
     return lookupValue && `${pickerLookupField}='${lookupValue}'`;
   } catch (e) {}
@@ -115,6 +107,17 @@ export async function createLookupFilterClause(api, recordId, lookupFieldName) {
     if (field === 'True' || field === 'False') {
       // condition isn't met, return expression that will always fail
       if (field !== formatted) return `Id=NULL`;
+      // conditions are met, no expression needed
+      return;
+    }
+
+    // special case for null lookup filter clauses that are checking against $Source
+    // SOQL won't accespt expressions like null=NULL
+    if (field === null) {
+      if (formatted && formatted.toLowerCase() !== 'null') {
+        // condition isn't met, return expression that will always fail
+        return `Id=NULL`;
+      }
       // conditions are met, no expression needed
       return;
     }
@@ -196,7 +199,10 @@ function createGroupedFiltersClause(filters) {
 
   return Object.values(grouped)
     .map(filters => {
-      const groupClause = filters.map(createExpression).join(' OR ');
+      const groupClause = filters
+        .map(createExpression)
+        .filter(Boolean)
+        .join(' OR ');
       return groupClause && `(${groupClause})`;
     })
     .filter(Boolean)
