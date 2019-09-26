@@ -9,12 +9,13 @@ import FilterTable from './components/FilterTable';
 import { Card, Spinner, ToastContainer, Toast } from '@salesforce/design-system-react';
 import './index.scss';
 
-function getInitialQuery({ description, columns, orderBy, staticFilter }) {
+function getInitialQuery({ description, columns, orderBy, staticFilter, dynamicFilters }) {
   return {
     description,
     columns,
     orderBy,
     staticFilter,
+    dynamicFilters,
     filters: [],
     implicitSort: 'Id'
   };
@@ -69,6 +70,7 @@ const ItemPicker = props => {
     showRecentItems,
     description,
     staticFilter,
+    dynamicFilters,
     onSelect
   } = props;
   const { api, eventService } = useComponentContext();
@@ -101,12 +103,13 @@ const ItemPicker = props => {
           description,
           columns: searchFields,
           orderBy,
-          staticFilter
+          staticFilter,
+          dynamicFilters
         }
       });
     }
     init();
-  }, [api, dispatch, description, staticFilter]);
+  }, [api, dispatch, description, staticFilter, dynamicFilters]);
 
   useEffect(() => {
     dispatch({ type: 'UPDATE_SEARCH', payload: debouncedSearchParams });
