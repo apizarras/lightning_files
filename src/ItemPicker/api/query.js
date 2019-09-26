@@ -22,8 +22,9 @@ function searchableColumnsFilter(column) {
   return type === 'string' || type === 'reference' || type === 'picklist';
 }
 
-function escapeSOQLString(str) {
-  return String(str || '').replace(/'/g, "\\'");
+function escapeSOQLString(str, isLikeQuery) {
+  if (isLikeQuery) return String(str || '').replace(/(['"\\_%])/g, '\\$1');
+  return String(str || '').replace(/(['"\\])/g, '\\$1');
 }
 
 function formatExpressionValue(type, value) {
@@ -114,7 +115,7 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
       case 'notContain':
         return `${field} NOT IN ${formatted}`;
       case 'startsWith':
-        return `${field} LIKE '${escapeSOQLString(value)}%'`;
+        return `${field} LIKE '${escapeSOQLString(value, true)}%'`;
       case 'includes':
         return `${field} INCLUDES ${formatted}`;
       case 'excludes':
@@ -219,7 +220,7 @@ function createGroupedSearchClause(columns, keyword) {
     .map(({ type, name, relationshipName }) =>
       type === 'reference' ? `${relationshipName}.Name` : name
     )
-    .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword)}%'`)
+    .map(columnName => `${columnName} LIKE '%${escapeSOQLString(keyword, true)}%'`)
     .filter(Boolean)
     .join(' OR ');
 
@@ -316,8 +317,12 @@ export function executeScalar(api, query) {
   return api.queryCount(soql.join(' '));
 }
 
+function createStringMatcher(keyword) {
+  return new RegExp(keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); // $& means the whole matched string
+}
+
 export function executeLocalSearch(query, items, searchParams) {
-  const keywords = splitKeywords(searchParams).map(x => new RegExp(x.trim(), 'i'));
+  const keywords = splitKeywords(searchParams).map(createStringMatcher);
   if (keywords.length === 0) return items;
 
   const searchColumns = (searchParams && searchParams.field
