@@ -74,14 +74,6 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
   const lookupFilter = await api.describeLookupFilter(description, lookupFieldName);
   if (!lookupFilter) return;
 
-  const record = await api
-    .query(
-      `SELECT ${Object.values(description.fields)
-        .filter(x => x.type === 'reference')
-        .map(x => x.name)
-        .join(',')} FROM ${description.name} WHERE Id='${recordId}'`
-    )
-    .then(results => results && results[0]);
   const { booleanFilter, filterItems } = lookupFilter;
   const lookupSobject = description.fields[lookupFieldName].referenceTo[0];
   const re = new RegExp(`^${lookupSobject}.`);
@@ -103,26 +95,6 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
   function createExpression($Source, filter) {
     const { field, operation, value, valueField } = filter;
     const formatted = valueField ? getValue($Source, valueField.split('.')) : value;
-
-    // special case for boolean lookup filter clauses that are checking against $Source
-    // SOQL won't accespt expressions like True=True, True=False
-    if (field === 'True' || field === 'False') {
-      // condition isn't met, return expression that will always fail
-      if (field !== formatted) return `Id=NULL`;
-      // conditions are met, no expression needed
-      return;
-    }
-
-    // special case for null lookup filter clauses that are checking against $Source
-    // SOQL won't accespt expressions like null=NULL
-    if (field === null) {
-      if (formatted && formatted.toLowerCase() !== 'null') {
-        // condition isn't met, return expression that will always fail
-        return `Id=NULL`;
-      }
-      // conditions are met, no expression needed
-      return;
-    }
 
     switch (operation) {
       case 'equals':
@@ -184,7 +156,23 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
   }
 
   const filters = organizeFilters(filterItems);
-  console.log({ filters });
+
+  const necessaryFields = filters
+    .map(
+      ({ valueField }) =>
+        valueField && !!~valueField.indexOf('$Source') && valueField.replace('$Source.', '')
+    )
+    .filter(Boolean);
+
+  const record =
+    necessaryFields.length > 0
+      ? await api
+          .query(
+            `SELECT ${necessaryFields.join(',')} FROM ${description.name} WHERE Id='${recordId}'`
+          )
+          .then(results => results && results[0])
+      : {};
+
   const clauses = filters.map(filter => createExpression(record, filter)).filter(Boolean);
 
   return clauses.length > 0 && `(${interpolate(booleanFilter, clauses)})`;
