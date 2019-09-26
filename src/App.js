@@ -19,6 +19,32 @@ export default function LightningComponent(props) {
   );
 }
 
+async function isExtendedPricingEnabled(api, settings) {
+  const { pickerSobject, sObjectName, recordId } = settings;
+  if (pickerSobject !== 'FX5__Price_Book_Item__c') return false;
+  if (!sObjectName || !recordId) return false;
+  if (sObjectName !== 'FX5__Ticket__c' && sObjectName !== 'FX5__Quote__c') return false;
+
+  let fieldPath = 'Enable_Extended_Pricing__c';
+  if (sObjectName === 'FX5__Ticket__c') {
+    fieldPath = 'FX5__Job__r.Enable_Extended_Pricing__c';
+  }
+
+  return await api
+    .query(`SELECT ${fieldPath} FROM ${sObjectName} WHERE Id='${recordId}'`)
+    .then(results => {
+      const record = results && results[0];
+      if (!record) return false;
+
+      if (sObjectName === 'FX5__Ticket__c') {
+        return record.FX5__Job__r.Enable_Extended_Pricing__c;
+      } else {
+        return record.Enable_Extended_Pricing__c;
+      }
+    })
+    .catch(e => false);
+}
+
 const App = () => {
   const { api, settings } = useComponentContext();
   const [description, setDescription] = useState();
@@ -34,7 +60,9 @@ const App = () => {
       const description = await api.describe(pickerSobject);
       setDescription(description);
 
-      if (pickerSobject === 'FX5__Price_Book_Item__c') {
+      const extendedPricingEnabled = await isExtendedPricingEnabled(api, settings);
+
+      if (extendedPricingEnabled) {
         const pricebookFilters = await createPricebookFilterClauses(api, settings, description);
         setDynamicFilters(pricebookFilters);
         setFilter(settings.filter);
