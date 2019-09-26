@@ -42,6 +42,7 @@ const FilterTable = props => {
   }, [api, query]);
 
   useEffect(() => {
+    if (items.length === 0) return;
     if (!query.columns) return;
     if (query.searchParams === searchParams) return;
     const filteredItems = executeLocalSearch(query, items, searchParams);
