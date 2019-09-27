@@ -28,10 +28,15 @@ function escapeSOQLString(str, isLikeQuery) {
 }
 
 function formatExpressionValue(type, value) {
-  if (value === undefined || value === null) return 'NULL';
+  if (value === undefined || value === null) {
+    return type === 'boolean' ? 'False' : 'NULL';
+  }
 
-  switch (type.toLowerCase()) {
+  switch (type) {
     case 'boolean':
+      if (typeof value === 'string') {
+        return value.toLowerCase() === 'true' ? 'True' : 'False';
+      }
       return Boolean(value) ? 'True' : 'False';
     case 'reference':
       return `'${value}'`;
@@ -71,55 +76,86 @@ export async function createParentFilterClause(api, settings) {
 export async function createLookupFilterClause(api, sobject, recordId, lookupFieldName) {
   if (!recordId || !lookupFieldName) return;
 
-  const description = await api.describe(sobject);
-  const lookupFilter = await api.describeLookupFilter(description, lookupFieldName);
+  const sourceDescription = await api.describe(sobject);
+  const lookupFilter = await api.describeLookupFilter(sourceDescription, lookupFieldName);
   if (!lookupFilter) return;
 
   const { booleanFilter, filterItems } = lookupFilter;
-  const lookupSobject = description.fields[lookupFieldName].referenceTo[0];
-  const re = new RegExp(`^${lookupSobject}.`);
+  const lookupSobject = sourceDescription.fields[lookupFieldName].referenceTo[0];
+  const lookupDescription = await api.describe(lookupSobject);
 
-  function clean(str) {
-    if (!str) return str;
-    return str.replace(re, ''); // strip root object api name
-  }
-
-  function getValue(obj, [name, ...rest]) {
-    if (name === '$Source') return getValue(obj, rest);
-
+  function getSourceValue(obj, [name, ...rest]) {
+    if (name === '$Source') return getSourceValue(obj, rest);
     const value = obj[name];
-    if (rest.length > 0) return getValue(value, rest);
-
-    return formatExpressionValue(description.fields[name].type, value);
+    if (rest.length > 0) return getSourceValue(value, rest);
+    return { value, type: sourceDescription.fields[name].type };
   }
 
   function createExpression($Source, filter) {
     const { field, operation, value, valueField } = filter;
-    const formatted = valueField ? getValue($Source, valueField.split('.')) : value;
+    let leftField, rightField, leftValue, rightValue;
+
+    if (!!~field.indexOf('$Source')) {
+      leftValue = getSourceValue($Source, field.split('.'));
+    } else {
+      leftField = field.replace(`${lookupSobject}.`, '');
+    }
+
+    if (valueField) {
+      if (!!~valueField.indexOf('$Source')) {
+        rightValue = getSourceValue($Source, valueField.split('.'));
+      } else {
+        rightField = valueField.replace(`${lookupSobject}.`, '');
+      }
+    } else {
+      rightValue = { value };
+    }
+
+    if (!leftField && !rightField) {
+      return leftValue.value !== rightValue.value ? 'Id=null' : 'Id!=null';
+    }
+
+    let lookupField, lookupValue;
+
+    if (!leftField) {
+      lookupField = rightField;
+      lookupValue = leftValue;
+    }
+    if (!rightField) {
+      lookupField = leftField;
+      lookupValue = rightValue;
+    }
+
+    if (lookupField === lookupValue) return 'Id!=null';
+
+    const formattedValue = formatExpressionValue(
+      lookupValue.type || lookupDescription.fields[lookupField].type,
+      lookupValue.value
+    );
 
     switch (operation) {
       case 'equals':
-        return `${field}=${formatted}`;
+        return `${lookupField}=${formattedValue}`;
       case 'notEqual':
-        return `${field}!=${formatted}`;
+        return `${lookupField}!=${formattedValue}`;
       case 'lessThan':
-        return `${field}<${formatted}`;
+        return `${lookupField}<${formattedValue}`;
       case 'greaterThan':
-        return `${field}>${formatted}`;
+        return `${lookupField}>${formattedValue}`;
       case 'lessOrEqual':
-        return `${field}<=${formatted}`;
+        return `${lookupField}<=${formattedValue}`;
       case 'greaterOrEqual':
-        return `${field}>=${formatted}`;
+        return `${lookupField}>=${formattedValue}`;
       case 'contains':
-        return `${field} IN ${formatted}`;
+        return `${lookupField} IN ${formattedValue}`;
       case 'notContain':
-        return `${field} NOT IN ${formatted}`;
+        return `${lookupField} NOT IN ${formattedValue}`;
       case 'startsWith':
-        return `${field} LIKE '${escapeSOQLString(value, true)}%'`;
+        return `${lookupField} LIKE '${escapeSOQLString(lookupValue.value, true)}%'`;
       case 'includes':
-        return `${field} INCLUDES ${formatted}`;
+        return `${lookupField} INCLUDES ${formattedValue}`;
       case 'excludes':
-        return `${field} EXCLUDES ${formatted}`;
+        return `${lookupField} EXCLUDES ${formattedValue}`;
       default:
     }
   }
@@ -135,46 +171,20 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
     }
   }
 
-  function organizeFilters(filterItems) {
-    return filterItems.map(({ field, operation, value, valueField }) => {
-      if (!!~field.indexOf('$Source')) {
-        // filter against $Source requires a static value
-        // swap field/valueField so we can evaluate the $Source value using same logic
-        return {
-          field: clean(valueField),
-          operation,
-          valueField: field
-        };
-      } else {
-        return {
-          field: clean(field),
-          operation,
-          value,
-          valueField: clean(valueField)
-        };
-      }
-    });
-  }
-
-  const filters = organizeFilters(filterItems);
-
-  const necessaryFields = filters
-    .map(
-      ({ valueField }) =>
-        valueField && !!~valueField.indexOf('$Source') && valueField.replace('$Source.', '')
-    )
+  const sourceFields = filterItems
+    .map(({ field }) => !!~field.indexOf('$Source') && field.replace('$Source.', ''))
     .filter(Boolean);
 
-  const record =
-    necessaryFields.length > 0
+  const $Source =
+    sourceFields.length > 0
       ? await api
           .query(
-            `SELECT ${necessaryFields.join(',')} FROM ${description.name} WHERE Id='${recordId}'`
+            `SELECT ${sourceFields.join(',')} FROM ${sourceDescription.name} WHERE Id='${recordId}'`
           )
           .then(results => results && results[0])
       : {};
 
-  const clauses = filters.map(filter => createExpression(record, filter)).filter(Boolean);
+  const clauses = filterItems.map(filter => createExpression($Source, filter)).filter(Boolean);
 
   return clauses.length > 0 && `(${interpolate(booleanFilter, clauses)})`;
 }
