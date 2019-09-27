@@ -34,6 +34,9 @@ function formatExpressionValue(type, value) {
 
   switch (type) {
     case 'boolean':
+      if (typeof value === 'string') {
+        return value.toLowerCase() === 'true' ? 'True' : 'False';
+      }
       return Boolean(value) ? 'True' : 'False';
     case 'reference':
       return `'${value}'`;
