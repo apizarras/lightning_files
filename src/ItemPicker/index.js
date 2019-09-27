@@ -157,16 +157,18 @@ const ItemPicker = props => {
       <ToastContainer>
         {confirmationMessage && (
           <Toast
+            variant="success"
+            duration={3000}
             labels={{
               heading: confirmationMessage
             }}
-            variant="success"
             onRequestClose={() => setConfirmationMessage(null)}
           />
         )}
         {errorMessage && (
           <Toast
             variant="error"
+            duration={5000}
             labels={{
               heading: 'Items could not be created',
               details: errorMessage
