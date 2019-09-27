@@ -397,9 +397,18 @@ export function sortItems(query, items) {
       key = field.relationshipName;
       sorter = (a, b) => (a[key] ? a[key].Name : '').localeCompare(b[key] ? b[key].Name : '');
       break;
-    default:
+    case 'email':
+    case 'phone':
+    case 'picklist':
+    case 'string':
+    case 'textarea':
+    case 'url':
       key = field.name;
       sorter = (a, b) => (a[key] || '').localeCompare(b[key] || '');
+      break;
+    default:
+      key = field.name;
+      sorter = (a, b) => a[key] - b[key];
   }
 
   items.sort(sorter);
