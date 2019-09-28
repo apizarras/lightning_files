@@ -86,7 +86,9 @@ const App = () => {
             [targetItemField]: Id
           }));
 
-          return api.insertItems(targetSobject, targetItems);
+          return api.insertItems(targetSobject, targetItems).then(({ errors }) => {
+            if (errors && errors.length > 0) throw errors;
+          });
         }
       : null;
 

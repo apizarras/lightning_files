@@ -82,7 +82,7 @@ const ItemPicker = props => {
   const [recentItems, setRecentItems] = useSessionStorage(`recents-${description.name}`, []);
   const [actionPending, setActionPending] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState();
-  const [errorMessage, setErrorMessage] = useState();
+  const [errorMessages, setErrorMessages] = useState();
 
   useEffect(() => {
     async function init() {
@@ -135,8 +135,12 @@ const ItemPicker = props => {
           `Successfully created ${items.length} item${items.length === 1 ? '' : 's'}`
         );
       })
-      .catch(error => {
-        setErrorMessage(error && error.message);
+      .catch(e => {
+        if (Array.isArray(e)) {
+          setErrorMessages([...new Set(e.map(error => error.message))]);
+        } else {
+          setErrorMessages([e.message]);
+        }
       })
       .finally(() => setActionPending(false));
   }
@@ -168,17 +172,18 @@ const ItemPicker = props => {
             onRequestClose={() => setConfirmationMessage(null)}
           />
         )}
-        {errorMessage && (
-          <Toast
-            variant="error"
-            duration={5000}
-            labels={{
-              heading: 'Items could not be created',
-              details: errorMessage
-            }}
-            onRequestClose={() => setErrorMessage(null)}
-          />
-        )}
+        {errorMessages &&
+          errorMessages.map(errorMessage => (
+            <Toast
+              key={errorMessage}
+              variant="error"
+              labels={{
+                heading: 'Items could not be created',
+                details: errorMessage
+              }}
+              onRequestClose={() => setErrorMessages(null)}
+            />
+          ))}
       </ToastContainer>
       <Header
         title={title}
