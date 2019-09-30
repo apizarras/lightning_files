@@ -39,7 +39,7 @@ function queryReducer(state, action) {
       return { ...state, orderBy: { field: payload, direction } };
     case 'ADD_FILTER':
       let value = payload.item[payload.field.name];
-      if (value === '' || value === null || value === undefined) return state;
+      if (value === '' || value === null || value === undefined || value === false) return state;
       if (
         state.filters.find(
           ({ field, item }) =>
