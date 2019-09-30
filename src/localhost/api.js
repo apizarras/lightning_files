@@ -23,11 +23,14 @@ export const dataService = connection => {
       new Promise((resolve, reject) =>
         connection.sobject(sobject).create(items, { allOrNone: true }, (err, results) => {
           if (err) return reject(err);
+          const updatedRecords = [];
+          const updateErrors = [];
           results.forEach(({ id, success, errors }, index) => {
-            if (success) console.log('Created record id:', id, items[index]);
-            if (errors) reject(errors[0]);
+            if (success) updatedRecords.push(id);
+            if (errors) updateErrors.push(...errors);
           });
-          resolve(results);
+
+          resolve({ updatedRecords, errors: updateErrors });
         })
       )
   };

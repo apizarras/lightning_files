@@ -58,19 +58,64 @@ function createExpression(filter) {
   return `${field.name} = ${formatted}`;
 }
 
-export async function createParentFilterClause(api, settings) {
+async function getParentLookupValue(api, settings) {
   const { sObjectName, recordId, pickerLookupField, pickerLookupValue } = settings;
   if (!sObjectName || !recordId || !pickerLookupField || !pickerLookupValue) return;
 
   try {
     const soql = `SELECT ${pickerLookupValue} FROM ${sObjectName} WHERE Id='${recordId}'`;
-    const lookupValue = await api.query(soql).then(results => {
-      return pickerLookupValue
-        .split('.')
-        .reduce((value, key) => value && value[key], results && results[0]);
-    });
-    return lookupValue && `${pickerLookupField}='${lookupValue}'`;
+    const record = await api.query(soql).then(results => results && results[0]);
+    return pickerLookupValue.split('.').reduce((value, key) => value && value[key], record);
   } catch (e) {}
+}
+
+export async function createPricebookFilterClauses(api, settings) {
+  const parentLookupValue = await getParentLookupValue(api, settings);
+  if (!parentLookupValue) return;
+
+  const pricebooks = await api.query(
+    `SELECT Id, FX5__Parent_Price_Book__c FROM FX5__Price_Book__c`
+  );
+  if (!pricebooks) return;
+
+  const parentIds = pricebooks.reduce((parents, { Id, FX5__Parent_Price_Book__c }) => {
+    parents[Id] = FX5__Parent_Price_Book__c;
+    return parents;
+  }, {});
+
+  const parentChain = [];
+  let parent = parentLookupValue;
+
+  while (parent) {
+    parentChain.push(parent);
+    parent = parentIds[parent];
+  }
+
+  const filters = parentChain.map((id, index) => {
+    const soql = [`FX5__Price_Book__c='${id}'`];
+    if (index === 0) return soql[0];
+
+    soql.push(`AND FX5__Catalog_Item__c NOT IN (`);
+    soql.push(`SELECT FX5__Catalog_Item__c FROM FX5__CatalogItemPriceBook__c`);
+    soql.push(`WHERE FX5__Price_Book__c IN (`);
+    soql.push(
+      parentChain
+        .slice(0, index)
+        .map(x => `'${x}'`)
+        .join(',')
+    );
+    soql.push('))');
+    return soql.join(' ');
+  });
+
+  return filters;
+}
+
+export async function createParentFilterClause(api, settings) {
+  const { sObjectName, recordId, pickerLookupField, pickerLookupValue } = settings;
+  if (!sObjectName || !recordId || !pickerLookupField || !pickerLookupValue) return;
+  const lookupValue = await getParentLookupValue(api, settings);
+  return lookupValue && `${pickerLookupField}='${lookupValue}'`;
 }
 
 export async function createLookupFilterClause(api, sobject, recordId, lookupFieldName) {
@@ -244,13 +289,14 @@ function createSearchClause(columns, searchParams) {
   return keywords.map(keyword => createGroupedSearchClause(searchColumns, keyword)).join(' AND ');
 }
 
-function createWhereClause(query) {
+function createWhereClause(query, dynamicCondition) {
   const { columns, staticFilter, filters, searchParams } = query;
   const conditions = [];
 
   if (staticFilter) conditions.push(staticFilter);
   if (filters) conditions.push(createGroupedFiltersClause(filters));
   if (searchParams) conditions.push(createSearchClause(columns, searchParams));
+  if (dynamicCondition) conditions.push(dynamicCondition);
 
   const filtered = conditions.filter(Boolean);
   if (!filtered.length) return;
@@ -305,12 +351,21 @@ export async function getSearchFields(api, description) {
 }
 
 export async function executeQuery(api, query) {
-  const { description, columns, orderBy, implicitSort } = query;
+  const { description, columns, orderBy, dynamicFilters } = query;
   if (!description || !columns || !orderBy) return [];
+  if (dynamicFilters) {
+    return Promise.all(dynamicFilters.map(filter => executeQuerySingle(api, query, filter)))
+      .then(set => set.reduce((arr, x) => arr.concat(x), []))
+      .then(items => sortItems(query, items));
+  }
+  return executeQuerySingle(api, query);
+}
 
+async function executeQuerySingle(api, query, dynamicFilter) {
+  const { description, columns, orderBy, implicitSort } = query;
   const fieldNames = getFieldNames(description, columns);
   const soql = [`SELECT ${fieldNames.join(',')} FROM ${description.name}`];
-  soql.push(createWhereClause(query));
+  soql.push(createWhereClause(query, dynamicFilter));
   soql.push(createOrderBy(orderBy, implicitSort));
   soql.push(`LIMIT ${BUFFER_SIZE}`);
 
@@ -318,11 +373,20 @@ export async function executeQuery(api, query) {
 }
 
 export function executeScalar(api, query) {
-  const { description, columns, orderBy } = query;
+  const { description, columns, orderBy, dynamicFilters } = query;
   if (!description || !columns || !orderBy) return;
+  if (dynamicFilters) {
+    return Promise.all(dynamicFilters.map(filter => executeScalarSingle(api, query, filter))).then(
+      counts => counts.reduce((sum, x) => (sum += x), 0)
+    );
+  }
+  return executeScalarSingle(api, query);
+}
 
+async function executeScalarSingle(api, query, dynamicFilter) {
+  const { description } = query;
   const soql = [`SELECT COUNT() FROM ${description.name}`];
-  soql.push(createWhereClause(query));
+  soql.push(createWhereClause(query, dynamicFilter));
 
   return api.queryCount(soql.join(' '));
 }
