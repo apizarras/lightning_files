@@ -60,6 +60,9 @@ const FilterTable = props => {
     <div className="filter-table">
       <Tabs id="tabs-tables" variant="scoped" selectedIndex={tabIndex} onSelect={setTabIndex}>
         <TabsPanel label="Top Search Results">
+          {!loading && items.length === 0 && (
+            <p style={{ height: 350, padding: '0 1rem' }}>No matching items were found</p>
+          )}
           <DataTable
             compact={compact}
             style={{ height: 350 }}

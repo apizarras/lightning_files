@@ -28,6 +28,8 @@ const DataTable = props => {
     return ids;
   }, {});
 
+  if (!loading && items.length === 0) return null;
+
   return (
     <div
       className={`data-table ${compact ? 'compact' : null} ${

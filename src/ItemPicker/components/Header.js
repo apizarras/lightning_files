@@ -33,7 +33,7 @@ const Header = props => {
             {query.orderBy && query.orderBy.field.label}
           </span>
         ) : (
-          ''
+          <span>&nbsp;</span>
         )
       }
       onRenderActions={() =>
