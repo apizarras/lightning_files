@@ -15,6 +15,8 @@ const SYSTEM_FIELDS = [
 ];
 
 const BUFFER_SIZE = 100;
+const TRUE_EXPRESSION = 'Id!=null';
+const FALSE_EXPRESSION = 'Id=null';
 
 function searchableColumnsFilter(column) {
   // salesforce LIKE operator only supports strings
@@ -133,7 +135,51 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
     if (name === '$Source') return getSourceValue(obj, rest);
     const value = obj[name];
     if (rest.length > 0) return getSourceValue(value, rest);
-    return { value, type: sourceDescription.fields[name].type };
+    return { value, type: sourceDescription.fields[name].type, recordType: obj.RecordType };
+  }
+
+  function createStaticExpression(filter, left, right) {
+    let leftValue = left.recordType
+      ? `'${left.recordType.Name}'`
+      : formatExpressionValue(left.type || right.type, left.value);
+    let rightValue = right.recordType
+      ? `'${right.recordType.Name}'`
+      : formatExpressionValue(left.type || right.type, right.value);
+
+    let result;
+
+    switch (filter.operation) {
+      case 'equals':
+        result = leftValue === rightValue;
+        break;
+      case 'notEqual':
+        result = leftValue !== rightValue;
+        break;
+      case 'lessThan':
+        result = left.value < right.value;
+        break;
+      case 'greaterThan':
+        result = left.value > right.value;
+        break;
+      case 'lessOrEqual':
+        result = left.value <= right.value;
+        break;
+      case 'greaterOrEqual':
+        result = left.value >= right.value;
+        break;
+      case 'contains':
+        result = right.value && !!~String(left.value || '').indexOf(right.value);
+        break;
+      case 'notContain':
+        result = right.value && !~String(left.value || '').indexOf(right.value);
+        break;
+      case 'startsWith':
+        result = right.value && String(left.value || '').indexOf(right.value) === 0;
+        break;
+      default:
+    }
+
+    return result ? TRUE_EXPRESSION : FALSE_EXPRESSION;
   }
 
   function createExpression($Source, filter) {
@@ -156,12 +202,11 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
       rightValue = { value };
     }
 
-    if (!leftField && !rightField) {
-      return leftValue.value !== rightValue.value ? 'Id=null' : 'Id!=null';
-    }
+    if (!leftField && !rightField) return createStaticExpression(filter, leftValue, rightValue);
 
     let lookupField, lookupValue;
 
+    // make sure API names are always on the left side of an expression
     if (!leftField) {
       lookupField = rightField;
       lookupValue = leftValue;
@@ -171,7 +216,9 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
       lookupValue = rightValue;
     }
 
-    if (lookupField === lookupValue) return 'Id!=null';
+    if (lookupField === lookupValue) {
+      return createStaticExpression(filter, leftValue, rightValue);
+    }
 
     const formattedValue = formatExpressionValue(
       lookupValue.type || lookupDescription.fields[lookupField].type,
@@ -216,21 +263,29 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
     }
   }
 
-  const sourceFields = filterItems
-    .map(({ field }) => !!~field.indexOf('$Source') && field.replace('$Source.', ''))
-    .filter(Boolean);
+  const sourceFields = new Set(
+    filterItems
+      .map(({ field }) => !!~field.indexOf('$Source') && field.replace('$Source.', ''))
+      .filter(Boolean)
+  );
+
+  if (sourceFields.has('RecordTypeId')) {
+    sourceFields.add('RecordType.Id');
+    sourceFields.add('RecordType.Name');
+  }
 
   const $Source =
-    sourceFields.length > 0
+    sourceFields.size > 0
       ? await api
           .query(
-            `SELECT ${sourceFields.join(',')} FROM ${sourceDescription.name} WHERE Id='${recordId}'`
+            `SELECT ${[...sourceFields].join(',')} FROM ${
+              sourceDescription.name
+            } WHERE Id='${recordId}'`
           )
           .then(results => results && results[0])
       : {};
 
   const clauses = filterItems.map(filter => createExpression($Source, filter)).filter(Boolean);
-
   return clauses.length > 0 && `(${interpolate(booleanFilter, clauses)})`;
 }
 
