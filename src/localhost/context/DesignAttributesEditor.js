@@ -58,7 +58,7 @@ const Editor = ({ config, settings, onChange }) => {
         <Checkbox
           labels={{ label }}
           checked={Boolean(settings[name])}
-          onChange={checked => onChange(name, checked)}
+          onChange={e => onChange(name, e.target.checked)}
         />
       );
     case 'picklist':
