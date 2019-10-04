@@ -265,8 +265,13 @@ export async function createLookupFilterClause(api, sobject, recordId, lookupFie
 
   const sourceFields = new Set(
     filterItems
-      .map(({ field }) => !!~field.indexOf('$Source') && field.replace('$Source.', ''))
-      .filter(Boolean)
+      .reduce((paths, { field, valueField }) => {
+        field && paths.push(field);
+        valueField && paths.push(valueField);
+        return paths;
+      }, [])
+      .filter(path => !!~path.indexOf('$Source'))
+      .map(path => path.replace('$Source.', ''))
   );
 
   if (sourceFields.has('RecordTypeId')) {
