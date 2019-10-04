@@ -122,7 +122,8 @@ $stripe-color: #f3f2f2;
   [data-cell-type='datetime'],
   [data-cell-type='int'],
   [data-cell-type='location'],
-  [data-cell-type='percent'] {
+  [data-cell-type='percent'],
+  [data-cell-type='time'] {
     text-align: right;
   }
 
