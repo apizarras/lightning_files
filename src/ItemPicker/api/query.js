@@ -42,6 +42,8 @@ function formatExpressionValue(type, value) {
       return Boolean(value) ? 'True' : 'False';
     case 'reference':
       return `'${value}'`;
+    case 'time':
+      return formatTimeExpressionValue(value);
     case 'email':
     case 'phone':
     case 'picklist':
@@ -52,6 +54,21 @@ function formatExpressionValue(type, value) {
     default:
       return value.toString();
   }
+}
+
+function formatTimeExpressionValue(value) {
+  // REST API (localhost) returns time as a valid string
+  if (process.env.NODE_ENV === 'development') return value;
+
+  // APEX returns time in milliseconds
+  // but SOQL only accepts time in HH:MM:00.000Z format
+  let hours, minutes;
+  const MS_HOUR = 60 * 60 * 1000;
+  const MS_MINUTE = 60 * 1000;
+  hours = Math.floor(value / MS_HOUR);
+  minutes = (value % MS_HOUR) / MS_MINUTE;
+
+  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:00.000Z`;
 }
 
 function createExpression(filter) {
