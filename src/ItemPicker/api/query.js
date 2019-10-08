@@ -423,6 +423,7 @@ export async function getSearchFields(api, description) {
   return columnNames
     .map(name => description.fields[name])
     .filter(Boolean)
+    .filter(field => field.type !== 'textarea')
     .filter(field => !~SYSTEM_FIELDS.indexOf(field.name))
     .filter(field => !/^(FX5__)?Locked_/.test(field.name));
 }
