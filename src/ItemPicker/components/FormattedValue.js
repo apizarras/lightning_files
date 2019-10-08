@@ -5,6 +5,7 @@ function FormattedValue(props) {
   const { className, field, item } = props;
   const value = item && item[field.name];
   if (value === undefined || value === null || value === false) return null;
+  if (field.type === 'location' && (!value.latitude || !value.longitude)) return null;
 
   let formatted;
 
@@ -48,7 +49,9 @@ function FormattedValue(props) {
       break;
     case 'location':
       const { latitude, longitude } = value;
-      formatted = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+      formatted = `${parseFloat(latitude).toFixed(field.scale)}, ${parseFloat(longitude).toFixed(
+        field.scale
+      )}`;
       break;
     case 'multipicklist':
       formatted = (
