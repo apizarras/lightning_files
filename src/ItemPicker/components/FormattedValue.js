@@ -42,9 +42,11 @@ function FormattedValue(props) {
       break;
     case 'date':
     case 'datetime':
+      // TODO: honor user prefs/timezone
       formatted = new Date(value).toLocaleString();
       break;
     case 'double':
+    case 'percent':
       formatted = value.toFixed(field.scale);
       break;
     case 'location':
@@ -66,14 +68,38 @@ function FormattedValue(props) {
       const shallowObject = item && item[field.relationshipName];
       formatted = shallowObject ? shallowObject.Name || value : value;
       break;
+    case 'time':
+      formatted = formatTime(value);
+      break;
     case 'picklist':
     case 'string':
     case 'textarea':
+    case 'url':
     default:
       formatted = value.toString();
   }
 
   return <span {...attrs}>{formatted}</span>;
+}
+
+// TODO: honor user prefs
+function formatTime(value) {
+  let hours, minutes;
+
+  if (process.env.NODE_ENV === 'development') {
+    // localhost returns time as a string
+    [hours, minutes] = value.split(':').map(x => parseInt(x, 10));
+  } else {
+    // salesforce returns time in milliseconds
+    const MS_HOUR = 60 * 60 * 1000;
+    const MS_MINUTE = 60 * 1000;
+    hours = Math.floor(value / MS_HOUR);
+    minutes = (value % MS_HOUR) / MS_MINUTE;
+  }
+
+  return `${hours === 0 ? '12' : hours % 12}:${minutes < 10 ? '0' : ''}${minutes} ${
+    hours >= 12 ? 'PM' : 'AM'
+  }`;
 }
 
 export default FormattedValue;
