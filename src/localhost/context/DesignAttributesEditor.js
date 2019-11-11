@@ -3,12 +3,17 @@ import { useSettings, getDefaultSettings } from './Settings';
 import { DESIGN_ATTRIBUTES } from '../../constants';
 import {
   Card,
+  Input,
   Textarea,
   Checkbox,
   RadioGroup,
   Radio,
-  Button
+  Button,
 } from '@salesforce/design-system-react';
+
+function applyChanges(state, action) {
+  return { ...state, ...action };
+}
 
 const DesignAttributesEditor = props => {
   const [settings, dispatch] = useSettings();
@@ -31,9 +36,6 @@ const DesignAttributesEditor = props => {
   return (
     <Card heading="Design Attributes">
       <div className="slds-card__body slds-card__body--inner slds-form slds-form_stacked">
-        {DESIGN_ATTRIBUTES.map(config => (
-          <Editor key={config.name} config={config} settings={changes} onChange={onChange} />
-        ))}
         <div className="slds-m-top_medium">
           <Button variant="base" label="Reset to defaults" onClick={reset} />
           <Button
@@ -43,6 +45,9 @@ const DesignAttributesEditor = props => {
             onClick={save}
           />
         </div>
+        {DESIGN_ATTRIBUTES.map(config => (
+          <Editor key={config.name} config={config} settings={changes} onChange={onChange} />
+        ))}
       </div>
     </Card>
   );
@@ -57,8 +62,8 @@ const Editor = ({ config, settings, onChange }) => {
       return (
         <Checkbox
           labels={{ label }}
-          checked={Boolean(settings[name])}
-          onChange={e => onChange(name, e.target.checked)}
+          checked={settings[name]}
+          onChange={checked => onChange(name, checked)}
         />
       );
     case 'picklist':
@@ -75,6 +80,16 @@ const Editor = ({ config, settings, onChange }) => {
           ))}
         </RadioGroup>
       );
+    case 'number':
+      return (
+        <Input
+          type="number"
+          label={label}
+          value={settings[name]}
+          onChange={e => onChange(name, e.target.value)}
+        />
+      );
+    case 'string':
     default:
       return (
         <Textarea
@@ -85,9 +100,5 @@ const Editor = ({ config, settings, onChange }) => {
       );
   }
 };
-
-function applyChanges(state, action) {
-  return { ...state, ...action };
-}
 
 export default DesignAttributesEditor;

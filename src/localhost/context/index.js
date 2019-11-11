@@ -3,12 +3,11 @@ import Connect from './Connect';
 import Menu from './Menu';
 import { SettingsProvider } from './Settings';
 import DesignAttributesEditor from './DesignAttributesEditor';
-import EventDebugger from './EventDebugger';
 
 export * from './Connect';
 export * from './Settings';
 
-export const ConnectionProvider = props => {
+export const ConnectionProvider = ({ children }) => {
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
@@ -26,16 +25,16 @@ export const ConnectionProvider = props => {
             top: 0,
             right: 0,
             bottom: 0,
-            left: 0
+            left: 0,
           }}>
-          <Menu />
+        <Menu />
           <div className="slds-brand-band slds-brand-band_medium">
             <section
               style={{
                 position: 'absolute',
                 top: 50,
                 width: '100%',
-                height: 'calc(100% - 50px)'
+                height: 'calc(100% - 50px)',
               }}>
               <div className="slds-template_default">
                 <div
@@ -43,12 +42,12 @@ export const ConnectionProvider = props => {
                     display: 'flex',
                     flexFlow: 'row wrap',
                     minWidth: 1050,
-                    marginBottom: '3rem'
+                    marginBottom: '3rem',
                   }}>
-                  <div style={{ width: '66.66%' }}>{props.children}</div>
+                  <div style={{ width: '66.66%' }}>{children}</div>
                   <div style={{ width: '33.33%', paddingLeft: '.75rem' }}>
                     <DesignAttributesEditor />
-                    <EventDebugger />
+
                   </div>
                 </div>
               </div>

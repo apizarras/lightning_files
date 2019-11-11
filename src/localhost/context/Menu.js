@@ -4,7 +4,7 @@ import {
   GlobalHeader,
   GlobalHeaderProfile,
   Popover,
-  Button
+  Button,
 } from '@salesforce/design-system-react';
 
 const Menu = props => {
@@ -17,17 +17,15 @@ const Menu = props => {
         popover={
           <Popover
             body={
-              <>
-                <div className="slds-clearfix">
-                  <p className="slds-text-title slds-p-bottom_medium">{organization_name}</p>
-                  <Button
-                    className="slds-float_right"
-                    variant="destructive"
-                    label="Log Out"
-                    onClick={() => connection.logout()}
-                  />
-                </div>
-              </>
+              <div className="slds-clearfix">
+                <p className="slds-text-title slds-p-bottom_medium">{organization_name}</p>
+                <Button
+                  className="slds-float_right"
+                  variant="destructive"
+                  label="Log Out"
+                  onClick={() => connection.logout()}
+                />
+              </div>
             }
             id="header-profile-popover-id"
           />

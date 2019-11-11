@@ -68,8 +68,9 @@ export function getConnection(onSessionExpired) {
       connection.identity = identity;
       connection.logout = () => (window.location.href = LOGOUT_URL);
       connection.getJSON = resource => getJSON(connection, resource, onSessionExpired);
-
+      console.log("connection", connection)
       return connection;
+
     });
 }
 
@@ -128,6 +129,6 @@ export function getRequestOptions(connection, path) {
     options.headers['salesforceproxy-endpoint'] = url;
     url = `${PROXY_URL}?${+Date.now()}.${Math.random()}`;
   }
-
+console.log("request options url: ", url);
   return [url, options];
 }
