@@ -1,7 +1,7 @@
 import { CONTENTDOCUMENTLINK_FIELDS } from '../constants';
 import axios from 'axios';
 
-const createDataService = connection => {
+const dataService = connection => {
   let acls = {};
   const descriptions = {};
   const hasPermission = (permission) => {
@@ -257,4 +257,4 @@ const eventService = () => {
   };
 };
 
-export { lightningEventsCallback, updateCellCallback, createDataService, events, eventService };
+export { lightningEventsCallback, updateCellCallback, dataService, events, eventService };

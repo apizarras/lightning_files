@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import * as api from './localhost/api';
+import * as api from './localhost/apiMethods';
 import { ConnectionProvider, useConnection, useSettings } from './localhost/context';
 
 function LocalComponent() {

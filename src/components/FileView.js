@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, IconSettings, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
 import './FileView.scss';
-import AddFileDialog from './AddFileDialog';
 import queryString from 'query-string';
-import moment from 'moment';
-import CustomDataTableCell from './CustomDataTableCell';
 import { ComponentContext } from './Context/context';
 
 
@@ -47,7 +44,6 @@ class FileView extends Component {
                   <div className="data-table">
                     <DataTable fixedHeader fixedLayout items={this.state.files}>
                       <DataTableColumn label="Sync" property="sync" width="20%">
-                        <CustomDataTableCell />
                       </DataTableColumn>
                       <DataTableColumn label="Title" property="title" />
                       <DataTableColumn label="Created By" property="createdBy" />
