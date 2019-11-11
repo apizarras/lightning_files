@@ -36,6 +36,7 @@ class FileView extends Component {
         <IconSettings iconPath="../../_slds/icons">
             <div className="slds-grid slds-grid_vertical component-container">
               <Card
+                  heading="Files"
                   icon={<Icon category="standard" name="document" size="medium" />}
                   headerActions={<button type="button" className="slds-button slds-button_neutral" onClick={this.toggleOpen}>Upload File</button>}
               >
