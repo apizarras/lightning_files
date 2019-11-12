@@ -9,7 +9,11 @@ export function createApi(dataService) {
         ([description, fields]) => ({ ...description, fields })
       );
     },
+    describeGlobal: dataService.describeGlobal,
     describePicklist: dataService.describePicklist,
+    deleteItems: dataService.deleteItems,
+    fetchDescription: dataService.fetchDescription,
+    fetchFiles: dataService.fetchFiles,
     query: dataService.query,
     queryCount: dataService.queryCount,
     searchLayout: sobject => dataService.restApi(`search/layout/?q=${sobject}`).then(r => r[0]),
@@ -51,7 +55,10 @@ export function createApi(dataService) {
         console.error(e);
       }
     },
-    insertItems: dataService.insertItems
+    insertItems: dataService.insertItems,
+    uploadFile: dataService.uploadFile,
+    downloadFile: dataService.downloadFile,
+    toggleSyncFlag: dataService.toggleSyncFlag
   };
 }
 

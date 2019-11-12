@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ComponentContextProvider, useComponentContext } from './components/Context/context'
-import { createParentFilterClause, createPricebookFilterClauses } from './components/api/query';
 import FileView from './components/FileView';
 import { IconSettings } from '@salesforce/design-system-react';
+
 
 export default function LightningComponent(props) {
   const { settings, dataService, eventService } = props;

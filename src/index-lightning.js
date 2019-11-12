@@ -1,7 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { IconSettings } from '@salesforce/design-system-react';
+// import {
+//   LightningContextProvider,
+//   UserContextProvider,
+//   DataContextProvider
+// } from './components/Context';
 import App from './App';
 import { DESIGN_ATTRIBUTES } from './constants';
+
+export default function LightningComponent({ dataService, settings, events, connection }) {
+  return (
+    <IconSettings iconPath="/_slds/icons">
+
+            <App dataService={dataService} settings={settings} events={events} connection={connection}/>
+
+    </IconSettings>
+  );
+}
 
 export function init(component, sessionId, eventService) {
   const containerElement = component.find('root').getElement();
@@ -16,7 +32,7 @@ export function init(component, sessionId, eventService) {
       action.setCallback(this, response => {
         if (response.getState() === 'SUCCESS') {
           const returnValue = response.getReturnValue();
-
+          console.log("return value: ", returnValue);
           try {
             // we have to conditionally parse because metadata types are unsupported by AuraEnabled endpoints
             resolve(needsParse ? JSON.parse(returnValue) : returnValue);
@@ -35,15 +51,23 @@ export function init(component, sessionId, eventService) {
 
   const dataService = {
     describe: sobjectType => wrap('describe', { sobjectType }, true),
+    describeChildRelationships: sobjectType =>
+      wrap('describeChildRelationships', { sobjectType }, true),
     describeFields: sobjectType => wrap('describeFields', { sobjectType }, true),
     describePicklist: (sobjectType, fieldName) =>
       wrap('describePicklist', { sobjectType, fieldName }, true),
+    describeGlobal: sobjects => wrap('describeGlobal', { sobjects }),
+    fetchDescription: (sobject, descriptions) => wrap('fetchDescription', {sobject, descriptions}),
     query: soql => wrap('query', { soql }),
     queryCount: soql => wrap('countQuery', { soql }),
+    apexRest: (method, payload) => wrap('restEndpoint', { method, payload }),
     restApi: path =>
       wrap('callRest', { sessionId, endpoint: `/services/data/v44.0/${path}` }, true),
-    insertItems: (sobjectType, items) =>
-      wrap('insertItems', { sobjectType, items: items.map(x => JSON.stringify(x)) })
+    updateItems: (sobjectType, changes) =>
+      wrap('updateItems', { sobjectType, changes: changes.map(c => JSON.stringify(c)) }),
+    deleteItems: (sobjectType, ids) => wrap('deleteItems', { ids }),
+    getUser: () => wrap('fetchUser', null),
+    fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId})
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(
@@ -55,7 +79,7 @@ export function init(component, sessionId, eventService) {
   );
 
   ReactDOM.render(
-    <App settings={settings} dataService={dataService} eventService={eventService} />,
+    <LightningComponent dataService={dataService} settings={settings} events={eventService} />,
     containerElement
   );
 }
