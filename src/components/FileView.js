@@ -113,6 +113,7 @@ class FileView extends Component {
         api
           .fetchFiles(sObjectId)
           .then(files => {
+            console.log("files response from fetchFiles: ", files);
             const fileDetails = files.map(detail => {
               return {
                 id: detail.ContentDocument.Id,

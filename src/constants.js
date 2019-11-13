@@ -11,7 +11,7 @@ export const DESIGN_ATTRIBUTES = [
     name: 'recordId',
     label: 'Page Object Record Id (from Salesforce)',
     type: 'string',
-    defaultValue: 'a0p1N00000CHOabQAH'
+    defaultValue: '/a1c2a0000003OHRAA2'
   }
 ];
 

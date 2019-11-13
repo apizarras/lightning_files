@@ -32,7 +32,6 @@ export function init(component, sessionId, eventService) {
       action.setCallback(this, response => {
         if (response.getState() === 'SUCCESS') {
           const returnValue = response.getReturnValue();
-          console.log("return value: ", returnValue);
           try {
             // we have to conditionally parse because metadata types are unsupported by AuraEnabled endpoints
             resolve(needsParse ? JSON.parse(returnValue) : returnValue);
