@@ -110,6 +110,7 @@ class FileView extends Component {
         this.setState({
           isBusy: true
         });
+        console.log(sObjectId);
         api
           .fetchFiles(sObjectId)
           .then(files => {
@@ -119,11 +120,10 @@ class FileView extends Component {
                 id: detail.ContentDocument.Id,
                 LatestPublishedVersionId: detail.ContentDocument.LatestPublishedVersion.Id,
                 title: detail.ContentDocument.LatestPublishedVersion.Title,
-                createdBy: detail.ContentDocument.LatestPublishedVersion.CreatedBy.Name,
+                createdBy: detail.ContentDocument.CreatedBy.Name,
                 lastModifiedDate: moment.utc(detail.ContentDocument.LatestPublishedVersion.LastModifiedDate).local().format('L LT'),
                 lastModifiedBy: detail.ContentDocument.LatestPublishedVersion.LastModifiedBy.Name,
                 sync: detail.ContentDocument.LatestPublishedVersion.FX5__Sync__c,
-                url: detail.ContentDocument.attributes.url
               }
             });
             this.setState({ files: fileDetails, isBusy: false });
