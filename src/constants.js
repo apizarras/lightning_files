@@ -21,6 +21,7 @@ export const CONTENTDOCUMENTLINK_FIELDS = [
   "LinkedEntityId",
   "LinkedEntity.Type",
   "ContentDocument.Id",
+  "ContentDocument.CreatedBy.Name",
   "ContentDocument.LatestPublishedVersion.Id",
   "ContentDocument.LatestPublishedVersion.Title",
   "ContentDocument.LatestPublishedVersion.PathOnClient",
