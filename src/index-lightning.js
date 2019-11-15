@@ -66,7 +66,8 @@ export function init(component, sessionId, eventService) {
       wrap('updateItems', { sobjectType, changes: changes.map(c => JSON.stringify(c)) }),
     deleteItems: (sobjectType, ids) => wrap('deleteItems', { ids }),
     getUser: () => wrap('fetchUser', null),
-    fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId})
+    fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId}),
+    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(

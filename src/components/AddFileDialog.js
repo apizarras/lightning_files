@@ -43,6 +43,7 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
         return new Promise(function(resolve, reject){
           reader.onload = function( e ) {
             var fileData = btoa( e.target.result );
+            const Title = file.name;
             var contentVersionData = {
                 "FirstPublishLocationId": parentId,
                 "Title": file.name,
@@ -55,7 +56,7 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
               console.log(`%c>>>> percentCompleted `, `background-color: yellow;` , percentCompleted, progressEvent );
             };
 
-            return api.uploadFile( parentId, contentVersionData, onUploadProgress )
+            return api.uploadFile( parentId, Title, fileData )
               .then(resolve, reject);
           };
 
