@@ -12,6 +12,12 @@ export const DESIGN_ATTRIBUTES = [
     label: 'Page Object Record Id (from Salesforce)',
     type: 'string',
     defaultValue: '/a1c2a0000003OHRAA2'
+  },
+  {
+    name: 'instanceUrl',
+    label: 'current Salesforce instance url',
+    type: 'string',
+    defaultValue: 'https://na73.salesforce.com'
   }
 ];
 

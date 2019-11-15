@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, IconSettings, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
 import './FileView.scss';
-// import AddFileDialog from './AddFileDialog';
+import AddFileDialog from './AddFileDialog';
 import queryString from 'query-string';
 import moment from 'moment';
 // import CustomDataTableCell from './CustomDataTableCell';
@@ -67,10 +67,11 @@ class FileView extends Component {
     }
 
     handleFileDelete = (fileToDelete) => {
-      const id = this.state.fileToDelete;
+      const ids = this.state.fileToDelete;
       const { api } = this.context;
+      console.log("ids: ", ids);
       return api
-      .deleteItems(id)
+      .deleteItems('ContentDocument', ids)
       .then(response => {
         this.setState({fileToDelete: []});
         this.setState({showDeletePrompt: false});
@@ -86,10 +87,12 @@ class FileView extends Component {
       const { api } = this.context;
       console.log("context: ", this.context);
       const newUrl = this.context.settings.instanceUrl + `/lightning/r/ContentDocument/` + id + `/view`;
+      console.log("instanceUrl ", this.context.settings.instanceUrl );
       const win = window.open(newUrl, '_blank');
     }
 
     downloadFile = (e) => {
+      console.log("e", e);
       const { api } = this.context;
       return api.downloadFile(e);
     }
@@ -163,14 +166,13 @@ class FileView extends Component {
                   headerActions={<button type="button" className="slds-button slds-button_neutral" onClick={this.toggleOpen}>Upload File</button>}
               >
                   <Modal heading="Upload File" isOpen={this.state.isOpen} ariaHideApp={false} disableClose>
-                      {/* <AddFileDialog
+                      <AddFileDialog
                           onSave={this.fetchData}
-                          connection={this.props.connection}
                           parentId={this.state.sObjectId}
                           handleClose={this.toggleClose}
                           files={this.state.files}
                           dataService={this.context}
-                          /> */}
+                          />
                   </Modal>
                   <div className="data-table">
                     <DataTable fixedHeader fixedLayout items={this.state.files}>
