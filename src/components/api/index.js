@@ -13,6 +13,7 @@ export function createApi(dataService) {
     describePicklist: dataService.describePicklist,
     deleteItems: dataService.deleteItems,
     downloadFile: dataService.downloadFile,
+    previewFile: dataService.previewFile,
     fetchDescription: dataService.fetchDescription,
     fetchFiles: dataService.fetchFiles,
     query: dataService.query,
@@ -58,9 +59,8 @@ export function createApi(dataService) {
     },
     insertItems: dataService.insertItems,
     uploadFile: dataService.uploadFile,
-    toggleSyncFlag: dataService.toggleSyncFlag,
-    getInstanceUrl: dataService.getInstanceUrl
-  };
+    toggleSyncFlag: dataService.toggleSyncFlag
+    };
 }
 
 // converts a salesforce 15 character id into an 18 character id

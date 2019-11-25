@@ -86,10 +86,11 @@ class FileView extends Component {
     previewFile = (id) => {
       const { api } = this.context;
       console.log("context: ", this.context);
-      const newUrl = this.context.settings.instanceUrl + `/lightning/r/ContentDocument/` + id + `/view`;
-      console.log("instanceUrl ", this.context.settings.instanceUrl );
-      const win = window.open(newUrl, '_blank');
-    }
+      return api.previewFile(id)
+      .then(response => {
+        const win = window.open(response, '_blank');
+      })
+    };
 
     downloadFile = (id) => {
       const { api } = this.context;
@@ -104,7 +105,6 @@ class FileView extends Component {
           link.click();
         }
       )
-
     }
 
     fetchData = () => {
