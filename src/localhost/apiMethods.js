@@ -181,7 +181,7 @@ return {
           .then(resolve,reject);
       });
     },
-    downloadFile: (e, id) => {
+    downloadFile: (id) => {
       var requestConfig = {
         headers: {
           ContentType: 'blob',
@@ -194,10 +194,12 @@ return {
       const responseType = "blob";
 
       return new Promise(function(resolve, reject) {
-        return axios.get(`${appVersion === 'DEV' ? connection.instanceUrl : ''}/services/data/${apiVersion}/sobjects/ContentDocument/`+ e, requestConfig, responseType)
+        console.log("instanceUrl: ", connection.instanceUrl);
+        return axios.get(`${appVersion === 'DEV' ? connection.instanceUrl : ''}/services/data/${apiVersion}/sobjects/ContentDocument/`+ id, requestConfig, responseType)
         .then((response) => {
+          console.log("response: ", response);
           const fileName = response.data.Title;
-          const downloadUrl = connection.instanceUrl + "/sfc/servlet.shepherd/document/download/" + e;
+          const downloadUrl = connection.instanceUrl + "/sfc/servlet.shepherd/document/download/" + id;
           const link = document.createElement("a");
           link.href = downloadUrl;
           link.setAttribute("download", fileName);

@@ -1,11 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { IconSettings } from '@salesforce/design-system-react';
-// import {
-//   LightningContextProvider,
-//   UserContextProvider,
-//   DataContextProvider
-// } from './components/Context';
 import App from './App';
 import { DESIGN_ATTRIBUTES } from './constants';
 
@@ -66,13 +61,17 @@ export function init(component, sessionId, eventService) {
       wrap('updateItems', { sobjectType, changes: changes.map(c => JSON.stringify(c)) }),
     deleteItems: (sobjectType, ids) => wrap('deleteItems', { ids }),
     getUser: () => wrap('fetchUser', null),
+    getInstanceUrl: () => wrap('getInstanceUrl'),
+    downloadFile: (id) => wrap('downloadFile', { id }),
     fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId}),
-    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData })
+    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData }),
+    toggleSyncFlag: (file) => wrap('toggleSyncFlag', { file })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(
     (settings, { name }) => {
       settings[name] = component.get(`v.${name}`);
+      console.log("settings: ", settings);
       return settings;
     },
     { componentId: component.getGlobalId() }

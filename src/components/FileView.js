@@ -91,10 +91,20 @@ class FileView extends Component {
       const win = window.open(newUrl, '_blank');
     }
 
-    downloadFile = (e) => {
-      console.log("e", e);
+    downloadFile = (id) => {
       const { api } = this.context;
-      return api.downloadFile(e);
+      return api.downloadFile(id)
+      .then(
+        response => {
+          console.log("response: ", response);
+          const link = document.createElement("a");
+          link.href = response;
+          console.log("downloadUrl: ", response);
+          link.setAttribute("download", id);
+          link.click();
+        }
+      )
+
     }
 
     fetchData = () => {
@@ -182,8 +192,11 @@ class FileView extends Component {
                       <DataTableColumn label="Title" property="title" />
                       <DataTableColumn label="Created By" property="createdBy" />
                       <DataTableColumn label="Last Modified Date" property="lastModifiedDate" />
+                      { console.log("instanceUrl: ", this.context) }
                       <DataTableRowActions
                       onAction={this.handleSelectionAction}
+                      fileName={this.Title}
+                      instanceUrl={this.context.settings.instanceUrl}
                       dropdown={<Dropdown iconCategory="utility"
                         iconName="down"
                         options={[

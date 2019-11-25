@@ -10,13 +10,9 @@ console.log("data service: ", dataService);
     return events.handleSelectedRows(rowIds);
   };
 
-  const onOpenRtf = (mode, rowId, apiName, label, callback) => {
-    return events.handleOpenRtf(mode, rowId, apiName, label, callback);
-  };
-
   return (
     <LightningContext.Provider
-      value={{ dataService, settings, events, refresh, handleLightningSelect, onOpenRtf }}>
+      value={{ dataService, settings, events, refresh, handleLightningSelect }}>
       {children}
     </LightningContext.Provider>
   );

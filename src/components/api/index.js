@@ -12,6 +12,7 @@ export function createApi(dataService) {
     describeGlobal: dataService.describeGlobal,
     describePicklist: dataService.describePicklist,
     deleteItems: dataService.deleteItems,
+    downloadFile: dataService.downloadFile,
     fetchDescription: dataService.fetchDescription,
     fetchFiles: dataService.fetchFiles,
     query: dataService.query,
@@ -57,8 +58,8 @@ export function createApi(dataService) {
     },
     insertItems: dataService.insertItems,
     uploadFile: dataService.uploadFile,
-    downloadFile: dataService.downloadFile,
-    toggleSyncFlag: dataService.toggleSyncFlag
+    toggleSyncFlag: dataService.toggleSyncFlag,
+    getInstanceUrl: dataService.getInstanceUrl
   };
 }
 
