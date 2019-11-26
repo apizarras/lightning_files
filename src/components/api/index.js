@@ -59,7 +59,7 @@ export function createApi(dataService) {
     },
     insertItems: dataService.insertItems,
     uploadFile: dataService.uploadFile,
-    toggleSyncFlag: dataService.toggleSyncFlag
+    updateItems: dataService.updateItems
     };
 }
 

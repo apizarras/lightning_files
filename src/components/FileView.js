@@ -4,7 +4,7 @@ import './FileView.scss';
 import AddFileDialog from './AddFileDialog';
 import queryString from 'query-string';
 import moment from 'moment';
-// import CustomDataTableCell from './CustomDataTableCell';
+import CustomDataTableCell from './CustomDataTableCell';
 import { ComponentContext } from './Context/context';
 
 
@@ -151,19 +151,22 @@ class FileView extends Component {
           })
       };
 
-      handleCheckboxChange = (Id, checkboxValue, [items], file, index) => {
-        console.log("this.context: ", this.context);
+      handleCheckboxChange = (Id, checkboxValue, [items], file) => {
         const { api } = this.context;
-        this.setState({updatingIndex: index});
-        console.log("index: ", index);
+        console.log("api: ", this.context);
         const files = this.state.files;
-        console.log("file", file);
-         console.log("this.state", this.state);
-        return api.toggleSyncFlag(file)
-          .then(result => {
-            this.fetchData();
-            this.setState({files: [...files], updatingIndex: null});
-          })
+        const fileId = file.LatestPublishedVersionId;
+        const sobjectType = 'ContentVersion';
+        const columnName = 'FX5__Sync__c';
+        console.log("Id, checkboxValue, [items], file", Id, checkboxValue, [items], file);
+        const changes = [{Id: fileId, [columnName]: !file.sync}];
+        console.log("changes: ", changes);
+        return api.updateItems(sobjectType, changes)
+        .then(result => {
+          console.log("result", result);
+          this.fetchData();
+          this.setState({files: [...files], updatingIndex: null});
+        })
       }
 
     render() {
@@ -187,7 +190,7 @@ class FileView extends Component {
                   <div className="data-table">
                     <DataTable fixedHeader fixedLayout items={this.state.files}>
                       <DataTableColumn label="Sync" property="sync" width="20%">
-                        {/* <CustomDataTableCell handleCheckboxChange={this.handleCheckboxChange}/> */}
+                        <CustomDataTableCell handleCheckboxChange={this.handleCheckboxChange}/>
                       </DataTableColumn>
                       <DataTableColumn label="Title" property="title" />
                       <DataTableColumn label="Created By" property="createdBy" />

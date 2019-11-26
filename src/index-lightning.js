@@ -64,8 +64,7 @@ export function init(component, sessionId, eventService) {
     downloadFile: (id) => wrap('downloadFile', { id }),
     previewFile: (id) => wrap('previewFile', { id }),
     fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId}),
-    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData }),
-    toggleSyncFlag: (file) => wrap('toggleSyncFlag', { file })
+    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(
