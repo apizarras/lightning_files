@@ -1,11 +1,9 @@
 .component-container {
-  background: #061c3e;
-  border: 1px solid rgb(221, 219, 218);
-  border-radius: 5px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
   margin: 5px;
 }
 
 .data-table {
   height: 18vw;
+  overflow: auto;
 }

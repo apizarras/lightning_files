@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Icon, IconSettings, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
 import './FileView.scss';
 import AddFileDialog from './AddFileDialog';
-import queryString from 'query-string';
 import moment from 'moment';
 import CustomDataTableCell from './CustomDataTableCell';
 import { ComponentContext } from './Context/context';
@@ -45,7 +44,6 @@ class FileView extends Component {
     }
 
     handleSelectionAction = (e, value) => {
-      console.log("this.state: ", this.state);
       const newValue = value.label;
       switch (newValue) {
         case "Delete":
@@ -57,6 +55,7 @@ class FileView extends Component {
         case "Download":
           this.downloadFile(e.id);
           break;
+        default:
       }
     }
 
@@ -69,7 +68,6 @@ class FileView extends Component {
     handleFileDelete = (fileToDelete) => {
       const ids = this.state.fileToDelete;
       const { api } = this.context;
-      console.log("ids: ", ids);
       return api
       .deleteItems('ContentDocument', ids)
       .then(response => {
@@ -85,7 +83,6 @@ class FileView extends Component {
 
     previewFile = (id) => {
       const { api } = this.context;
-      console.log("context: ", this.context);
       return api.previewFile(id)
       .then(response => {
         const win = window.open(response, '_blank');
@@ -97,10 +94,8 @@ class FileView extends Component {
       return api.downloadFile(id)
       .then(
         response => {
-          console.log("response: ", response);
           const link = document.createElement("a");
           link.href = response;
-          console.log("downloadUrl: ", response);
           link.setAttribute("download", id);
           link.click();
         }
@@ -114,8 +109,6 @@ class FileView extends Component {
           sobject: this.context.settings.sobject
         };
         const { api } = this.context;
-        console.log("contextTypen: ", this.context);
-        console.log("this.data: ", this.data);
         const parentId = this.data.sObjectId;
         const sObjectId = parentId;
         const sobject = 'ContentDocument';
@@ -123,11 +116,9 @@ class FileView extends Component {
         this.setState({
           isBusy: true
         });
-        console.log(sObjectId);
         api
           .fetchFiles(sObjectId)
           .then(files => {
-            console.log("files response from fetchFiles: ", files);
             const fileDetails = files.map(detail => {
               return {
                 id: detail.ContentDocument.Id,
@@ -140,7 +131,6 @@ class FileView extends Component {
               }
             });
             this.setState({ files: fileDetails, isBusy: false });
-            console.log("this.state.files: ", this.state.files);
             this.countFiles(files);
             })
           .catch(function(err) {
@@ -153,25 +143,21 @@ class FileView extends Component {
 
       handleCheckboxChange = (Id, checkboxValue, [items], file) => {
         const { api } = this.context;
-        console.log("api: ", this.context);
         const files = this.state.files;
         const fileId = file.LatestPublishedVersionId;
         const sobjectType = 'ContentVersion';
         const columnName = 'FX5__Sync__c';
-        console.log("Id, checkboxValue, [items], file", Id, checkboxValue, [items], file);
         const changes = [{Id: fileId, [columnName]: !file.sync}];
-        console.log("changes: ", changes);
         return api.updateItems(sobjectType, changes)
         .then(result => {
-          console.log("result", result);
           this.fetchData();
           this.setState({files: [...files], updatingIndex: null});
         })
       }
 
+
     render() {
         return (
-        <IconSettings iconPath="../../_slds/icons">
             <div className="slds-grid slds-grid_vertical component-container">
               <Card
                   heading={this.state.fileCount > 1 && <strong>Files {(`(${this.state.fileCount})`)}</strong> || this.state.fileCount === 1 && <strong>File {(`(${this.state.fileCount})`)}</strong> }
@@ -188,14 +174,13 @@ class FileView extends Component {
                           />
                   </Modal>
                   <div className="data-table">
-                    <DataTable fixedHeader fixedLayout items={this.state.files}>
+                    <DataTable items={this.state.files} fixedHeader fixedLayout>
                       <DataTableColumn label="Sync" property="sync" width="20%">
                         <CustomDataTableCell handleCheckboxChange={this.handleCheckboxChange}/>
                       </DataTableColumn>
                       <DataTableColumn label="Title" property="title" />
                       <DataTableColumn label="Created By" property="createdBy" />
                       <DataTableColumn label="Last Modified Date" property="lastModifiedDate" />
-                      { console.log("instanceUrl: ", this.context) }
                       <DataTableRowActions
                       onAction={this.handleSelectionAction}
                       fileName={this.Title}
@@ -218,7 +203,6 @@ class FileView extends Component {
                   </Modal>
               </Card>
             </div>
-        </IconSettings>
         )
     }
 }

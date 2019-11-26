@@ -1,5 +1,5 @@
 import React from 'react';
-import { DataTableCell, Checkbox, SetupAssistantStep } from '@salesforce/design-system-react';
+import { DataTableCell, Checkbox } from '@salesforce/design-system-react';
 
 
 const CustomDataTableCell = ({ children, ...props }) => {
