@@ -87,6 +87,9 @@ class FileView extends Component {
       .then(response => {
         const win = window.open(response, '_blank');
       })
+      .catch(error => {
+        console.log(error);
+      })
     };
 
     downloadFile = (id) => {
@@ -100,6 +103,9 @@ class FileView extends Component {
           link.click();
         }
       )
+      .catch(error => {
+        console.log(error);
+      })
     }
 
     fetchData = () => {
@@ -152,6 +158,9 @@ class FileView extends Component {
         .then(result => {
           this.fetchData();
           this.setState({files: [...files], updatingIndex: null});
+        })
+        .catch(error => {
+          console.log(error);
         })
       }
 
