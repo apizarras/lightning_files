@@ -77,9 +77,9 @@ class FileView extends Component {
       })
       .then(this.fetchData)
       .catch(error => {
-        console.error(error);
+        console.log(error);
       })
-    }
+    };
 
     previewFile = (id) => {
       const { api } = this.context;
@@ -106,7 +106,7 @@ class FileView extends Component {
       .catch(error => {
         console.log(error);
       })
-    }
+    };
 
     fetchData = () => {
         this.data =
@@ -162,7 +162,7 @@ class FileView extends Component {
         .catch(error => {
           console.log(error);
         })
-      }
+      };
 
 
     render() {
@@ -173,15 +173,14 @@ class FileView extends Component {
                   icon={<Icon category="standard" name="document" size="medium" />}
                   headerActions={<button type="button" className="slds-button slds-button_neutral" onClick={this.toggleOpen}>Upload File</button>}
               >
-                  <Modal heading="Upload File" isOpen={this.state.isOpen} ariaHideApp={false} disableClose>
                       <AddFileDialog
                           onSave={this.fetchData}
+                          isOpen={this.state.isOpen}
                           parentId={this.state.sObjectId}
                           handleClose={this.toggleClose}
                           files={this.state.files}
                           dataService={this.context}
                           />
-                  </Modal>
                   <div className="data-table">
                     <DataTable items={this.state.files} fixedHeader fixedLayout>
                       <DataTableColumn label="Sync" property="sync" width="20%">

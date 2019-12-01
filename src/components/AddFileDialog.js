@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgressBar } from '@salesforce/design-system-react';
+import { ProgressBar, Modal } from '@salesforce/design-system-react';
 import './AddFileDialog.scss';
 import { ComponentContext, useComponentContext } from './Context/context';
 
@@ -70,7 +70,9 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
       }
 
     return (
-    <div className="showHideModal" isopen={isOpen}>
+    <Modal heading="Upload File" isOpen={isOpen} ariaHideApp={false} disableClose>
+
+    <div className="showHideModal">
         <section>
           <div className="slds-modal__content slds-m-around_medium">
             <label className="custom-file-upload slds-button slds-float_left slds-m-right_medium">
@@ -86,6 +88,8 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
             </footer>
         </section>
     </div>
+    </Modal>
+
     )
 }
 
