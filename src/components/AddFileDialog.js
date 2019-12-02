@@ -32,16 +32,16 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
 
     function uploadFile() {
         const fxFileInput = document.getElementById('fxFileInput');
-        var file = fxFileInput.files[0];
+        const file = fxFileInput.files[0];
         if (!file) return Promise.resolve();
 
         setShowPercentCompleted(true);
-        var reader = new FileReader();
+        const reader = new FileReader();
         return new Promise(function(resolve, reject){
           reader.onload = function( e ) {
-            var fileData = btoa( e.target.result );
+            const fileData = btoa( e.target.result );
             const Title = file.name;
-            var contentVersionData = {
+            const contentVersionData = {
                 "FirstPublishLocationId": parentId,
                 "Title": file.name,
                 "PathOnClient": file.name,

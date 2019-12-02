@@ -117,8 +117,6 @@ class FileView extends Component {
         const { api } = this.context;
         const parentId = this.data.sObjectId;
         const sObjectId = parentId;
-        const sobject = 'ContentDocument';
-        const descriptions = {};
         this.setState({
           isBusy: true
         });
@@ -183,7 +181,7 @@ class FileView extends Component {
                           />
                   <div className="data-table">
                     <DataTable items={this.state.files} fixedHeader fixedLayout className="slds-p-left_small slds-p-right_small">
-                      <DataTableColumn label="Sync" property="sync" width="5rem">
+                      <DataTableColumn label="Sync" property="sync" width="4rem">
                         <CustomDataTableCell handleCheckboxChange={this.handleCheckboxChange}/>
                       </DataTableColumn>
                       <DataTableColumn label="Title" property="title" />
