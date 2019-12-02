@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProgressBar, Modal } from '@salesforce/design-system-react';
 import './AddFileDialog.scss';
-import { ComponentContext, useComponentContext } from './Context/context';
+import { useComponentContext } from './Context/context';
 
 
 const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...props  }) => {
@@ -31,9 +31,6 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
       };
 
     function uploadFile() {
-      console.log("file: ", file);
-      console.log("parentId", parentId);
-      console.log("api: ", api);
         const fxFileInput = document.getElementById('fxFileInput');
         var file = fxFileInput.files[0];
         if (!file) return Promise.resolve();
@@ -50,7 +47,6 @@ const AddFileDialog = ({handleClose, children, isOpen, onSave, sObjectId, ...pro
                 "PathOnClient": file.name,
                 "VersionData": fileData
               };
-              console.log("fileData, contentVersionData: ", fileData, contentVersionData);
             const onUploadProgress = function(progressEvent) {
               setPercentCompleted( Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
               console.log(`%c>>>> percentCompleted `, `background-color: yellow;` , percentCompleted, progressEvent );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, IconSettings, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
+import { Icon, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
 import './FileView.scss';
 import AddFileDialog from './AddFileDialog';
 import moment from 'moment';
@@ -65,7 +65,7 @@ class FileView extends Component {
       this.setState({fileToDelete: selection, showDeletePrompt: true});
     }
 
-    handleFileDelete = (fileToDelete) => {
+    handleFileDelete = () => {
       const ids = this.state.fileToDelete;
       const { api } = this.context;
       return api
@@ -182,8 +182,8 @@ class FileView extends Component {
                           dataService={this.context}
                           />
                   <div className="data-table">
-                    <DataTable items={this.state.files} fixedHeader fixedLayout>
-                      <DataTableColumn label="Sync" property="sync" width="20%">
+                    <DataTable items={this.state.files} fixedHeader fixedLayout className="slds-p-left_small slds-p-right_small">
+                      <DataTableColumn label="Sync" property="sync" width="5rem">
                         <CustomDataTableCell handleCheckboxChange={this.handleCheckboxChange}/>
                       </DataTableColumn>
                       <DataTableColumn label="Title" property="title" />
