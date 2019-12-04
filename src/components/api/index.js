@@ -10,7 +10,6 @@ export function createApi(dataService) {
       );
     },
     describeGlobal: dataService.describeGlobal,
-    describePicklist: dataService.describePicklist,
     deleteItems: dataService.deleteItems,
     downloadFile: dataService.downloadFile,
     previewFile: dataService.previewFile,
@@ -18,45 +17,6 @@ export function createApi(dataService) {
     fetchFiles: dataService.fetchFiles,
     query: dataService.query,
     queryCount: dataService.queryCount,
-    searchLayout: sobject => dataService.restApi(`search/layout/?q=${sobject}`).then(r => r[0]),
-    describeLookupFilter: async (description, fieldName) => {
-      try {
-        const field = description.fields[fieldName];
-        if (!field) return;
-
-        const [sourceEntityId, targetEntityId] = await Promise.all([
-          toolingQuery(
-            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${description.name}'`
-          ).then(res => res.records[0] && res.records[0].DurableId),
-          toolingQuery(
-            `SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName='${
-              field.referenceTo[0]
-            }'`
-          ).then(res => res.records[0] && res.records[0].DurableId)
-        ]);
-        if (!sourceEntityId || !targetEntityId) return;
-
-        const sourceFieldId = await toolingQuery(
-          `SELECT DurableId FROM FieldDefinition WHERE EntityDefinitionId='${sourceEntityId}' AND QualifiedApiName='${field.name}'`
-        ).then(res => res.records[0] && res.records[0].DurableId);
-        if (!sourceFieldId) return;
-
-        const developerName =
-          'nf_' +
-          sourceFieldId
-            .split('.')
-            .map(sf15to18)
-            .join('_');
-
-        const filter = await toolingQuery(
-          `SELECT Metadata FROM LookupFilter WHERE Active=TRUE AND DeveloperName='${developerName}'`
-        ).then(res => res.records && res.records[0]);
-
-        return filter && filter.Metadata;
-      } catch (e) {
-        console.error(e);
-      }
-    },
     insertItems: dataService.insertItems,
     uploadFile: dataService.uploadFile,
     updateItems: dataService.updateItems

@@ -45,11 +45,7 @@ export function init(component, sessionId, eventService) {
 
   const dataService = {
     describe: sobjectType => wrap('describe', { sobjectType }, true),
-    describeChildRelationships: sobjectType =>
-      wrap('describeChildRelationships', { sobjectType }, true),
     describeFields: sobjectType => wrap('describeFields', { sobjectType }, true),
-    describePicklist: (sobjectType, fieldName) =>
-      wrap('describePicklist', { sobjectType, fieldName }, true),
     describeGlobal: sobjects => wrap('describeGlobal', { sobjects }),
     fetchDescription: (sobject, descriptions) => wrap('fetchDescription', {sobject, descriptions}),
     query: soql => wrap('query', { soql }),

@@ -5,7 +5,5 @@ export {
   LightningContext,
   UserContext,
   LightningContextProvider,
-  UserContextProvider,
-  DataContextProvider,
-  DataContext
+  UserContextProvider
 };
