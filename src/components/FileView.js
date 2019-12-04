@@ -128,7 +128,6 @@ class FileView extends Component {
     api
       .fetchFiles(linkedEntityId)
       .then(files => {
-        console.log(files);
         const fileDetails = files.map(detail => {
           return {
             id: detail.ContentDocument.Id,

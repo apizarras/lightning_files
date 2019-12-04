@@ -21,7 +21,6 @@ export default function LightningComponent(props) {
 const App = () => {
   const { api, settings } = useComponentContext();
   const [description, setDescription] = useState();
-  console.log('connection/api: ', api);
 
   useEffect(() => {
     async function fetch() {
