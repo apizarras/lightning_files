@@ -24,17 +24,17 @@ export const DESIGN_ATTRIBUTES = [
 export const MESSAGE_TYPES = ['I did something good', 'I did something bad'];
 
 export const CONTENTDOCUMENTLINK_FIELDS = [
-  "LinkedEntityId",
-  "LinkedEntity.Type",
-  "ContentDocument.Id",
-  "ContentDocument.CreatedBy.Name",
-  "ContentDocument.LatestPublishedVersion.Id",
-  "ContentDocument.LatestPublishedVersion.Title",
-  "ContentDocument.LatestPublishedVersion.PathOnClient",
-  "ContentDocument.LatestPublishedVersion.ContentSize",
-  "ContentDocument.LatestPublishedVersion.CreatedBy.Name",
-  "ContentDocument.LatestPublishedVersion.CreatedDate",
-  "ContentDocument.LatestPublishedVersion.LastModifiedDate",
-  "ContentDocument.LatestPublishedVersion.LastModifiedBy.Name",
-  "ContentDocument.LatestPublishedVersion.FX5__Sync__c",
-]
+  'LinkedEntityId',
+  'LinkedEntity.Type',
+  'ContentDocument.Id',
+  'ContentDocument.CreatedBy.Name',
+  'ContentDocument.LatestPublishedVersion.Id',
+  'ContentDocument.LatestPublishedVersion.Title',
+  'ContentDocument.LatestPublishedVersion.PathOnClient',
+  'ContentDocument.LatestPublishedVersion.ContentSize',
+  'ContentDocument.LatestPublishedVersion.CreatedBy.Name',
+  'ContentDocument.LatestPublishedVersion.CreatedDate',
+  'ContentDocument.LatestPublishedVersion.LastModifiedDate',
+  'ContentDocument.LatestPublishedVersion.LastModifiedBy.Name',
+  'ContentDocument.LatestPublishedVersion.FX5__Sync__c'
+];

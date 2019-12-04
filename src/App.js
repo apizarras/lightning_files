@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ComponentContextProvider, useComponentContext } from './components/Context/context'
+import { ComponentContextProvider, useComponentContext } from './components/Context/context';
 import FileView from './components/FileView';
 import { IconSettings } from '@salesforce/design-system-react';
-
 
 export default function LightningComponent(props) {
   const { settings, dataService, eventService } = props;
@@ -22,7 +21,7 @@ export default function LightningComponent(props) {
 const App = () => {
   const { api, settings } = useComponentContext();
   const [description, setDescription] = useState();
-  console.log("connection/api: ", api);
+  console.log('connection/api: ', api);
 
   useEffect(() => {
     async function fetch() {
@@ -39,7 +38,5 @@ const App = () => {
 
   if (!description) return null;
 
-  return (
-    <FileView description={description}/>
-  );
+  return <FileView description={description} />;
 };

@@ -8,7 +8,7 @@ import {
   Checkbox,
   RadioGroup,
   Radio,
-  Button,
+  Button
 } from '@salesforce/design-system-react';
 
 function applyChanges(state, action) {

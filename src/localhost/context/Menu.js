@@ -4,7 +4,7 @@ import {
   GlobalHeader,
   GlobalHeaderProfile,
   Popover,
-  Button,
+  Button
 } from '@salesforce/design-system-react';
 
 const Menu = props => {

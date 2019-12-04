@@ -4,109 +4,110 @@ import axios from 'axios';
 const dataService = connection => {
   let acls = {};
   const descriptions = {};
-  const hasPermission = (permission) => {
-    return acls[permission]
+  const hasPermission = permission => {
+    return acls[permission];
   };
 
-return {
-  describe: sobject => connection.describe(sobject),
-  describeFields: sobject =>
-    connection.describe(sobject).then(description =>
-      description.fields.reduce((fields, field) => {
-        fields[field.name] = field;
-        return fields;
-      }, {})
-    ),
-  describeChildRelationships: sobject =>
-    connection.describe(sobject).then(description => description.childRelationships),
-  describePicklist: (sobject, fieldName) =>
-    connection.describe(sobject).then(description => {
-      return description.fields.find(f => f.name === fieldName).picklistValues;
-    }),
-  query: soql => connection.query(soql).then(r => r.records),
-  queryCount: soql => connection.query(soql).then(r => r.totalSize),
-  getUser: () => {
-    const r = connection.identity;
-    return Promise.resolve({
-      ...r,
-      id: r.user_id,
-      orgId: r.organization_id,
-      userType: r.user_type,
-      isMultiCurrency: true,
-      defaultCurrency: 'USD'
-    });
-  },
-  updateItems: (connection, sobjectType, changes) => {
-    console.log("connection", connection);
-    return connection
-      .sobject(sobjectType)
-      .update(changes, { allOrNone: false })
-      .then(results => {
-        return {
-          updatedRecords: results.map(r => r.id),
-          errors: results
-            .filter(r => !r.success)
-            .map(r => {
-              return { id: r.id, message: r.errors.map(e => e.message).join(' ') };
-            })
-        };
+  return {
+    describe: sobject => connection.describe(sobject),
+    describeFields: sobject =>
+      connection.describe(sobject).then(description =>
+        description.fields.reduce((fields, field) => {
+          fields[field.name] = field;
+          return fields;
+        }, {})
+      ),
+    describeChildRelationships: sobject =>
+      connection.describe(sobject).then(description => description.childRelationships),
+    describePicklist: (sobject, fieldName) =>
+      connection.describe(sobject).then(description => {
+        return description.fields.find(f => f.name === fieldName).picklistValues;
+      }),
+    query: soql => connection.query(soql).then(r => r.records),
+    queryCount: soql => connection.query(soql).then(r => r.totalSize),
+    getUser: () => {
+      const r = connection.identity;
+      return Promise.resolve({
+        ...r,
+        id: r.user_id,
+        orgId: r.organization_id,
+        userType: r.user_type,
+        isMultiCurrency: true,
+        defaultCurrency: 'USD'
       });
-  },
-  deleteItems: (ids) => {
-    console.log("ids", ids);
-    return connection
-      .sobject("ContentDocument")
-      .destroy(ids)
-      .then(results => {
-        const values = ids.map((id, index) => {
+    },
+    updateItems: (connection, sobjectType, changes) => {
+      console.log('connection', connection);
+      return connection
+        .sobject(sobjectType)
+        .update(changes, { allOrNone: false })
+        .then(results => {
           return {
-            id,
-            success: results[index].success,
-            message: results[index].errors.map(e => e.message).join(' ')
+            updatedRecords: results.map(r => r.id),
+            errors: results
+              .filter(r => !r.success)
+              .map(r => {
+                return { id: r.id, message: r.errors.map(e => e.message).join(' ') };
+              })
           };
         });
-        return {
-          deletedRecords: values.filter(r => r.success).map(r => r.id),
-          errors: values.filter(r => !r.success)
-        };
-      })
-      .catch(error => {
-        console.log("error: ", error)
-      })
-  },
-  fetchFiles: (sobjectId, embedded) => {
-    let sortOpts = ['ContentDocument.LatestPublishedVersion.SystemModStamp DESC', 'SystemModStamp DESC'];
-    console.log("contentDocument fields", CONTENTDOCUMENTLINK_FIELDS);
-    console.log("connection: ", connection);
-    console.log("sObjectId: ", sobjectId);
-    if (embedded) {
-      // sort by FX5__Sync__c first, so synced files show first in compact view
-      sortOpts.splice(0,0,'ContentDocument.LatestPublishedVersion.FX5__Sync__c DESC');
-    }
-    return connection
-      .sobject('ContentDocumentLink')
-      .select(CONTENTDOCUMENTLINK_FIELDS.join(', '))
-      .where(`LinkedEntityId = '${sobjectId}'`)
-      .sort(sortOpts.join(','))
-      .execute()
-      .then(result => {
-        console.log("result: ", result);
-        return result;
+    },
+    deleteItems: ids => {
+      console.log('ids', ids);
+      return connection
+        .sobject('ContentDocument')
+        .destroy(ids)
+        .then(results => {
+          const values = ids.map((id, index) => {
+            return {
+              id,
+              success: results[index].success,
+              message: results[index].errors.map(e => e.message).join(' ')
+            };
+          });
+          return {
+            deletedRecords: values.filter(r => r.success).map(r => r.id),
+            errors: values.filter(r => !r.success)
+          };
+        })
+        .catch(error => {
+          console.log('error: ', error);
+        });
+    },
+    fetchFiles: (sobjectId, embedded) => {
+      let sortOpts = [
+        'ContentDocument.LatestPublishedVersion.SystemModStamp DESC',
+        'SystemModStamp DESC'
+      ];
+      console.log('contentDocument fields', CONTENTDOCUMENTLINK_FIELDS);
+      console.log('connection: ', connection);
+      console.log('sObjectId: ', sobjectId);
+      if (embedded) {
+        // sort by FX5__Sync__c first, so synced files show first in compact view
+        sortOpts.splice(0, 0, 'ContentDocument.LatestPublishedVersion.FX5__Sync__c DESC');
+      }
+      return connection
+        .sobject('ContentDocumentLink')
+        .select(CONTENTDOCUMENTLINK_FIELDS.join(', '))
+        .where(`LinkedEntityId = '${sobjectId}'`)
+        .sort(sortOpts.join(','))
+        .execute()
+        .then(result => {
+          console.log('result: ', result);
+          return result;
+        });
+    },
+    describeGlobal: () => {
+      return connection.describeGlobal().then(({ sobjects }) => {
+        sobjects.reduce((descriptions, sobject) => {
+          descriptions[sobject.keyPrefix] = sobject;
+          return descriptions;
+        }, {});
+        return sobjects;
       });
-  },
-  describeGlobal: () => {
-    return connection
-    .describeGlobal()
-    .then(({ sobjects }) => {
-      sobjects.reduce((descriptions, sobject) => {
-        descriptions[sobject.keyPrefix] = sobject;
-        return descriptions;
-      }, {});
-      return sobjects;
-    });
-  },
-  fetchDescription: (sobject, descriptions) => {
-    console.log("sobject", sobject);
+    },
+    fetchDescription: (sobject, descriptions) => {
+      console.log('sobject', sobject);
       if (descriptions[sobject]) return Promise.resolve(descriptions[sobject]);
       descriptions[sobject] = null;
 
@@ -120,10 +121,13 @@ return {
           }, {});
 
           var objKey = sobject.toLowerCase();
-          var aliasKey = objKey.replace(/__c$/,'').replace(/^\w*__/,'').replace(/_/g,'');
+          var aliasKey = objKey
+            .replace(/__c$/, '')
+            .replace(/^\w*__/, '')
+            .replace(/_/g, '');
 
           var obj = result;
-          if(objKey !== aliasKey){
+          if (objKey !== aliasKey) {
             acls[aliasKey + '_read'] = !!obj;
             acls[aliasKey + '_create'] = (obj && obj.createable) || false;
             acls[aliasKey + '_update'] = (obj && obj.updateable) || false;
@@ -138,12 +142,16 @@ return {
           return (descriptions[sobject] = result);
         })
         .catch(error => {
-          console.log(`%c>>>>  Error fetching description: `, `background-color: red; color:yellow;`, sobject, error);
+          console.log(
+            `%c>>>>  Error fetching description: `,
+            `background-color: red; color:yellow;`,
+            sobject,
+            error
+          );
           return null;
         });
-
     },
-  getObjectInfo: (connection, sobject, id) => {
+    getObjectInfo: (connection, sobject, id) => {
       return connection
         .sobject(sobject)
         .select('Name, FX5__Tracking_Number__c')
@@ -154,77 +162,93 @@ return {
           return rec.FX5__Tracking_Number__c;
         });
     },
-  uploadFile: (parentId, contentVersionData, onUploadProgress) => {
-      if(!contentVersionData) return Promise.reject();
+    uploadFile: (parentId, contentVersionData, onUploadProgress) => {
+      if (!contentVersionData) return Promise.reject();
 
       var requestConfig = {
-            headers: {
-              ContentType: 'application/json',
-              Accept: 'application/json',
-              'Authorization': `Bearer ${connection.accessToken}`
-            },
-            onUploadProgress: onUploadProgress || function noOp() {}
-          };
-      const apiVersion = "v42.0";
-      const appVersion = "DEV";
+        headers: {
+          ContentType: 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${connection.accessToken}`
+        },
+        onUploadProgress: onUploadProgress || function noOp() {}
+      };
+      const apiVersion = 'v42.0';
+      const appVersion = 'DEV';
       return new Promise(function(resolve, reject) {
-
-        return axios.post(`${appVersion === 'DEV' ? connection.instanceUrl : ''}/services/data/${apiVersion}/sobjects/ContentVersion/`, contentVersionData, requestConfig)
-          .then(function(){
-            console.log(`>>>> File uploaded successfully : `, contentVersionData.Title, contentVersionData);
-            console.log("resolve? ", resolve);
+        return axios
+          .post(
+            `${
+              appVersion === 'DEV' ? connection.instanceUrl : ''
+            }/services/data/${apiVersion}/sobjects/ContentVersion/`,
+            contentVersionData,
+            requestConfig
+          )
+          .then(function() {
+            console.log(
+              `>>>> File uploaded successfully : `,
+              contentVersionData.Title,
+              contentVersionData
+            );
+            console.log('resolve? ', resolve);
           })
           .catch(function(err) {
             var error = (err.response && err.response.data && err.response.data[0]) || err;
             reject(error);
           })
-          .then(resolve,reject);
+          .then(resolve, reject);
       });
     },
-    downloadFile: (id) => {
+    downloadFile: id => {
       var requestConfig = {
         headers: {
           ContentType: 'blob',
           Accept: 'application/json',
-          'Authorization': `Bearer ${connection.accessToken}`
+          Authorization: `Bearer ${connection.accessToken}`
         }
       };
-      const apiVersion = "v42.0";
-      const appVersion = "DEV";
-      const responseType = "blob";
+      const apiVersion = 'v42.0';
+      const appVersion = 'DEV';
+      const responseType = 'blob';
 
       return new Promise(function(resolve, reject) {
-        console.log("instanceUrl: ", connection.instanceUrl);
-        return axios.get(`${appVersion === 'DEV' ? connection.instanceUrl : ''}/services/data/${apiVersion}/sobjects/ContentDocument/`+ id, requestConfig, responseType)
-        .then((response) => {
-          console.log("response: ", response);
-          const fileName = response.data.Title;
-          const downloadUrl = connection.instanceUrl + "/sfc/servlet.shepherd/document/download/" + id;
-          const link = document.createElement("a");
-          link.href = downloadUrl;
-          link.setAttribute("download", fileName);
-          link.click();
-        })
-        .then(resolve, reject);
-      })
+        console.log('instanceUrl: ', connection.instanceUrl);
+        return axios
+          .get(
+            `${
+              appVersion === 'DEV' ? connection.instanceUrl : ''
+            }/services/data/${apiVersion}/sobjects/ContentDocument/` + id,
+            requestConfig,
+            responseType
+          )
+          .then(response => {
+            console.log('response: ', response);
+            const fileName = response.data.Title;
+            const downloadUrl =
+              connection.instanceUrl + '/sfc/servlet.shepherd/document/download/' + id;
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.setAttribute('download', fileName);
+            link.click();
+          })
+          .then(resolve, reject);
+      });
     },
-    toggleSyncFlag: (file) => {
-      console.log("file, files, item", file)
+    toggleSyncFlag: file => {
+      console.log('file, files, item', file);
       return connection
         .sobject('ContentVersion')
-        .update({Id: file.LatestPublishedVersionId, FX5__Sync__c: !file.sync})
+        .update({ Id: file.LatestPublishedVersionId, FX5__Sync__c: !file.sync })
         .then(result => {
           if (!result.success) {
             console.error(result.errors);
             return result.errors;
           }
-          console.log("result: ", result);
+          console.log('result: ', result);
           return result.success;
         });
     }
-  }
-
-
+  };
 };
 
 let lightningEventsCallback;

@@ -20,7 +20,7 @@ export function getDefaultSettings() {
       settings[config.name] = config.defaultValue;
       return settings;
     },
-    { componentId: 'DEV' },
+    { componentId: 'DEV' }
   );
 }
 

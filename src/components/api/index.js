@@ -20,7 +20,7 @@ export function createApi(dataService) {
     insertItems: dataService.insertItems,
     uploadFile: dataService.uploadFile,
     updateItems: dataService.updateItems
-    };
+  };
 }
 
 // converts a salesforce 15 character id into an 18 character id

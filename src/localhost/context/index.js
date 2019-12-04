@@ -25,16 +25,16 @@ export const ConnectionProvider = ({ children }) => {
             top: 0,
             right: 0,
             bottom: 0,
-            left: 0,
+            left: 0
           }}>
-        <Menu />
+          <Menu />
           <div className="slds-brand-band slds-brand-band_medium">
             <section
               style={{
                 position: 'absolute',
                 top: 50,
                 width: '100%',
-                height: 'calc(100% - 50px)',
+                height: 'calc(100% - 50px)'
               }}>
               <div className="slds-template_default">
                 <div
@@ -42,12 +42,11 @@ export const ConnectionProvider = ({ children }) => {
                     display: 'flex',
                     flexFlow: 'row wrap',
                     minWidth: 1050,
-                    marginBottom: '3rem',
+                    marginBottom: '3rem'
                   }}>
                   <div style={{ width: '66.66%' }}>{children}</div>
                   <div style={{ width: '33.33%', paddingLeft: '.75rem' }}>
                     <DesignAttributesEditor />
-
                   </div>
                 </div>
               </div>

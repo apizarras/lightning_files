@@ -13,11 +13,11 @@ const CustomDataTableCell = ({ children, ...props }) => {
   const sendData = () => {
     props.handleCheckboxChange(Id, checkboxValue, [items], file);
   };
-  return(
+  return (
     <DataTableCell title="title">
       <Checkbox checked={checkboxValue} id={Id} onChange={sendData} />
     </DataTableCell>
-  )
+  );
 };
 CustomDataTableCell.displayName = DataTableCell.displayName;
 

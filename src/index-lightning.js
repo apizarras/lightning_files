@@ -7,9 +7,7 @@ import { DESIGN_ATTRIBUTES } from './constants';
 export default function LightningComponent({ dataService, settings, events, connection }) {
   return (
     <IconSettings iconPath="/_slds/icons">
-
-            <App dataService={dataService} settings={settings} events={events} connection={connection}/>
-
+      <App dataService={dataService} settings={settings} events={events} connection={connection} />
     </IconSettings>
   );
 }
@@ -47,7 +45,8 @@ export function init(component, sessionId, eventService) {
     describe: sobjectType => wrap('describe', { sobjectType }, true),
     describeFields: sobjectType => wrap('describeFields', { sobjectType }, true),
     describeGlobal: sobjects => wrap('describeGlobal', { sobjects }),
-    fetchDescription: (sobject, descriptions) => wrap('fetchDescription', {sobject, descriptions}),
+    fetchDescription: (sobject, descriptions) =>
+      wrap('fetchDescription', { sobject, descriptions }),
     query: soql => wrap('query', { soql }),
     queryCount: soql => wrap('countQuery', { soql }),
     apexRest: (method, payload) => wrap('restEndpoint', { method, payload }),
@@ -57,16 +56,16 @@ export function init(component, sessionId, eventService) {
       wrap('updateItems', { sobjectType, changes: changes.map(c => JSON.stringify(c)) }),
     deleteItems: (sobjectType, ids) => wrap('deleteItems', { ids }),
     getUser: () => wrap('fetchUser', null),
-    downloadFile: (id) => wrap('downloadFile', { id }),
-    previewFile: (id) => wrap('previewFile', { id }),
-    fetchFiles: (linkedEntityId) => wrap('fetchFiles', {linkedEntityId}),
-    uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData })
+    downloadFile: id => wrap('downloadFile', { id }),
+    previewFile: id => wrap('previewFile', { id }),
+    fetchFiles: linkedEntityId => wrap('fetchFiles', { linkedEntityId }),
+    uploadFile: (parentId, Title, fileData) => wrap('uploadFile', { parentId, Title, fileData })
   };
 
   const settings = DESIGN_ATTRIBUTES.reduce(
     (settings, { name }) => {
       settings[name] = component.get(`v.${name}`);
-      console.log("settings: ", settings);
+      console.log('settings: ', settings);
       return settings;
     },
     { componentId: component.getGlobalId() }
