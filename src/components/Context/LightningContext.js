@@ -5,7 +5,6 @@ export const LightningContext = createContext();
 export const LightningContextProvider = ({ children, dataService, settings, events }) => {
   const [forceRefresh, setForceRefresh] = useState(null);
   const refresh = { setForceRefresh, forceRefresh };
-console.log("data service: ", dataService);
   const handleLightningSelect = rowIds => {
     return events.handleSelectedRows(rowIds);
   };

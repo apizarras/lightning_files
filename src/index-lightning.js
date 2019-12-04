@@ -63,7 +63,7 @@ export function init(component, sessionId, eventService) {
     getUser: () => wrap('fetchUser', null),
     downloadFile: (id) => wrap('downloadFile', { id }),
     previewFile: (id) => wrap('previewFile', { id }),
-    fetchFiles: (sobjectId) => wrap('fetchFiles', {sobjectId}),
+    fetchFiles: (linkedEntityId) => wrap('fetchFiles', {linkedEntityId}),
     uploadFile: (parentId, Title, fileData ) => wrap('uploadFile', { parentId, Title, fileData })
   };
 

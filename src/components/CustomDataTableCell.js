@@ -1,7 +1,6 @@
 import React from 'react';
 import { DataTableCell, Checkbox } from '@salesforce/design-system-react';
 
-
 const CustomDataTableCell = ({ children, ...props }) => {
   const items = props.items;
   const file = {

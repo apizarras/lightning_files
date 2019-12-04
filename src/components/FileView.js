@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Icon, Button, Card, Modal, DataTable, DataTableColumn, DataTableRowActions, Dropdown }  from '@salesforce/design-system-react';
 import './FileView.scss';
 import AddFileDialog from './AddFileDialog';
-import moment from 'moment';
 import CustomDataTableCell from './CustomDataTableCell';
 import { ComponentContext } from './Context/context';
 
@@ -115,21 +114,21 @@ class FileView extends Component {
           sobject: this.context.settings.sobject
         };
         const { api } = this.context;
-        const parentId = this.data.sObjectId;
-        const sObjectId = parentId;
+        const linkedEntityId = this.data.sObjectId;
         this.setState({
           isBusy: true
         });
         api
-          .fetchFiles(sObjectId)
+          .fetchFiles(linkedEntityId)
           .then(files => {
+            console.log(files);
             const fileDetails = files.map(detail => {
               return {
                 id: detail.ContentDocument.Id,
                 LatestPublishedVersionId: detail.ContentDocument.LatestPublishedVersion.Id,
                 title: detail.ContentDocument.LatestPublishedVersion.Title,
                 createdBy: detail.ContentDocument.CreatedBy.Name,
-                lastModifiedDate: moment.utc(detail.ContentDocument.LatestPublishedVersion.LastModifiedDate).local().format('L LT'),
+                lastModifiedDate: detail.ContentDocument.LatestPublishedVersion.LastModifiedDate,
                 lastModifiedBy: detail.ContentDocument.LatestPublishedVersion.LastModifiedBy.Name,
                 sync: detail.ContentDocument.LatestPublishedVersion.FX5__Sync__c,
               }
