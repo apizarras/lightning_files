@@ -42,7 +42,7 @@
   "devDependencies": {
     "fs-extra": "8.1.0",
     "jsforce": "1.9.2",
-    "node-sass": "4.12.0",
+    "node-sass": "4.13.1",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.1",
     "react-app-rewired": "2.1.3"
